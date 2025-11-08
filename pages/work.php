@@ -11,8 +11,10 @@ requireAuth();
 $page_title = 'Рабочая';
 
 require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../includes/settings.php';
 
 $isAdmin = isAdmin();
+$maxPoolCapacityKg = (float)getSetting('max_pool_capacity_kg', 5000);
 ?>
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pool_blocks.css">
 
@@ -35,6 +37,8 @@ $isAdmin = isAdmin();
 </div>
 
 <script>
+const maxPoolCapacityKg = <?php echo $maxPoolCapacityKg; ?>;
+
 // Загрузка бассейнов
 function loadPools() {
     const grid = $('#poolsGrid');
@@ -141,6 +145,11 @@ function renderPools(pools) {
                     </button>
                 </div>
         ` : '';
+        const fillInfoHtml = renderFillInfo(session);
+        const measurementsHtml = renderMeasurements(session);
+        const contentRowHtml = measurementsHtml
+            ? `<div class="pool-content-row">${measurementsHtml}</div>`
+            : '';
         const blockHtml = `
             <div class="pool-block ${emptyClass}" data-pool-id="${pool.id}">
                 <div class="pool-block-header">
@@ -153,13 +162,45 @@ function renderPools(pools) {
                     </div>
                 </div>
                 <div class="pool-block-content">
-                    ${renderMeasurements(session)}
+                    ${fillInfoHtml}
+                    ${contentRowHtml}
                 </div>
                 ${actionsHtml}
             </div>
         `;
         grid.append(blockHtml);
     });
+}
+
+function renderFillInfo(session) {
+    const maxCapacity = maxPoolCapacityKg > 0 ? maxPoolCapacityKg : null;
+    const currentLoad = session && session.current_load ? session.current_load : null;
+    let fillPercent = null;
+
+    if (maxCapacity && currentLoad && currentLoad.weight !== null && currentLoad.weight !== undefined && !isNaN(currentLoad.weight)) {
+        fillPercent = Math.max(0, (parseFloat(currentLoad.weight) / maxCapacity) * 100);
+    }
+
+    if (fillPercent === null) {
+        return '';
+    }
+
+    const clamped = Math.min(fillPercent, 100);
+    const progressClass = getFillProgressClass(fillPercent);
+    return `
+        <div class="pool-fill-info text-center w-100 mb-2">
+            <div class="pool-fill-label text-muted small">Заполненность бассейна</div>
+            <div class="progress pool-fill-progress">
+                <div class="progress-bar ${progressClass}"
+                     role="progressbar"
+                     style="width: ${clamped}%;"
+                     aria-valuenow="${Math.round(clamped)}"
+                     aria-valuemin="0"
+                     aria-valuemax="100">
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 // Показать уведомление
@@ -300,6 +341,16 @@ function renderMeasurements(session) {
     html += '</div>';
     
     return html;
+}
+
+function getFillProgressClass(percent) {
+    if (percent < 60) {
+        return 'bg-primary';
+    }
+    if (percent <= 85) {
+        return 'bg-success';
+    }
+    return 'bg-warning';
 }
 
 // Экранирование HTML

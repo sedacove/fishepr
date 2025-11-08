@@ -1,3 +1,12 @@
+[data-theme="dark"] .pool-fill-label {
+    color: #cfd3d8;
+    font-size: 0.6rem;
+}
+
+[data-theme="dark"] .pool-fill-progress {
+    background-color: rgba(173, 181, 189, 0.25);
+}
+
 /**
  * Стили для блоков бассейнов на рабочей странице
  */
@@ -105,11 +114,20 @@
 .pool-block-content {
     min-height: 120px;
     display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 0.5rem 1rem;
+    gap: 0.75rem;
+}
+
+.pool-content-row {
+    display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 1rem;
+    align-items: flex-start;
     gap: 1rem;
+    width: 100%;
 }
 
 .pool-measurements {
@@ -123,6 +141,25 @@
 .pool-measurement-item {
     width: 100%;
     text-align: left;
+}
+
+.pool-fill-info {
+    width: 100%;
+    margin-bottom: 0.2rem;
+}
+
+.pool-fill-label {
+    font-size: 0.6rem;
+}
+
+.pool-fill-progress {
+    height: 0.35rem;
+    border-radius: 0.35rem;
+    background-color: rgba(13, 110, 253, 0.15);
+}
+
+.pool-fill-progress .progress-bar {
+    border-radius: 0.35rem;
 }
 
 .pool-measurement-value {
@@ -267,6 +304,14 @@
 [data-theme="dark"] .pool-block-name {
     color: #f1f3f5;
     opacity: 0.9;
+}
+
+[data-theme="dark"] .pool-fill-label {
+    color: #cfd3d8;
+}
+
+[data-theme="dark"] .pool-fill-progress {
+    background-color: rgba(173, 181, 189, 0.25);
 }
 
 [data-theme="dark"] .pool-block-divider {

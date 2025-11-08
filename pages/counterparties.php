@@ -228,7 +228,7 @@ function renderCounterpartiesTable(counterparties) {
             : '';
 
         const inn = counterparty.inn ? escapeHtml(counterparty.inn) : '—';
-        const phone = counterparty.phone ? formatPhone(counterparty.phone) : '—';
+        const phone = formatPhone(counterparty.phone);
         const email = counterparty.email ? `<a href="mailto:${escapeHtml(counterparty.email)}">${escapeHtml(counterparty.email)}</a>` : '—';
         const documents = counterparty.documents_count > 0
             ? `<span class="badge bg-info text-dark">${counterparty.documents_count}</span>`

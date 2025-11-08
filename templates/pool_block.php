@@ -5,6 +5,9 @@
  * @param array $pool Данные бассейна
  * @param array|null $session Данные активной сессии (если есть)
  */
+
+require_once __DIR__ . '/../includes/settings.php';
+$maxPoolCapacityKg = (float)getSetting('max_pool_capacity_kg', 5000);
 ?>
 <div class="pool-block" data-pool-id="<?php echo htmlspecialchars($pool['id']); ?>">
     <div class="pool-block-header">
@@ -13,11 +16,10 @@
             // Проверяем, нужно ли показывать предупреждение о просроченном замере
             $showMeasurementWarning = false;
             $measurementWarningTooltip = null;
-            $currentLoadWeight = $session['current_load']['weight'] ?? null;
-            $currentLoadFishCount = $session['current_load']['fish_count'] ?? null;
-            $weightIsApproximate = $session['current_load']['weight_is_approximate'] ?? false;
+            $currentLoadWeight = isset($session['current_load']['weight']) ? $session['current_load']['weight'] : null;
+            $currentLoadFishCount = isset($session['current_load']['fish_count']) ? $session['current_load']['fish_count'] : null;
+            $weightIsApproximate = isset($session['current_load']['weight_is_approximate']) ? $session['current_load']['weight_is_approximate'] : false;
             if ($session) {
-                require_once __DIR__ . '/../includes/settings.php';
                 $warningTimeout = getSettingInt('measurement_warning_timeout_minutes', 60);
                 
                 if (array_key_exists('last_measurement_diff_minutes', $session)) {
@@ -104,6 +106,39 @@
         </div>
     </div>
     <div class="pool-block-content">
+        <?php
+            $fillPercent = null;
+            $showFillInfo = false;
+            if ($session && $maxPoolCapacityKg > 0 && $currentLoadWeight !== null) {
+                $fillPercent = max(0, ($currentLoadWeight / $maxPoolCapacityKg) * 100);
+                $showFillInfo = true;
+            }
+            if ($showFillInfo) {
+                $fillClass = 'bg-primary';
+                if ($fillPercent < 60) {
+                    $fillClass = 'bg-primary';
+                } elseif ($fillPercent <= 85) {
+                    $fillClass = 'bg-success';
+                } else {
+                    $fillClass = 'bg-warning';
+                }
+                ?>
+                <div class="pool-fill-info text-center w-100 mb-2">
+                    <div class="pool-fill-label text-muted small">Заполненность бассейна</div>
+                    <div class="progress pool-fill-progress">
+                        <div class="progress-bar <?php echo $fillClass; ?>"
+                             role="progressbar"
+                             style="width: <?php echo min(100, $fillPercent); ?>%;"
+                             aria-valuenow="<?php echo min(100, round($fillPercent)); ?>"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                </div>
+                <?php
+            }
+        ?>
+        <div class="pool-content-row">
         <?php if ($session && isset($session['last_measurement']) && $session['last_measurement']): 
             $measurement = $session['last_measurement'];
             $temp = $measurement['temperature'] ?? null;
@@ -188,6 +223,7 @@
                 <?php endif; ?>
             </div>
         <?php endif; ?>
+    </div>
     </div>
     <?php if ($session): ?>
     <div class="pool-block-divider"></div>
