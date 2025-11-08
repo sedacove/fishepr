@@ -8,6 +8,7 @@ header('Content-Type: application/json');
 
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/activity_log.php';
 
 requireAdmin();
 
@@ -123,15 +124,10 @@ function listFinanceRecords(PDO $pdo, string $type): array
             FROM {$table}
             {$whereSql}
             ORDER BY record_date DESC, id DESC
-            LIMIT :limit OFFSET :offset";
+            LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
 
     $stmt = $pdo->prepare($sql);
-    foreach ($params as $index => $value) {
-        $stmt->bindValue($index + 1, $value);
-    }
-    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt->execute($params);
     $records = $stmt->fetchAll();
 
     return [
@@ -185,9 +181,25 @@ function saveFinanceRecord(PDO $pdo, string $type, int $userId): array
         $userId,
     ]);
 
+    $id = (int)$pdo->lastInsertId();
+
+    logActivity(
+        'create',
+        getFinanceEntityType($type),
+        $id,
+        getFinanceEntityLabel($type) . ' добавлен',
+        [
+            'record_date' => $data['record_date'],
+            'title' => $data['title'],
+            'amount' => $data['amount'],
+            'comment' => $data['comment'],
+        ]
+    );
+
     return [
         'success' => true,
         'message' => ($type === 'expenses' ? 'Расход' : 'Приход') . ' успешно добавлен',
+        'id' => $id,
     ];
 }
 
@@ -200,6 +212,13 @@ function updateFinanceRecord(PDO $pdo, string $type): array
         throw new Exception('ID записи не указан');
     }
 
+    $existingStmt = $pdo->prepare("SELECT record_date, title, amount, comment FROM {$table} WHERE id = ?");
+    $existingStmt->execute([$id]);
+    $existing = $existingStmt->fetch();
+    if (!$existing) {
+        throw new Exception('Запись не найдена');
+    }
+
     $data = validateFinancePayload($payload, $type);
 
     $stmt = $pdo->prepare("UPDATE {$table} SET record_date = ?, title = ?, amount = ?, comment = ? WHERE id = ?");
@@ -210,6 +229,32 @@ function updateFinanceRecord(PDO $pdo, string $type): array
         $data['comment'],
         $id,
     ]);
+
+    $changes = [];
+    if ($existing['record_date'] !== $data['record_date']) {
+        $changes['record_date'] = ['old' => $existing['record_date'], 'new' => $data['record_date']];
+    }
+    if ($existing['title'] !== $data['title']) {
+        $changes['title'] = ['old' => $existing['title'], 'new' => $data['title']];
+    }
+    if ((float)$existing['amount'] !== (float)$data['amount']) {
+        $changes['amount'] = ['old' => (float)$existing['amount'], 'new' => (float)$data['amount']];
+    }
+    $existingComment = $existing['comment'] ?? null;
+    $newComment = $data['comment'] ?? null;
+    if ($existingComment !== $newComment) {
+        $changes['comment'] = ['old' => $existingComment, 'new' => $newComment];
+    }
+
+    if (!empty($changes)) {
+        logActivity(
+            'update',
+            getFinanceEntityType($type),
+            $id,
+            getFinanceEntityLabel($type) . ' обновлён',
+            $changes
+        );
+    }
 
     return [
         'success' => true,
@@ -226,8 +271,23 @@ function deleteFinanceRecord(PDO $pdo, string $type): array
         throw new Exception('ID записи не указан');
     }
 
+    $existingStmt = $pdo->prepare("SELECT record_date, title, amount, comment FROM {$table} WHERE id = ?");
+    $existingStmt->execute([$id]);
+    $existing = $existingStmt->fetch();
+    if (!$existing) {
+        throw new Exception('Запись не найдена');
+    }
+
     $stmt = $pdo->prepare("DELETE FROM {$table} WHERE id = ?");
     $stmt->execute([$id]);
+
+    logActivity(
+        'delete',
+        getFinanceEntityType($type),
+        $id,
+        getFinanceEntityLabel($type) . ' удалён',
+        $existing
+    );
 
     return [
         'success' => true,
@@ -310,6 +370,16 @@ function validateFinancePayload(array $payload, string $type): array
         'amount' => $amount,
         'comment' => $comment,
     ];
+}
+
+function getFinanceEntityType(string $type): string
+{
+    return $type === 'expenses' ? 'finance_expense' : 'finance_income';
+}
+
+function getFinanceEntityLabel(string $type): string
+{
+    return $type === 'expenses' ? 'Расход' : 'Приход';
 }
 
 

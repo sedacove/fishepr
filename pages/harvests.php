@@ -147,7 +147,7 @@ function createTabs(pools) {
         // Определяем текст таба
         let tabText = '';
         if (hasSession) {
-            tabText = escapeHtml(pool.active_session.session_name);
+            tabText = `${escapeHtml(pool.name)}: ${escapeHtml(pool.active_session.session_name)}`;
         } else {
             tabText = '<i class="bi bi-x-circle text-muted"></i>';
         }
@@ -163,7 +163,7 @@ function createTabs(pools) {
                         role="tab"
                         ${hasSession ? `onclick="switchPool(${pool.id})"` : ''}
                         ${!hasSession ? 'disabled' : ''}
-                        title="${hasSession ? escapeHtml(pool.active_session.session_name) : 'Нет активной сессии'}">
+                        title="${hasSession ? `${escapeHtml(pool.name)}: ${escapeHtml(pool.active_session.session_name)}` : 'Нет активной сессии'}">
                     ${tabText}
                 </button>
             </li>

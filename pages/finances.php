@@ -290,18 +290,19 @@ function renderExpensesTable(records) {
     }
 
     records.forEach(function(record) {
+        const dateDisplay = formatDateHuman(record.record_date);
         const row = `
             <tr>
-                <td>${escapeHtml(record.record_date)}</td>
+                <td>${escapeHtml(dateDisplay)}</td>
                 <td>${escapeHtml(record.title)}</td>
                 <td class="text-danger fw-semibold">${formatCurrency(record.amount)}</td>
                 <td>${record.comment ? escapeHtml(record.comment) : '—'}</td>
                 <td class="text-end">
                     <div class="btn-group btn-group-sm" role="group">
-                        <button class="btn btn-outline-primary" onclick="editExpense(${record.id})" title="Редактировать">
+                        <button class="btn btn-primary btn-sm" onclick="editExpense(${record.id})" title="Редактировать">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-outline-danger" onclick="deleteExpense(${record.id})" title="Удалить">
+                        <button class="btn btn-danger btn-sm" onclick="deleteExpense(${record.id})" title="Удалить">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -322,18 +323,19 @@ function renderIncomesTable(records) {
     }
 
     records.forEach(function(record) {
+        const dateDisplay = formatDateHuman(record.record_date);
         const row = `
             <tr>
-                <td>${escapeHtml(record.record_date)}</td>
+                <td>${escapeHtml(dateDisplay)}</td>
                 <td>${escapeHtml(record.title)}</td>
                 <td class="text-success fw-semibold">${formatCurrency(record.amount)}</td>
                 <td>${record.comment ? escapeHtml(record.comment) : '—'}</td>
                 <td class="text-end">
                     <div class="btn-group btn-group-sm" role="group">
-                        <button class="btn btn-outline-primary" onclick="editIncome(${record.id})" title="Редактировать">
+                        <button class="btn btn-primary btn-sm" onclick="editIncome(${record.id})" title="Редактировать">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-outline-danger" onclick="deleteIncome(${record.id})" title="Удалить">
+                        <button class="btn btn-danger btn-sm" onclick="deleteIncome(${record.id})" title="Удалить">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -576,6 +578,21 @@ function formatCurrency(value) {
         return '0 ₽';
     }
     return number.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₽';
+}
+
+function formatDateHuman(dateStr) {
+    if (!dateStr) {
+        return '';
+    }
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+        return `${parts[2]}.${parts[1]}.${parts[0]}`;
+    }
+    const parsed = new Date(dateStr);
+    if (Number.isNaN(parsed.getTime())) {
+        return dateStr;
+    }
+    return parsed.toLocaleDateString('ru-RU');
 }
 
 function setTodayDate(selector) {
