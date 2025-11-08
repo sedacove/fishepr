@@ -213,6 +213,26 @@ function loadRecords(poolId) {
     });
 }
 
+function toggleRecordSavingState(isSaving) {
+    const btn = $('#recordModal .modal-footer .btn-primary');
+    if (!btn.length) {
+        return;
+    }
+
+    if (isSaving) {
+        if (!btn.data('original-html')) {
+            btn.data('original-html', btn.html());
+        }
+        btn.prop('disabled', true);
+        btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+    } else {
+        const original = btn.data('original-html');
+        btn.html(original || 'Сохранить');
+        btn.prop('disabled', false);
+        btn.removeData('original-html');
+    }
+}
+
 // Отображение записей
 function renderRecords(records, poolId) {
     const tbody = $('#recordsBody-' + poolId);
@@ -393,6 +413,8 @@ function saveRecord() {
     const action = currentEditId ? 'update' : 'create';
     const url = '<?php echo BASE_URL; ?>api/mortality.php?action=' + action;
     
+    toggleRecordSavingState(true);
+
     $.ajax({
         url: url,
         method: 'POST',
@@ -417,6 +439,8 @@ function saveRecord() {
             const response = xhr.responseJSON || {};
             showAlert('danger', response.message || 'Ошибка при сохранении записи');
         }
+    }).always(function() {
+        toggleRecordSavingState(false);
     });
 }
 

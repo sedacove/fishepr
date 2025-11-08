@@ -10,6 +10,7 @@ require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/activity_log.php';
 require_once __DIR__ . '/../includes/settings.php';
+require_once __DIR__ . '/../includes/telegram.php';
 
 // Требуем авторизацию
 requireAuth();
@@ -127,6 +128,13 @@ try {
             } else {
                 $recordedAt = date('Y-m-d H:i:s');
             }
+
+            if (strpos($recordedAt, 'T') !== false) {
+                $recordedAt = str_replace('T', ' ', $recordedAt);
+                if (strlen($recordedAt) === 16) {
+                    $recordedAt .= ':00';
+                }
+            }
             
             // Валидация
             if (!$poolId) {
@@ -177,6 +185,28 @@ try {
                     'recorded_at' => $recordedAt
                 ]);
             }
+
+            // Уведомление в Telegram при превышении порога
+            $sessionStmt = $pdo->prepare("
+                SELECT name
+                FROM sessions
+                WHERE pool_id = ? AND is_completed = 0
+                ORDER BY start_date DESC
+                LIMIT 1
+            ");
+            $sessionStmt->execute([$poolId]);
+            $activeSession = $sessionStmt->fetchColumn() ?: null;
+
+            $createdByName = $_SESSION['user_full_name'] ?? $_SESSION['user_login'] ?? null;
+
+            maybeSendMortalityAlert([
+                'pool_name' => $pool['name'],
+                'session_name' => $activeSession,
+                'fish_count' => $fishCount,
+                'weight' => $weight,
+                'recorded_at' => $recordedAt,
+                'created_by' => $createdByName,
+            ]);
             
             echo json_encode([
                 'success' => true,

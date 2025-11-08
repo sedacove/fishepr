@@ -579,6 +579,26 @@ function openHarvestModal(poolId) {
     modal.show();
 }
 
+function toggleMortalitySavingState(isSaving) {
+    const btn = $('#mortalityModal .modal-footer .btn-primary');
+    if (!btn.length) {
+        return;
+    }
+
+    if (isSaving) {
+        if (!btn.data('original-html')) {
+            btn.data('original-html', btn.html());
+        }
+        btn.prop('disabled', true);
+        btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+    } else {
+        const original = btn.data('original-html');
+        btn.html(original || 'Сохранить');
+        btn.prop('disabled', false);
+        btn.removeData('original-html');
+    }
+}
+
 // Сохранить замер
 function saveMeasurement() {
     const form = $('#measurementForm')[0];
@@ -644,6 +664,8 @@ function saveMortality() {
         formData.recorded_at = $('#mortalityDateTime').val().replace('T', ' ');
     }
     
+    toggleMortalitySavingState(true);
+
     $.ajax({
         url: '<?php echo BASE_URL; ?>api/mortality.php?action=create',
         method: 'POST',
@@ -666,6 +688,8 @@ function saveMortality() {
             const response = xhr.responseJSON || {};
             showAlert('danger', response.message || 'Ошибка при сохранении падежа');
         }
+    }).always(function() {
+        toggleMortalitySavingState(false);
     });
 }
 
