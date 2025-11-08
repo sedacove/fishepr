@@ -86,13 +86,17 @@ try {
     // Отборы
     $stmt = $pdo->prepare("
         SELECT 
-            recorded_at,
-            weight,
-            fish_count
-        FROM harvests
-        WHERE pool_id = ? 
-        AND recorded_at >= ?
-        ORDER BY recorded_at ASC
+            h.recorded_at,
+            h.weight,
+            h.fish_count,
+            h.counterparty_id,
+            c.name AS counterparty_name,
+            c.color AS counterparty_color
+        FROM harvests h
+        LEFT JOIN counterparties c ON h.counterparty_id = c.id
+        WHERE h.pool_id = ? 
+        AND h.recorded_at >= ?
+        ORDER BY h.recorded_at ASC
     ");
     $stmt->execute([$session['pool_id'], $session['start_date']]);
     $harvests = $stmt->fetchAll();

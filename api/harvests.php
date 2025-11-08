@@ -34,9 +34,12 @@ try {
                 SELECT 
                     h.*,
                     u.login as created_by_login,
-                    u.full_name as created_by_name
+                    u.full_name as created_by_name,
+                    c.name AS counterparty_name,
+                    c.color AS counterparty_color
                 FROM harvests h
                 LEFT JOIN users u ON h.created_by = u.id
+                LEFT JOIN counterparties c ON h.counterparty_id = c.id
                 WHERE h.pool_id = ?
                 ORDER BY h.recorded_at DESC
             ");
@@ -54,6 +57,7 @@ try {
                 $createdAtTimestamp = strtotime($record['created_at']);
                 $record['created_at'] = date('d.m.Y H:i', $createdAtTimestamp);
                 $record['created_by_full_name'] = $record['created_by_name'];
+                $record['counterparty_id'] = $record['counterparty_id'] !== null ? (int)$record['counterparty_id'] : null;
                 
                 // Проверка, может ли пользователь редактировать эту запись
                 if ($isAdmin) {
@@ -88,9 +92,12 @@ try {
                 SELECT 
                     h.*,
                     u.login as created_by_login,
-                    u.full_name as created_by_name
+                    u.full_name as created_by_name,
+                    c.name AS counterparty_name,
+                    c.color AS counterparty_color
                 FROM harvests h
                 LEFT JOIN users u ON h.created_by = u.id
+                LEFT JOIN counterparties c ON h.counterparty_id = c.id
                 WHERE h.id = ?
             ");
             $stmt->execute([$id]);
@@ -99,6 +106,8 @@ try {
             if (!$record) {
                 throw new Exception('Отбор не найден');
             }
+            
+            $record['counterparty_id'] = $record['counterparty_id'] !== null ? (int)$record['counterparty_id'] : null;
             
             // Преобразование даты
             $record['recorded_at'] = date('Y-m-d\TH:i', strtotime($record['recorded_at']));
@@ -120,6 +129,7 @@ try {
             $poolId = isset($data['pool_id']) ? (int)$data['pool_id'] : 0;
             $weight = isset($data['weight']) ? (float)$data['weight'] : null;
             $fishCount = isset($data['fish_count']) ? (int)$data['fish_count'] : null;
+            $counterpartyId = isset($data['counterparty_id']) && $data['counterparty_id'] !== '' ? (int)$data['counterparty_id'] : null;
             
             // Для администратора можно указать дату/время, для пользователя - текущее время
             if ($isAdmin && isset($data['recorded_at']) && !empty($data['recorded_at'])) {
@@ -150,18 +160,27 @@ try {
                 throw new Exception('Бассейн не найден или неактивен');
             }
             
+            if ($counterpartyId !== null) {
+                $stmt = $pdo->prepare("SELECT id FROM counterparties WHERE id = ?");
+                $stmt->execute([$counterpartyId]);
+                if (!$stmt->fetch()) {
+                    throw new Exception('Контрагент не найден');
+                }
+            }
+            
             $createdBy = getCurrentUserId();
             
             // Вставка
             $stmt = $pdo->prepare("
-                INSERT INTO harvests (pool_id, weight, fish_count, recorded_at, created_by)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO harvests (pool_id, weight, fish_count, counterparty_id, recorded_at, created_by)
+                VALUES (?, ?, ?, ?, ?, ?)
             ");
             
             $stmt->execute([
                 $poolId,
                 $weight,
                 $fishCount,
+                $counterpartyId,
                 $recordedAt,
                 $createdBy
             ]);
@@ -174,6 +193,7 @@ try {
                     'pool_id' => $poolId,
                     'weight' => $weight,
                     'fish_count' => $fishCount,
+                    'counterparty_id' => $counterpartyId,
                     'recorded_at' => $recordedAt
                 ]);
             }
@@ -242,6 +262,7 @@ try {
             
             $weight = isset($data['weight']) ? (float)$data['weight'] : $oldRecord['weight'];
             $fishCount = isset($data['fish_count']) ? (int)$data['fish_count'] : $oldRecord['fish_count'];
+            $counterpartyId = isset($data['counterparty_id']) && $data['counterparty_id'] !== '' ? (int)$data['counterparty_id'] : null;
             
             // Валидация
             if ($weight <= 0) {
@@ -250,6 +271,14 @@ try {
             
             if ($fishCount < 0) {
                 throw new Exception('Количество рыб должно быть неотрицательным числом');
+            }
+            
+            if ($counterpartyId !== null) {
+                $stmt = $pdo->prepare("SELECT id FROM counterparties WHERE id = ?");
+                $stmt->execute([$counterpartyId]);
+                if (!$stmt->fetch()) {
+                    throw new Exception('Контрагент не найден');
+                }
             }
             
             // Преобразование даты/времени
@@ -263,6 +292,7 @@ try {
                     pool_id = ?,
                     weight = ?,
                     fish_count = ?,
+                    counterparty_id = ?,
                     recorded_at = ?
                 WHERE id = ?
             ");
@@ -271,6 +301,7 @@ try {
                 $poolId,
                 $weight,
                 $fishCount,
+                $counterpartyId,
                 $recordedAt,
                 $id
             ]);
@@ -288,6 +319,9 @@ try {
             }
             if ($oldRecord['recorded_at'] !== $recordedAt) {
                 $changes['recorded_at'] = ['old' => $oldRecord['recorded_at'], 'new' => $recordedAt];
+            }
+            if ((int)$oldRecord['counterparty_id'] !== (int)$counterpartyId) {
+                $changes['counterparty_id'] = ['old' => $oldRecord['counterparty_id'], 'new' => $counterpartyId];
             }
             
             // Логирование всех изменений

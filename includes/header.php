@@ -10,6 +10,12 @@ if (!isset($page_title)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($page_title); ?></title>
     
+    <link rel="icon" type="image/x-icon" href="<?php echo BASE_URL; ?>assets/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo BASE_URL; ?>assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo BASE_URL; ?>assets/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo BASE_URL; ?>assets/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="<?php echo BASE_URL; ?>assets/favicon/site.webmanifest">
+    <meta name="theme-color" content="#0d6efd">
     <!-- Google Fonts - Bitter (для заголовков) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -150,6 +156,11 @@ if (!isset($page_title)) {
                             <li>
                                 <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/sessions.php">
                                     <i class="bi bi-diagram-3"></i> Сессии
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/counterparties.php">
+                                    <i class="bi bi-building"></i> Контрагенты
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>

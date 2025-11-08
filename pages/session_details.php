@@ -131,6 +131,17 @@ require_once __DIR__ . '/../includes/header.php';
                         <h5 class="mb-0">Отборы</h5>
                     </div>
                     <div class="card-body">
+                        <canvas id="counterpartyHarvestsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Общие отборы</h5>
+                    </div>
+                    <div class="card-body">
                         <canvas id="harvestsChart"></canvas>
                     </div>
                 </div>
@@ -219,6 +230,7 @@ function displaySessionData(data) {
     buildTemperatureChart(data.measurements);
     buildOxygenChart(data.measurements);
     buildMortalityChart(data.mortality);
+    buildCounterpartyHarvestsChart(data.harvests);
     buildHarvestsChart(data.harvests);
     buildWeighingsChart(data.weighings);
 }
@@ -408,6 +420,129 @@ function buildMortalityChart(mortality) {
     });
 }
 
+let counterpartyHarvestsChartInstance = null;
+
+function buildCounterpartyHarvestsChart(harvests) {
+    const canvas = document.getElementById('counterpartyHarvestsChart');
+    if (!canvas) {
+        return;
+    }
+    const ctx = canvas.getContext('2d');
+    
+    if (counterpartyHarvestsChartInstance) {
+        counterpartyHarvestsChartInstance.destroy();
+    }
+    
+    if (!harvests || harvests.length === 0) {
+        counterpartyHarvestsChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: []
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, title: { display: true, text: 'Вес (кг)' } }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+        return;
+    }
+    
+    const labels = Array.from(new Set(harvests.map(h => formatDateTime(h.recorded_at))));
+    const labelIndexMap = {};
+    labels.forEach((label, index) => {
+        labelIndexMap[label] = index;
+    });
+    
+    const datasetMap = new Map();
+    harvests.forEach(function(harvest) {
+        const key = harvest.counterparty_id || 'none';
+        if (!datasetMap.has(key)) {
+            datasetMap.set(key, {
+                label: harvest.counterparty_name || 'Без контрагента',
+                color: harvest.counterparty_color || '#6c757d',
+                data: Array(labels.length).fill(0),
+                fishCounts: Array(labels.length).fill(0)
+            });
+        }
+        const dataset = datasetMap.get(key);
+        const label = formatDateTime(harvest.recorded_at);
+        const index = labelIndexMap[label];
+        const weight = parseFloat(harvest.weight);
+        if (!isNaN(weight)) {
+            dataset.data[index] += weight;
+        }
+        const fishCount = parseInt(harvest.fish_count, 10);
+        if (!isNaN(fishCount)) {
+            dataset.fishCounts[index] += fishCount;
+        }
+    });
+    
+    const datasets = Array.from(datasetMap.values()).map(function(entry) {
+        return {
+            label: entry.label,
+            data: entry.data,
+            backgroundColor: hexToRgba(entry.color, 0.5),
+            borderColor: entry.color,
+            borderWidth: 1,
+            stack: 'counterparty',
+            metaFishCounts: entry.fishCounts
+        };
+    });
+    
+    counterpartyHarvestsChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                x: {
+                    stacked: true
+                },
+                y: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'Вес (кг)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const dataset = context.dataset || {};
+                            const value = context.parsed.y !== undefined ? context.parsed.y : context.parsed;
+                            const fishCounts = dataset.metaFishCounts || [];
+                            const fish = fishCounts[context.dataIndex] || 0;
+                            let label = `${dataset.label || ''}: ${formatNumber(value, 2)} кг`;
+                            if (fish) {
+                                label += ` (${formatInteger(fish)} шт)`;
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
 // График отборов
 function buildHarvestsChart(harvests) {
     const ctx = document.getElementById('harvestsChart').getContext('2d');
@@ -553,6 +688,35 @@ function formatDateTime(dateString) {
 
 function formatNumber(value, decimals) {
     return parseFloat(value).toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
+
+function formatInteger(value) {
+    const number = parseInt(value, 10);
+    if (isNaN(number)) {
+        return '0';
+    }
+    return number.toLocaleString('ru-RU');
+}
+
+function hexToRgba(hex, alpha) {
+    if (!hex) {
+        return `rgba(108, 117, 125, ${alpha})`;
+    }
+    let normalized = hex.trim();
+    if (normalized.startsWith('#')) {
+        normalized = normalized.substring(1);
+    }
+    if (normalized.length === 3) {
+        normalized = normalized.split('').map(char => char + char).join('');
+    }
+    const bigint = parseInt(normalized, 16);
+    if (isNaN(bigint)) {
+        return `rgba(108, 117, 125, ${alpha})`;
+    }
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 function showAlert(type, message) {

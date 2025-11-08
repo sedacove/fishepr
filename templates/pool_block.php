@@ -93,7 +93,7 @@
                             $daysText = 'дня';
                         }
                         ?>
-                        <div class="pool-block-session-duration">Сессия длится <?php echo $daysDiff; ?> <?php echo $daysText; ?></div>
+                        <div class="pool-block-session-duration">Сессия <?php echo $daysDiff; ?> <?php echo $daysText; ?></div>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
@@ -149,7 +149,7 @@
                 <?php if ($oxygen !== null): ?>
                     <div class="pool-measurement-item">
                         <div class="pool-measurement-value <?php echo $oxygenColorClass; ?>">
-                            O<sub>2</sub> <?php echo number_format($oxygen, 1, '.', ' '); ?>
+                            O<sub>2</sub>&nbsp;<?php echo number_format($oxygen, 1, '.', ' '); ?>
                             <?php echo $oxygenArrowHtml; ?>
                         </div>
                     </div>

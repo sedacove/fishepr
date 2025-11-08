@@ -92,11 +92,14 @@
 
 .pool-block-name {
     position: absolute;
-    top: 0;
-    right: 0;
-    font-size: 0.75rem;
-    color: #666666;
-    font-weight: 400;
+    top: 0.15rem;
+    right: 0.75rem;
+    font-family: 'Bitter', serif;
+    font-size: 3rem;
+    line-height: 1;
+    color: #343a40;
+    font-weight: 600;
+    opacity: 0.85;
 }
 
 .pool-block-content {
@@ -262,7 +265,8 @@
 }
 
 [data-theme="dark"] .pool-block-name {
-    color: #999999;
+    color: #f1f3f5;
+    opacity: 0.9;
 }
 
 [data-theme="dark"] .pool-block-divider {

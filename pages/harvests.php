@@ -50,6 +50,7 @@ $fishCountId = 'recordFishCount';
 $currentPoolId = 'currentPoolId';
 $modalTitleId = 'recordModalTitle';
 $saveFunction = 'saveRecord';
+$counterpartySelectId = 'recordCounterparty';
 require_once __DIR__ . '/../templates/harvest_modal.php';
 ?>
 
@@ -57,6 +58,7 @@ require_once __DIR__ . '/../templates/harvest_modal.php';
 let currentEditId = null;
 let currentPoolId = null;
 let poolsList = [];
+let counterpartiesList = [];
 let isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
 
 // Загрузка бассейнов и создание табов
@@ -77,6 +79,42 @@ function loadPools() {
             showAlert('danger', 'Ошибка при загрузке бассейнов');
         }
     });
+}
+
+function loadCounterpartiesList() {
+    if (!isAdmin) {
+        counterpartiesList = [];
+        return;
+    }
+    $.ajax({
+        url: '<?php echo BASE_URL; ?>api/counterparties.php?action=list',
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                counterpartiesList = response.data;
+            } else if (response.message) {
+                showAlert('danger', response.message);
+            }
+        },
+        error: function() {
+            showAlert('danger', 'Ошибка при загрузке контрагентов');
+        }
+    });
+}
+
+function populateCounterpartySelect(selector, selectedId) {
+    const select = typeof selector === 'string' ? $(selector) : selector;
+    if (!select || !select.length) {
+        return;
+    }
+    select.empty().append('<option value="">Не указан</option>');
+    counterpartiesList.forEach(function(counterparty) {
+        const label = counterparty.name ? escapeHtml(counterparty.name) : '—';
+        const isSelected = selectedId !== null && selectedId !== undefined && counterparty.id == selectedId ? 'selected' : '';
+        select.append(`<option value="${counterparty.id}" ${isSelected}>${label}</option>`);
+    });
+    select.prop('disabled', !isAdmin);
 }
 
 // Создание табов
@@ -153,6 +191,7 @@ function createTabs(pools) {
                                         <th>Дата и время</th>
                                         <th>Вес (кг)</th>
                                         <th>Количество рыб (шт)</th>
+                                        <th>Контрагент</th>
                                         <th>Кто делал</th>
                                         <?php if ($isAdmin): ?>
                                         <th>Действия</th>
@@ -161,7 +200,7 @@ function createTabs(pools) {
                                 </thead>
                                 <tbody id="recordsBody-${pool.id}">
                                     <tr>
-                                        <td colspan="<?php echo $isAdmin ? '5' : '4'; ?>" class="text-center">
+                                        <td colspan="<?php echo $isAdmin ? '6' : '5'; ?>" class="text-center">
                                             <div class="spinner-border spinner-border-sm" role="status">
                                                 <span class="visually-hidden">Загрузка...</span>
                                             </div>
@@ -194,7 +233,7 @@ function switchPool(poolId) {
 function loadRecords(poolId) {
     const tbody = $('#recordsBody-' + poolId);
     
-    tbody.html('<tr><td colspan="<?php echo $isAdmin ? '5' : '4'; ?>" class="text-center"><div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Загрузка...</span></div></td></tr>');
+    tbody.html('<tr><td colspan="<?php echo $isAdmin ? '6' : '5'; ?>" class="text-center"><div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Загрузка...</span></div></td></tr>');
     
     $.ajax({
         url: '<?php echo BASE_URL; ?>api/harvests.php?action=list&pool_id=' + poolId,
@@ -219,11 +258,15 @@ function renderRecords(records, poolId) {
     tbody.empty();
     
     if (records.length === 0) {
-        tbody.html(`<tr><td colspan="<?php echo $isAdmin ? '5' : '4'; ?>" class="text-center text-muted">Записи не найдены</td></tr>`);
+        tbody.html(`<tr><td colspan="<?php echo $isAdmin ? '6' : '5'; ?>" class="text-center text-muted">Записи не найдены</td></tr>`);
         return;
     }
     
     records.forEach(function(record) {
+        const badgeColor = record.counterparty_color || '#6c757d';
+        const counterpartyBadge = record.counterparty_name 
+            ? `<span class="badge ${getContrastTextClass(badgeColor)}" style="background-color: ${badgeColor};">${escapeHtml(record.counterparty_name)}</span>`
+            : '<span class="badge bg-light text-muted">—</span>';
         const userInfo = record.created_by_full_name 
             ? `${escapeHtml(record.created_by_full_name)} (${escapeHtml(record.created_by_login)})`
             : escapeHtml(record.created_by_login || 'Неизвестно');
@@ -260,6 +303,7 @@ function renderRecords(records, poolId) {
                 <td>${record.recorded_at_display}</td>
                 <td>${record.weight}</td>
                 <td>${record.fish_count}</td>
+                <td>${counterpartyBadge}</td>
                 <td>${userInfo}</td>
                 ${actionsHtml}
             </tr>
@@ -283,6 +327,8 @@ function openAddModal(poolId = null) {
         const selected = (poolId && pool.id == poolId) ? 'selected' : '';
         select.append(`<option value="${pool.id}" ${selected}>${escapeHtml(pool.name)}</option>`);
     });
+    
+    populateCounterpartySelect('#recordCounterparty', null);
     
     // Показываем поле даты/времени только для администратора
     if (isAdmin) {
@@ -337,6 +383,7 @@ function openEditModal(id) {
                 $('#recordPool').val(record.pool_id);
                 $('#recordWeight').val(record.weight);
                 $('#recordFishCount').val(record.fish_count);
+                populateCounterpartySelect('#recordCounterparty', record.counterparty_id);
                 
                 // Для администратора можно редактировать дату/время и бассейн, для пользователя - нет
                 if (isAdmin) {
@@ -380,6 +427,12 @@ function saveRecord() {
         weight: parseFloat($('#recordWeight').val()),
         fish_count: parseInt($('#recordFishCount').val())
     };
+    const counterpartyValue = $('#recordCounterparty').val();
+    if (counterpartyValue) {
+        formData.counterparty_id = parseInt(counterpartyValue);
+    } else {
+        formData.counterparty_id = null;
+    }
     
     // Для администратора можно изменить дату/время, для пользователя - нет
     if (isAdmin && $('#recordDateTime').is(':visible')) {
@@ -464,6 +517,28 @@ function showAlert(type, message) {
     }, 5000);
 }
 
+function getContrastTextClass(color) {
+    if (!color) {
+        return 'text-white';
+    }
+    let normalized = color.trim();
+    if (normalized.startsWith('#')) {
+        normalized = normalized.substring(1);
+    }
+    if (normalized.length === 3) {
+        normalized = normalized.split('').map(char => char + char).join('');
+    }
+    const bigint = parseInt(normalized, 16);
+    if (isNaN(bigint)) {
+        return 'text-white';
+    }
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.6 ? 'text-dark' : 'text-white';
+}
+
 // Экранирование HTML
 function escapeHtml(text) {
     if (text === null || text === undefined) return '';
@@ -479,6 +554,9 @@ function escapeHtml(text) {
 
 // Загрузка при открытии страницы
 $(document).ready(function() {
+    if (isAdmin) {
+        loadCounterpartiesList();
+    }
     loadPools();
 });
 </script>

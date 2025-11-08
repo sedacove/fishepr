@@ -332,16 +332,20 @@ function formatInteger(value) {
     return Number(value).toLocaleString('ru-RU');
 }
 
+let poolsList = [];
+let counterpartiesList = [];
+let isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
+let measurementWarningTimeoutMinutes = 60; // По умолчанию 60 минут
+
 // Загрузка при открытии страницы
 $(document).ready(function() {
     loadMeasurementWarningTimeout();
     loadPools();
     loadPoolsList();
+    if (isAdmin) {
+        loadCounterpartiesList();
+    }
 });
-
-let poolsList = [];
-let isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
-let measurementWarningTimeoutMinutes = 60; // По умолчанию 60 минут
 
 // Загрузка настройки времени предупреждения о замерах
 function loadMeasurementWarningTimeout() {
@@ -366,6 +370,19 @@ function loadPoolsList() {
         success: function(response) {
             if (response.success) {
                 poolsList = response.data;
+            }
+        }
+    });
+}
+
+function loadCounterpartiesList() {
+    $.ajax({
+        url: '<?php echo BASE_URL; ?>api/counterparties.php?action=list',
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                counterpartiesList = response.data;
             }
         }
     });
@@ -490,6 +507,14 @@ function openHarvestModal(poolId) {
         $('#harvestPool').val(poolId);
     }
     
+    const counterpartySelect = $('#harvestCounterparty');
+    counterpartySelect.empty().append('<option value="">Не указан</option>');
+    counterpartiesList.forEach(function(counterparty) {
+        const label = counterparty.name ? escapeHtml(counterparty.name) : '—';
+        counterpartySelect.append(`<option value="${counterparty.id}">${label}</option>`);
+    });
+    counterpartySelect.prop('disabled', !isAdmin);
+    
     const modal = new bootstrap.Modal(document.getElementById('harvestModal'));
     modal.show();
 }
@@ -599,6 +624,10 @@ function saveHarvest() {
         weight: parseFloat($('#harvestWeight').val()),
         fish_count: parseInt($('#harvestFishCount').val())
     };
+    const counterpartyValue = $('#harvestCounterparty').val();
+    if (counterpartyValue) {
+        formData.counterparty_id = parseInt(counterpartyValue);
+    }
     
     if (isAdmin && $('#harvestDateTime').val()) {
         formData.recorded_at = $('#harvestDateTime').val().replace('T', ' ');

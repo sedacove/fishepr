@@ -11,6 +11,7 @@ $datetimeFieldId = $datetimeFieldId ?? 'harvestDateTimeField';
 $datetimeInputId = $datetimeInputId ?? 'harvestDateTime';
 $weightId = $weightId ?? 'harvestWeight';
 $fishCountId = $fishCountId ?? 'harvestFishCount';
+$counterpartySelectId = $counterpartySelectId ?? 'harvestCounterparty';
 $currentPoolId = $currentPoolId ?? 'currentHarvestPoolId';
 $modalTitleId = $modalTitleId ?? 'harvestModalTitle';
 $saveFunction = $saveFunction ?? 'saveHarvest';
@@ -50,6 +51,14 @@ $saveFunction = $saveFunction ?? 'saveHarvest';
                             <label for="<?php echo htmlspecialchars($fishCountId); ?>" class="form-label">Количество рыб (шт) <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="<?php echo htmlspecialchars($fishCountId); ?>" name="fish_count" min="0" required>
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="<?php echo htmlspecialchars($counterpartySelectId); ?>" class="form-label">Контрагент</label>
+                        <select class="form-select" id="<?php echo htmlspecialchars($counterpartySelectId); ?>" name="counterparty_id">
+                            <option value="">Не указан</option>
+                        </select>
+                        <small class="text-muted">Выберите контрагента, если отбор связан с поставкой или покупателем.</small>
                     </div>
                 </form>
             </div>
