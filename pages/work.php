@@ -5,12 +5,13 @@
 
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/header.php';
-
-// Требуем авторизацию
+// Требуем авторизацию до вывода заголовков
 requireAuth();
 
 $page_title = 'Рабочая';
+
+require_once __DIR__ . '/../includes/header.php';
+
 $isAdmin = isAdmin();
 ?>
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pool_blocks.css">
