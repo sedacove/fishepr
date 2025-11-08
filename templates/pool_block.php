@@ -34,7 +34,7 @@ $maxPoolCapacityKg = (float)getSetting('max_pool_capacity_kg', 5000);
                     } elseif ($diffMinutes > $warningTimeout) {
                         $showMeasurementWarning = true;
                         $timeLabel = $diffLabel ?: 'достаточно давно';
-                        $measurementWarningTooltip = 'Замер не проводился ' . $timeLabel;
+                        $measurementWarningTooltip = 'Последний замер ' . $timeLabel;
                         if ($diffLabel) {
                             $measurementWarningTooltip .= ' назад';
                         }
@@ -47,7 +47,7 @@ $maxPoolCapacityKg = (float)getSetting('max_pool_capacity_kg', 5000);
                     
                     if ($minutesSinceLastMeasurement > $warningTimeout) {
                         $showMeasurementWarning = true;
-                        $measurementWarningTooltip = 'Замер не проводился с ' . $lastMeasurement->format('H:i');
+                        $measurementWarningTooltip = 'Последний замер был в ' . $lastMeasurement->format('H:i');
                     }
                 } else {
                     // Если замеров вообще не было, тоже показываем предупреждение
@@ -57,7 +57,7 @@ $maxPoolCapacityKg = (float)getSetting('max_pool_capacity_kg', 5000);
             }
             
             if ($showMeasurementWarning):
-                $tooltipText = $measurementWarningTooltip ?? 'Замер не проводился';
+                $tooltipText = $measurementWarningTooltip ?? 'Последний замер отсутствует';
             ?>
                 <i class="bi bi-exclamation-triangle-fill text-danger me-2" 
                    title="<?php echo htmlspecialchars($tooltipText); ?>"

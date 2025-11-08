@@ -98,17 +98,24 @@ if (!isset($page_title)) {
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo BASE_URL; ?>pages/work.php">Рабочая</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/measurements.php">Замеры</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/harvests.php">Отборы</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/mortality.php">Падеж</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/weighings.php">Навески</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="poolsDropdown" role="button" data-bs-toggle="dropdown">
+                            Бассейны
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/measurements.php">Замеры</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/harvests.php">Отборы</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/mortality.php">Падеж</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/weighings.php">Навески</a>
+                            </li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo BASE_URL; ?>pages/tasks.php">Задачи</a>
@@ -122,6 +129,11 @@ if (!isset($page_title)) {
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo BASE_URL; ?>pages/payroll.php">
                             ФЗП
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/finances.php">
+                            Финансы
                         </a>
                     </li>
                     <?php endif; ?>
