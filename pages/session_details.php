@@ -5,9 +5,7 @@
 
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/header.php';
-
-// Требуем авторизацию
+// Требуем авторизацию до вывода заголовков
 requireAuth();
 
 $sessionId = $_GET['id'] ?? null;
@@ -18,6 +16,8 @@ if (!$sessionId) {
 }
 
 $page_title = 'Детали сессии';
+
+require_once __DIR__ . '/../includes/header.php';
 ?>
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/session_details.css">
 

@@ -5,12 +5,13 @@
 
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/includes/auth.php';
-require_once __DIR__ . '/includes/header.php';
+// Устанавливаем заголовок страницы до подключения header.php
+$page_title = 'Главная страница';
 
-// Требуем авторизацию
+// Требуем авторизацию до вывода каких-либо заголовков
 requireAuth();
 
-$page_title = 'Главная страница';
+require_once __DIR__ . '/includes/header.php';
 ?>
 <div class="container mt-4">
     <div class="row">

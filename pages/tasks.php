@@ -5,14 +5,16 @@
 
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/header.php';
-require_once __DIR__ . '/../includes/section_descriptions.php';
+// Устанавливаем заголовок страницы до вывода контента
+$page_title = 'Задачи';
 
-// Требуем авторизацию
+// Требуем авторизацию до вывода заголовков
 requireAuth();
 
-$page_title = 'Задачи';
 $isAdmin = isAdmin();
+
+require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../includes/section_descriptions.php';
 ?>
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/tasks.css">
 <!-- SortableJS для drag-n-drop -->

@@ -6,14 +6,16 @@
 
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/header.php';
-require_once __DIR__ . '/../includes/section_descriptions.php';
+// Устанавливаем заголовок страницы до вывода контента
+$page_title = 'Замеры';
 
-// Требуем авторизацию
+// Требуем авторизацию до вывода заголовков
 requireAuth();
 
-$page_title = 'Замеры';
 $isAdmin = isAdmin();
+
+require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../includes/section_descriptions.php';
 ?>
 <div class="container mt-4">
     <div class="row mb-4">
