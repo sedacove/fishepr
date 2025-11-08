@@ -35,6 +35,9 @@ try {
         'bad_above' => (float)getSetting('oxygen_bad_above', 20)
     ];
     
+    $weighingWarningDays = getSettingInt('weighing_warning_days', 3);
+    $weighingWarningMinutes = max(0, $weighingWarningDays * 24 * 60);
+    
     // Функция для определения страты значения
     function getValueStratum($value, $settings) {
         if ($value < $settings['bad_below'] || $value > $settings['bad_above']) {
@@ -196,6 +199,24 @@ try {
             } else {
                 $session['avg_fish_weight'] = null;
                 $session['avg_weight_source'] = null;
+            }
+            
+            $session['last_weighing_at'] = $lastWeighing['recorded_at'] ?? null;
+            $session['last_weighing_diff_minutes'] = null;
+            $session['last_weighing_diff_label'] = null;
+            $session['weighing_warning'] = false;
+            
+            if ($session['last_weighing_at']) {
+                $lastWeighingDateTime = new DateTime($session['last_weighing_at']);
+                $now = new DateTime();
+                $diffMinutes = max(0, (int)floor(($now->getTimestamp() - $lastWeighingDateTime->getTimestamp()) / 60));
+                $session['last_weighing_diff_minutes'] = $diffMinutes;
+                $session['last_weighing_diff_label'] = formatDiffLabel($diffMinutes);
+                if ($diffMinutes > $weighingWarningMinutes) {
+                    $session['weighing_warning'] = true;
+                }
+            } else {
+                $session['weighing_warning'] = true;
             }
             
             // Получаем последний и предпоследний замеры для этого бассейна

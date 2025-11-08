@@ -16,6 +16,7 @@ $maxPoolCapacityKg = (float)getSetting('max_pool_capacity_kg', 5000);
             // Проверяем, нужно ли показывать предупреждение о просроченном замере
             $showMeasurementWarning = false;
             $measurementWarningTooltip = null;
+            $weighingWarningHtml = '';
             $currentLoadWeight = isset($session['current_load']['weight']) ? $session['current_load']['weight'] : null;
             $currentLoadFishCount = isset($session['current_load']['fish_count']) ? $session['current_load']['fish_count'] : null;
             $weightIsApproximate = isset($session['current_load']['weight_is_approximate']) ? $session['current_load']['weight_is_approximate'] : false;
@@ -62,6 +63,18 @@ $maxPoolCapacityKg = (float)getSetting('max_pool_capacity_kg', 5000);
                    title="<?php echo htmlspecialchars($tooltipText); ?>"
                    style="font-size: 1.2rem;"></i>
             <?php endif; ?>
+            <?php
+                $weighingWarning = $session['weighing_warning'] ?? false;
+                if ($weighingWarning):
+                    $weighingLabel = $session['last_weighing_diff_label'] ?? null;
+                    $weighingTooltip = ($weighingLabel && $weighingLabel !== 'ещё не проводился')
+                        ? 'Последняя навеска ' . htmlspecialchars($weighingLabel) . ' назад'
+                        : 'Навеска ещё не проводилась';
+            ?>
+                <i class="bi bi-exclamation-circle-fill text-warning me-2"
+                   title="<?php echo $weighingTooltip; ?>"
+                   style="font-size: 1.1rem;"></i>
+            <?php endif; ?>
             <?php if ($session && isset($session['id'])): ?>
                 <a href="<?php echo BASE_URL; ?>pages/session_details.php?id=<?php echo $session['id']; ?>" class="text-decoration-none">
                     <?php echo htmlspecialchars($session['name']); ?>
@@ -95,7 +108,7 @@ $maxPoolCapacityKg = (float)getSetting('max_pool_capacity_kg', 5000);
                             $daysText = 'дня';
                         }
                         ?>
-                        <div class="pool-block-session-duration">Сессия <?php echo $daysDiff; ?> <?php echo $daysText; ?></div>
+                        <div class="pool-block-session-duration"><?php echo $daysDiff; ?> <?php echo $daysText; ?></div>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>

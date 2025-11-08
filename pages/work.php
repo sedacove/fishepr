@@ -78,6 +78,7 @@ function renderPools(pools) {
         
         // Проверяем, нужно ли показывать предупреждение о просроченном замере
         let measurementWarningHtml = '';
+        let weighingWarningHtml = '';
         if (session) {
             const diffMinutes = typeof session.last_measurement_diff_minutes === 'number'
                 ? session.last_measurement_diff_minutes
@@ -90,6 +91,14 @@ function renderPools(pools) {
             } else if (diffMinutes !== undefined && diffMinutes > measurementWarningTimeoutMinutes) {
                 const label = diffLabel ? `${diffLabel} назад` : 'достаточно давно';
                 measurementWarningHtml = `<i class="bi bi-exclamation-triangle-fill text-danger me-2" title="Замер не проводился ${escapeHtml(label)}" style="font-size: 1.2rem;"></i>`;
+            }
+            
+            if (session.weighing_warning) {
+                const weighingLabel = session.last_weighing_diff_label || '';
+                const weighingTooltip = weighingLabel && weighingLabel !== 'ещё не проводился'
+                    ? `Последняя навеска ${escapeHtml(weighingLabel)} назад`
+                    : 'Навеска ещё не проводилась';
+                weighingWarningHtml = `<i class="bi bi-exclamation-circle-fill text-warning me-2" title="${weighingTooltip}" style="font-size: 1.1rem;"></i>`;
             }
         }
         
@@ -119,7 +128,7 @@ function renderPools(pools) {
                 } else if (lastDigit >= 2 && lastDigit <= 4) {
                     daysText = 'дня';
                 }
-                durationInfo = `<div class="pool-block-session-duration">Сессия длится ${daysDiff} ${daysText}</div>`;
+                durationInfo = `<div class="pool-block-session-duration">${daysDiff} ${daysText}</div>`;
             }
             
             sessionInfo = `
@@ -154,7 +163,7 @@ function renderPools(pools) {
             <div class="pool-block ${emptyClass}" data-pool-id="${pool.id}">
                 <div class="pool-block-header">
                     <div class="pool-block-title">
-                        ${measurementWarningHtml}${session && session.id ? `<a href="<?php echo BASE_URL; ?>pages/session_details.php?id=${session.id}" class="text-decoration-none">${escapeHtml(session.name)}</a>` : escapeHtml('ПУСТО')}${avgWeightHtml}
+                        ${measurementWarningHtml}${weighingWarningHtml}${session && session.id ? `<a href="<?php echo BASE_URL; ?>pages/session_details.php?id=${session.id}" class="text-decoration-none">${escapeHtml(session.name)}</a>` : escapeHtml('ПУСТО')}${avgWeightHtml}
                         ${sessionInfo}
                     </div>
                     <div class="pool-block-name">
