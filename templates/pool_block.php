@@ -12,7 +12,10 @@
             <?php 
             // Проверяем, нужно ли показывать предупреждение о просроченном замере
             $showMeasurementWarning = false;
-            $lastMeasurementTime = null;
+            $measurementWarningTooltip = null;
+            $currentLoadWeight = $session['current_load']['weight'] ?? null;
+            $currentLoadFishCount = $session['current_load']['fish_count'] ?? null;
+            $weightIsApproximate = $session['current_load']['weight_is_approximate'] ?? false;
             if ($session) {
                 require_once __DIR__ . '/../includes/settings.php';
                 $warningTimeout = getSettingInt('measurement_warning_timeout_minutes', 60);
@@ -24,10 +27,14 @@
                     if ($diffMinutes === null) {
                         // Замеры ещё не проводились
                         $showMeasurementWarning = true;
-                        $lastMeasurementTime = $diffLabel ?: 'ещё не проводился';
+                        $measurementWarningTooltip = 'Замер ещё не проводился';
                     } elseif ($diffMinutes > $warningTimeout) {
                         $showMeasurementWarning = true;
-                        $lastMeasurementTime = ($diffLabel ? $diffLabel . ' назад' : 'достаточно давно');
+                        $timeLabel = $diffLabel ?: 'достаточно давно';
+                        $measurementWarningTooltip = 'Замер не проводился ' . $timeLabel;
+                        if ($diffLabel) {
+                            $measurementWarningTooltip .= ' назад';
+                        }
                     }
                 } elseif (isset($session['last_measurement_at']) && $session['last_measurement_at']) {
                     // Fallback на случай отсутствия новых полей
@@ -37,20 +44,17 @@
                     
                     if ($minutesSinceLastMeasurement > $warningTimeout) {
                         $showMeasurementWarning = true;
-                        $lastMeasurementTime = $lastMeasurement->format('H:i');
+                        $measurementWarningTooltip = 'Замер не проводился с ' . $lastMeasurement->format('H:i');
                     }
                 } else {
                     // Если замеров вообще не было, тоже показываем предупреждение
                     $showMeasurementWarning = true;
-                    $lastMeasurementTime = 'ещё не проводился';
+                    $measurementWarningTooltip = 'Замер ещё не проводился';
                 }
             }
             
             if ($showMeasurementWarning):
-                $tooltipText = $lastMeasurementTime ?? '—';
-                if (stripos($tooltipText, 'замер') === false) {
-                    $tooltipText = 'Замер не проводился ' . $tooltipText;
-                }
+                $tooltipText = $measurementWarningTooltip ?? 'Замер не проводился';
             ?>
                 <i class="bi bi-exclamation-triangle-fill text-danger me-2" 
                    title="<?php echo htmlspecialchars($tooltipText); ?>"
@@ -145,22 +149,39 @@
                 <?php if ($oxygen !== null): ?>
                     <div class="pool-measurement-item">
                         <div class="pool-measurement-value <?php echo $oxygenColorClass; ?>">
-                            O<sub>2</sub>: <?php echo number_format($oxygen, 1, '.', ' '); ?>
+                            O<sub>2</sub> <?php echo number_format($oxygen, 1, '.', ' '); ?>
                             <?php echo $oxygenArrowHtml; ?>
                         </div>
                     </div>
                 <?php endif; ?>
             </div>
             <div class="pool-stats-right">
+                <?php if ($currentLoadWeight !== null || $currentLoadFishCount !== null): ?>
+                    <div class="pool-current-load text-end fw-semibold text-white mb-2" style="font-size: 1.1rem;">
+                        <?php if ($currentLoadWeight !== null): ?>
+                            <div><?php echo $weightIsApproximate ? '&asymp; ' : ''; ?><?php echo number_format($currentLoadWeight, 2, '.', ' '); ?>&nbsp;кг</div>
+                        <?php endif; ?>
+                        <?php if ($currentLoadFishCount !== null): ?>
+                            <div><?php echo number_format($currentLoadFishCount, 0, '.', ' '); ?>&nbsp;шт</div>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
                 <?php if (isset($session['mortality_last_hours'])): 
                     $mortality = $session['mortality_last_hours'];
                     $mortalityCount = $mortality['total_count'] ?? 0;
                     $mortalityHours = $mortality['hours'] ?? 24;
                     $mortalityColorClass = $mortality['color_class'] ?? 'text-danger';
+                    $mortalityBadgeClass = str_replace('text-', 'bg-', $mortalityColorClass);
+                    if ($mortalityBadgeClass === $mortalityColorClass) {
+                        $mortalityBadgeClass = $mortalityColorClass;
+                    }
+                    $mortalityBadgeTextClass = in_array($mortalityBadgeClass, ['bg-warning', 'bg-light', 'bg-info']) ? 'text-dark' : 'text-white';
                 ?>
                     <div class="pool-stat-item">
-                        <div class="pool-stat-value <?php echo $mortalityColorClass; ?>">
-                            <?php echo number_format($mortalityCount, 0, '.', ' '); ?> шт
+                        <div class="pool-stat-value">
+                            <span class="badge <?php echo htmlspecialchars($mortalityBadgeClass); ?> <?php echo $mortalityBadgeTextClass; ?>">
+                                <?php echo number_format($mortalityCount, 0, '.', ' '); ?> шт
+                            </span>
                         </div>
                         <div class="pool-stat-label">Падеж за <?php echo $mortalityHours; ?> ч</div>
                     </div>

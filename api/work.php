@@ -136,6 +136,22 @@ try {
     ");
     $pools = $stmt->fetchAll();
     
+    $mortalityTotalsStmt = $pdo->prepare("
+        SELECT 
+            COALESCE(SUM(weight), 0) AS total_weight,
+            COALESCE(SUM(fish_count), 0) AS total_count
+        FROM mortality
+        WHERE pool_id = ? AND recorded_at >= ?
+    ");
+    
+    $harvestTotalsStmt = $pdo->prepare("
+        SELECT 
+            COALESCE(SUM(weight), 0) AS total_weight,
+            COALESCE(SUM(fish_count), 0) AS total_count
+        FROM harvests
+        WHERE pool_id = ? AND recorded_at >= ?
+    ");
+    
     // Для каждого бассейна получаем активную сессию
     foreach ($pools as &$pool) {
         $stmt = $pdo->prepare("
@@ -154,6 +170,7 @@ try {
         
         if ($session) {
             // Получаем последнюю навеску для этой сессии (после начала сессии)
+            $lastWeighing = null;
             $stmt = $pdo->prepare("
                 SELECT 
                     weight,
@@ -276,6 +293,48 @@ try {
                 'hours' => $mortalityHours,
                 'total_count' => $totalCount,
                 'color_class' => $mortalityColorClass
+            ];
+            
+            // Расчёт текущей загрузки бассейна по сессии
+            $startDate = $session['start_date'] ?? null;
+            $startMass = isset($session['start_mass']) ? (float)$session['start_mass'] : null;
+            $startFishCount = isset($session['start_fish_count']) ? (int)$session['start_fish_count'] : null;
+            
+            $currentLoadWeight = null;
+            $currentLoadFishCount = null;
+            $weightIsApproximate = false;
+            
+            if ($startDate && ($startMass !== null || $startFishCount !== null)) {
+                $mortalityTotalsStmt->execute([$pool['id'], $startDate]);
+                $mortalityTotals = $mortalityTotalsStmt->fetch();
+                
+                $harvestTotalsStmt->execute([$pool['id'], $startDate]);
+                $harvestTotals = $harvestTotalsStmt->fetch();
+                
+                $totalMortalityWeight = isset($mortalityTotals['total_weight']) ? (float)$mortalityTotals['total_weight'] : 0.0;
+                $totalMortalityCount = isset($mortalityTotals['total_count']) ? (int)$mortalityTotals['total_count'] : 0;
+                $totalHarvestWeight = isset($harvestTotals['total_weight']) ? (float)$harvestTotals['total_weight'] : 0.0;
+                $totalHarvestCount = isset($harvestTotals['total_count']) ? (int)$harvestTotals['total_count'] : 0;
+                
+                if ($startMass !== null) {
+                    $currentLoadWeight = max(0, $startMass - $totalMortalityWeight - $totalHarvestWeight);
+                }
+                
+                if ($startFishCount !== null) {
+                    $currentLoadFishCount = max(0, $startFishCount - $totalMortalityCount - $totalHarvestCount);
+                }
+                
+                if ($lastWeighing && $lastWeighing['fish_count'] > 0 && $currentLoadFishCount !== null) {
+                    $avgWeightPerFish = (float)$lastWeighing['weight'] / (float)$lastWeighing['fish_count'];
+                    $currentLoadWeight = max(0, $avgWeightPerFish * $currentLoadFishCount);
+                    $weightIsApproximate = true;
+                }
+            }
+            
+            $session['current_load'] = [
+                'weight' => $currentLoadWeight,
+                'fish_count' => $currentLoadFishCount,
+                'weight_is_approximate' => $weightIsApproximate
             ];
         }
         

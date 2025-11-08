@@ -234,7 +234,7 @@ function renderMeasurements(session) {
         html += `
             <div class="pool-measurement-item">
                 <div class="pool-measurement-value ${oxygenColorClass}">
-                    O<sub>2</sub>: ${oxygenFormatted}
+                    O<sub>2</sub> ${oxygenFormatted}
                     ${oxygenArrowHtml}
                 </div>
             </div>
@@ -246,16 +246,51 @@ function renderMeasurements(session) {
     // Правая часть со статистикой
     html += '<div class="pool-stats-right">';
     
+    const currentLoad = session.current_load || null;
+    if (currentLoad) {
+        const hasWeight = currentLoad.weight !== null && currentLoad.weight !== undefined && !isNaN(currentLoad.weight);
+        const hasFishCount = currentLoad.fish_count !== null && currentLoad.fish_count !== undefined && !isNaN(currentLoad.fish_count);
+        
+        if (hasWeight || hasFishCount) {
+            html += '<div class="pool-current-load text-end fw-semibold text-white mb-2" style="font-size: 1.1rem;">';
+            
+            if (hasWeight) {
+                const weightFormatted = formatNumber(currentLoad.weight, 2);
+                if (weightFormatted) {
+                    const prefix = currentLoad.weight_is_approximate ? '&asymp;&nbsp;' : '';
+                    html += `<div>${prefix}${weightFormatted}&nbsp;кг</div>`;
+                }
+            }
+            
+            if (hasFishCount) {
+                const fishCountFormatted = formatInteger(currentLoad.fish_count);
+                if (fishCountFormatted) {
+                    html += `<div>${fishCountFormatted}&nbsp;шт</div>`;
+                }
+            }
+            
+            html += '</div>';
+        }
+    }
+    
     if (session.mortality_last_hours) {
         const mortality = session.mortality_last_hours;
         const mortalityCount = parseInt(mortality.total_count || 0);
         const mortalityHours = mortality.hours || 24;
         const mortalityColorClass = mortality.color_class || 'text-danger';
         const mortalityCountFormatted = mortalityCount.toLocaleString('ru-RU');
+        let mortalityBadgeClass = mortalityColorClass.replace('text-', 'bg-');
+        if (mortalityBadgeClass === mortalityColorClass) {
+            mortalityBadgeClass = mortalityColorClass;
+        }
+        const badgeTextDarkClasses = ['bg-warning', 'bg-light', 'bg-info'];
+        const mortalityBadgeTextClass = badgeTextDarkClasses.includes(mortalityBadgeClass) ? 'text-dark' : 'text-white';
         html += `
             <div class="pool-stat-item">
-                <div class="pool-stat-value ${mortalityColorClass}">
-                    ${mortalityCountFormatted} шт
+                <div class="pool-stat-value">
+                    <span class="badge ${mortalityBadgeClass} ${mortalityBadgeTextClass}">
+                        ${mortalityCountFormatted} шт
+                    </span>
                 </div>
                 <div class="pool-stat-label">Падеж за ${mortalityHours} ч</div>
             </div>
@@ -278,6 +313,23 @@ function escapeHtml(text) {
         "'": '&#039;'
     };
     return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
+function formatNumber(value, fractionDigits = 2) {
+    if (value === null || value === undefined || isNaN(value)) {
+        return '';
+    }
+    return Number(value).toLocaleString('ru-RU', {
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits
+    });
+}
+
+function formatInteger(value) {
+    if (value === null || value === undefined || isNaN(value)) {
+        return '';
+    }
+    return Number(value).toLocaleString('ru-RU');
 }
 
 // Загрузка при открытии страницы
