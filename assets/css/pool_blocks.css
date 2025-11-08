@@ -1,0 +1,324 @@
+/**
+ * Стили для блоков бассейнов на рабочей странице
+ */
+
+.pools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+    .pools-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .pools-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pool-block {
+    background-color: #ffffff;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    min-height: 300px;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pool-block:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.pool-block-header {
+    position: relative;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.pool-block-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.pool-block-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.pool-block-title a:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+}
+
+.pool-block-avg-weight-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+}
+
+.pool-block-session-info {
+    font-size: 0.65rem;
+    color: #666666;
+    font-weight: 400;
+    margin-top: 0.25rem;
+    line-height: 1.3;
+}
+
+.pool-block-session-info > div {
+    margin-bottom: 0.1rem;
+}
+
+.pool-block-session-duration {
+    margin-top: 0.2rem;
+    font-size: 0.6rem;
+    color: #888888;
+}
+
+.pool-block-name {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0.75rem;
+    color: #666666;
+    font-weight: 400;
+}
+
+.pool-block-content {
+    min-height: 120px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    gap: 1rem;
+}
+
+.pool-measurements {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.pool-measurement-item {
+    width: 100%;
+    text-align: left;
+}
+
+.pool-measurement-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.pool-measurement-value sub {
+    font-size: 0.6em;
+    vertical-align: baseline;
+}
+
+.pool-stats-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.pool-stat-item {
+    text-align: right;
+}
+
+.pool-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.pool-stat-label {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+.pool-block-divider {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 1rem 0;
+}
+
+.pool-block-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 0.5rem;
+}
+
+.pool-action-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.25rem;
+    padding: 0;
+    color: #ffffff;
+}
+
+.pool-action-btn:first-child {
+    background-color: #0d6efd;
+}
+
+.pool-action-btn:first-child:hover {
+    background-color: #0b5ed7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.4);
+}
+
+.pool-action-btn:nth-child(2) {
+    background-color: #ffc107;
+}
+
+.pool-action-btn:nth-child(2):hover {
+    background-color: #ffca2c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.4);
+}
+
+.pool-action-btn:nth-child(3) {
+    background-color: #198754;
+}
+
+.pool-action-btn:nth-child(3):hover {
+    background-color: #157347;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(25, 135, 84, 0.4);
+}
+
+.pool-action-btn:active {
+    transform: translateY(0);
+}
+
+.pool-block-empty {
+    opacity: 0.5;
+}
+
+/* Темная тема */
+[data-theme="dark"] .pool-block {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .pool-block:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .pool-block-header {
+    border-bottom-color: #404040;
+}
+
+[data-theme="dark"] .pool-block-title {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .pool-block-avg-weight-badge {
+    background-color: #0d6efd !important;
+}
+
+[data-theme="dark"] .pool-block-session-info {
+    color: #999999;
+}
+
+[data-theme="dark"] .pool-block-session-duration {
+    color: #777777;
+}
+
+[data-theme="dark"] .pool-block-name {
+    color: #999999;
+}
+
+[data-theme="dark"] .pool-block-divider {
+    background-color: #404040;
+}
+
+[data-theme="dark"] .pool-action-btn:first-child {
+    background-color: #0d6efd;
+}
+
+[data-theme="dark"] .pool-action-btn:first-child:hover {
+    background-color: #0b5ed7;
+}
+
+[data-theme="dark"] .pool-action-btn:nth-child(2) {
+    background-color: #ffc107;
+    color: #000000;
+}
+
+[data-theme="dark"] .pool-action-btn:nth-child(2):hover {
+    background-color: #ffca2c;
+    color: #000000;
+}
+
+[data-theme="dark"] .pool-action-btn:nth-child(3) {
+    background-color: #198754;
+}
+
+[data-theme="dark"] .pool-action-btn:nth-child(3):hover {
+    background-color: #157347;
+}
+
+[data-theme="dark"] .pool-measurement-value.text-success {
+    color: #75b798 !important;
+}
+
+[data-theme="dark"] .pool-measurement-value.text-warning {
+    color: #ffc107 !important;
+}
+
+[data-theme="dark"] .pool-measurement-value.text-danger {
+    color: #dc3545 !important;
+}
+
+[data-theme="dark"] .pool-stat-label {
+    color: #999 !important;
+}
+
+[data-theme="dark"] .pool-stat-value.text-danger {
+    color: #dc3545 !important;
+}
+
+[data-theme="dark"] .pool-stat-value.text-success {
+    color: #75b798 !important;
+}
+
+[data-theme="dark"] .pool-stat-value.text-warning {
+    color: #ffc107 !important;
+}

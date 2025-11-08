@@ -1,0 +1,246 @@
+/**
+ * Стили для страницы задач
+ */
+
+.tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.task-card {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    transition: box-shadow 0.2s;
+}
+
+.task-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.task-card.task-completed {
+    opacity: 0.7;
+    background-color: #f8f9fa;
+}
+
+.task-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.task-card-header .form-check {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.task-title {
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 0.5rem;
+}
+
+.task-title:hover {
+    text-decoration: underline;
+}
+
+.task-description {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    white-space: pre-wrap;
+}
+
+.task-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.task-assigned,
+.task-due-date {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.task-progress {
+    margin-top: 0.5rem;
+}
+
+.task-progress small {
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.task-actions {
+    border-top: 1px solid #dee2e6;
+    padding-top: 0.5rem;
+}
+
+.task-items-list {
+    margin-top: 0.5rem;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+}
+
+.task-item-input {
+    flex: 1;
+}
+
+.file-upload-area {
+    margin-top: 0.5rem;
+}
+
+.file-upload-dropzone {
+    border: 2px dashed #dee2e6;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: #f8f9fa;
+}
+
+.file-upload-dropzone:hover {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+}
+
+.file-upload-dropzone.drag-over {
+    border-color: #0d6efd;
+    background-color: #cfe2ff;
+}
+
+.file-upload-dropzone i {
+    font-size: 2rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.task-files-list {
+    list-style: none;
+    padding: 0;
+}
+
+.task-file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.task-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.task-checklist-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.task-checklist-item:last-child {
+    border-bottom: none;
+}
+
+.task-checklist-item.completed {
+    opacity: 0.6;
+}
+
+.task-checklist-item.completed .form-check-label {
+    text-decoration: line-through;
+}
+
+.task-meta-value {
+    font-size: 0.9rem;
+}
+
+.task-checklist-item {
+    cursor: move;
+}
+
+.task-item {
+    cursor: move;
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+    background-color: #e0e0e0;
+}
+
+.sortable-chosen {
+    background-color: #f0f0f0;
+}
+
+.sortable-drag {
+    opacity: 0.8;
+}
+
+[data-theme="dark"] .sortable-ghost {
+    background-color: #404040;
+}
+
+[data-theme="dark"] .sortable-chosen {
+    background-color: #3d3d3d;
+}
+
+.task-details {
+    padding: 1rem;
+}
+
+.task-details-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+[data-theme="dark"] .task-card {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .task-description {
+    color: #b0b0b0;
+}
+
+[data-theme="dark"] .task-meta {
+    color: #b0b0b0;
+}
+
+[data-theme="dark"] .file-upload-dropzone {
+    border-color: #404040;
+    background-color: #3d3d3d;
+}
+
+[data-theme="dark"] .file-upload-dropzone:hover {
+    border-color: #0d6efd;
+    background-color: #1a3a5c;
+}
+
+[data-theme="dark"] .file-upload-dropzone.drag-over {
+    border-color: #0d6efd;
+    background-color: #0d4a7a;
+}
+
+[data-theme="dark"] .task-file-item {
+    background-color: #3d3d3d;
+}
+
+[data-theme="dark"] .task-checklist-item {
+    border-bottom-color: #404040;
+}
+

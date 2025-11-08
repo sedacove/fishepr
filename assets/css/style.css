@@ -1,0 +1,720 @@
+/**
+ * Основные стили ERP системы
+ */
+
+/* Шрифт Roboto для основного текста */
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Шрифт Bitter для заголовков */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: 'Bitter', serif;
+}
+
+/* Общие стили для body */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Roboto', sans-serif;
+}
+
+.badge {
+    font-weight: 400;
+}
+
+.section-description {
+    border-left: 4px solid #0d6efd;
+}
+
+[data-theme="dark"] .section-description {
+    border-left-color: #66b2ff;
+}
+
+/* Основной контент */
+.main-content {
+    flex: 1;
+    padding-bottom: 2rem;
+}
+
+/* Навигация */
+.navbar {
+    min-height: 75px;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    padding: 0;
+}
+
+.navbar-logo {
+    height: 60px;
+    width: auto;
+    max-width: 150px;
+}
+
+.navbar-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="dark"] .navbar-text {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Часы */
+.clock-time {
+    font-family: 'DS-Digital', monospace;
+    font-size: 2.4rem;
+    font-weight: normal;
+    letter-spacing: 3px;
+    color: rgba(255, 255, 255, 0.95) !important;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+[data-theme="dark"] .clock-time {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Стили для страницы авторизации */
+body.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-container {
+    max-width: 400px;
+    width: 100%;
+    padding: 20px;
+}
+
+.login-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    padding: 40px;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-logo {
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    font-weight: 600;
+}
+
+/* Графики */
+#exampleChart {
+    max-height: 400px;
+}
+
+/* Темная тема */
+[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+[data-theme="dark"] body {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .main-content {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .card {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .card-body {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .card-title {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .card-text {
+    color: #d0d0d0;
+}
+
+[data-theme="dark"] .bg-light {
+    background-color: #2d2d2d !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: #a0a0a0 !important;
+}
+
+[data-theme="dark"] .form-control {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .form-control:focus {
+    background-color: #2d2d2d;
+    border-color: #667eea;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .form-label {
+    color: #e0e0e0;
+}
+
+.form-control::placeholder {
+    color: #6c757d;
+    opacity: 1;
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: #ced4da;
+    opacity: 1;
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background-color: #2d2d2d;
+    border-color: #404040;
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: #404040;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .dropdown-divider {
+    border-color: #404040;
+}
+
+[data-theme="dark"] .alert {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .alert-danger {
+    background-color: #3d1f1f;
+    border-color: #5a2a2a;
+    color: #ffcccc;
+}
+
+[data-theme="dark"] .alert-success {
+    background-color: #1f3d1f;
+    border-color: #2a5a2a;
+    color: #ccffcc;
+}
+
+[data-theme="dark"] .alert-info {
+    background-color: #1f2f3d;
+    border-color: #2a405a;
+    color: #cce5ff;
+}
+
+footer {
+    margin-top: 2rem;
+}
+
+[data-theme="dark"] footer {
+    background-color: #2d2d2d !important;
+    border-top: 1px solid #404040;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .table {
+    color: #e0e0e0 !important;
+    border-color: #404040 !important;
+    background-color: #2d2d2d !important;
+}
+
+[data-theme="dark"] .table thead {
+    background-color: #252525 !important;
+}
+
+[data-theme="dark"] .table thead th {
+    background-color: #252525 !important;
+    border-color: #404040 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .table tbody {
+    background-color: #2d2d2d !important;
+}
+
+[data-theme="dark"] .table tbody td {
+    background-color: transparent !important;
+    border-color: #404040 !important;
+    color: #e0e0e0 !important;
+}
+
+[data-theme="dark"] .table tbody tr {
+    background-color: transparent !important;
+    border-color: #404040 !important;
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #252525 !important;
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > td {
+    background-color: #252525 !important;
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: #2d2d2d !important;
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) > td {
+    background-color: #2d2d2d !important;
+}
+
+[data-theme="dark"] .table-hover > tbody > tr:hover {
+    background-color: #353535 !important;
+}
+
+[data-theme="dark"] .table-hover > tbody > tr:hover > td {
+    background-color: #353535 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .table-responsive {
+    border-color: #404040 !important;
+}
+
+/* Стили для задач на главной странице */
+.dashboard-tasks-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.dashboard-task-item {
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.dashboard-task-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dashboard-task-item:last-child {
+    margin-bottom: 0;
+}
+
+.task-title-small {
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.task-progress-small {
+    margin-top: 0.25rem;
+}
+
+[data-theme="dark"] .dashboard-task-item {
+    border-color: #404040;
+}
+
+[data-theme="dark"] .dashboard-task-item:hover {
+    background-color: #3d3d3d;
+}
+
+/* Модальные окна */
+[data-theme="dark"] .modal-content {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .modal-header {
+    border-bottom-color: #404040;
+}
+
+[data-theme="dark"] .modal-footer {
+    border-top-color: #404040;
+}
+
+[data-theme="dark"] .modal-title {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Формы */
+[data-theme="dark"] .form-select {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .form-select:focus {
+    background-color: #2d2d2d;
+    border-color: #667eea;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .form-select option {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .form-check-input {
+    background-color: #2d2d2d;
+    border-color: #404040;
+}
+
+[data-theme="dark"] .form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+[data-theme="dark"] .form-check-label {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .form-control:read-only {
+    background-color: #252525;
+    border-color: #404040;
+    color: #a0a0a0;
+}
+
+/* Кнопки */
+[data-theme="dark"] .btn-primary {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    background-color: #5568d3;
+    border-color: #5568d3;
+}
+
+[data-theme="dark"] .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #5a6268;
+}
+
+[data-theme="dark"] .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+[data-theme="dark"] .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+}
+
+[data-theme="dark"] .btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+}
+
+[data-theme="dark"] .btn-warning:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+    color: #000;
+}
+
+/* Badge */
+[data-theme="dark"] .badge {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .badge.bg-success {
+    background-color: #28a745 !important;
+}
+
+[data-theme="dark"] .badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+[data-theme="dark"] .badge.bg-primary {
+    background-color: #667eea !important;
+}
+
+[data-theme="dark"] .badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+/* Спиннер */
+[data-theme="dark"] .spinner-border {
+    border-color: #667eea;
+    border-right-color: transparent;
+}
+
+/* Маленький текст */
+[data-theme="dark"] small {
+    color: #a0a0a0;
+}
+
+/* Цветной текст */
+[data-theme="dark"] .text-danger {
+    color: #ff6b6b !important;
+}
+
+[data-theme="dark"] .text-success {
+    color: #51cf66 !important;
+}
+
+[data-theme="dark"] .text-warning {
+    color: #ffd43b !important;
+}
+
+[data-theme="dark"] .text-info {
+    color: #74c0fc !important;
+}
+
+[data-theme="dark"] .text-primary {
+    color: #667eea !important;
+}
+
+/* Визуально скрытые элементы */
+[data-theme="dark"] .visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Дополнительные элементы */
+[data-theme="dark"] strong {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+[data-theme="dark"] p {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .container {
+    color: #e0e0e0;
+}
+
+/* Список элементов (для бассейнов) */
+[data-theme="dark"] .list-group-item {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .list-group-item:hover {
+    background-color: #353535;
+}
+
+[data-theme="dark"] .list-group-item h6 {
+    color: #ffffff;
+}
+
+/* Таблица логов - мелкий шрифт */
+.logs-table {
+    font-size: 0.85rem;
+}
+
+.logs-table th {
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.logs-table td {
+    font-size: 0.85rem;
+    vertical-align: middle;
+}
+
+.logs-table small {
+    font-size: 0.75rem;
+}
+
+[data-theme="dark"] .logs-table {
+    font-size: 0.85rem;
+}
+
+[data-theme="dark"] .logs-table th {
+    font-size: 0.8rem;
+}
+
+[data-theme="dark"] .logs-table td {
+    font-size: 0.85rem;
+}
+
+[data-theme="dark"] .logs-table small {
+    font-size: 0.75rem;
+}
+
+/* Пагинация */
+.pagination {
+    font-size: 0.9rem;
+}
+
+[data-theme="dark"] .page-link {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .page-link:hover {
+    background-color: #404040;
+    border-color: #505050;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .page-item.active .page-link {
+    background-color: #667eea;
+    border-color: #667eea;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .page-item.disabled .page-link {
+    background-color: #252525;
+    border-color: #404040;
+    color: #666666;
+    cursor: not-allowed;
+}
+
+/* Табы */
+[data-theme="dark"] .nav-tabs {
+    border-bottom-color: #404040;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link {
+    color: #e0e0e0;
+    border-color: transparent;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link:hover {
+    border-color: #404040;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link.active {
+    background-color: #2d2d2d;
+    border-color: #404040 #404040 #2d2d2d;
+    color: #ffffff;
+}
+
+/* Неактивные табы */
+.nav-tabs .nav-link.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+[data-theme="dark"] .nav-tabs .nav-link.disabled {
+    opacity: 0.4;
+    color: #666666;
+}
+
+/* Кликабельные строки логов */
+.log-row-clickable:hover {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .log-row-clickable:hover {
+    background-color: rgba(0, 123, 255, 0.2) !important;
+}
+
+/* Модальное окно с изменениями */
+#changesContent {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+[data-theme="dark"] #changesContent {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0;
+}
+
+/* Градиентная шкала для нормальных значений */
+.gradient-scale-container {
+    margin: 2rem 0;
+}
+
+.gradient-scale-wrapper {
+    position: relative;
+    padding: 50px 0 10px 0;
+}
+
+.gradient-scale {
+    position: relative;
+    height: 60px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.gradient-scale-input {
+    position: absolute;
+    top: -50px;
+    transform: translateX(-50%);
+    width: 70px;
+    text-align: center;
+}
+
+.gradient-scale-input input {
+    width: 100%;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.35rem;
+}
+
+
+[data-theme="dark"] .gradient-scale {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+

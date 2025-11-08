@@ -1,0 +1,3 @@
+ALTER TABLE `users`
+    ADD COLUMN `salary` DECIMAL(12,2) NULL DEFAULT NULL AFTER `email`;
+
