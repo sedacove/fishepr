@@ -142,6 +142,9 @@ if (!isset($page_title)) {
                         <a class="nav-link" href="<?php echo BASE_URL; ?>pages/tasks.php">Задачи</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/meter_readings.php">Приборы</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="<?php echo BASE_URL; ?>pages/duty_calendar.php">
                             Календарь
                         </a>
@@ -194,6 +197,11 @@ if (!isset($page_title)) {
                             <li>
                                 <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/counterparties.php">
                                     <i class="bi bi-building"></i> Контрагенты
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/meters.php">
+                                    <i class="bi bi-speedometer"></i> Приборы учета
                                 </a>
                             </li>
                             <li>

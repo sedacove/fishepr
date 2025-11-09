@@ -274,7 +274,12 @@ function buildSettingsCategories(settings) {
 
 function isNotificationSetting(key) {
     const prefixes = ['telegram_', 'mortality_', 'measurement_warning_', 'weighing_warning_', 'alert_'];
-    const explicitKeys = ['mortality_alert_threshold', 'measurement_warning_timeout_minutes', 'weighing_warning_days'];
+    const explicitKeys = [
+        'mortality_alert_threshold',
+        'measurement_warning_timeout_minutes',
+        'weighing_warning_days',
+        'meter_reading_edit_timeout_minutes'
+    ];
     return prefixes.some(prefix => key.startsWith(prefix)) || explicitKeys.includes(key);
 }
 
