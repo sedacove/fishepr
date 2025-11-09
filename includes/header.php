@@ -1,4 +1,8 @@
 <?php
+if (!function_exists('asset_url')) {
+    require_once __DIR__ . '/../config/config.php';
+}
+
 if (!isset($page_title)) {
     $page_title = 'ERP Система';
 }
