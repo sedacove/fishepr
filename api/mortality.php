@@ -382,6 +382,47 @@ try {
                 'message' => 'Запись о падеже успешно удалена'
             ]);
             break;
+
+        case 'totals_last30':
+            $today = new DateTimeImmutable('today');
+            $startDate = $today->sub(new DateInterval('P29D'));
+
+            $stmt = $pdo->prepare("
+                SELECT DATE(recorded_at) AS record_date, SUM(fish_count) AS total_count
+                FROM mortality
+                WHERE recorded_at >= ? AND recorded_at <= ?
+                GROUP BY DATE(recorded_at)
+                ORDER BY record_date ASC
+            ");
+            $stmt->execute([
+                $startDate->format('Y-m-d 00:00:00'),
+                $today->format('Y-m-d 23:59:59'),
+            ]);
+            $rows = $stmt->fetchAll();
+
+            $totalsMap = [];
+            foreach ($rows as $row) {
+                $totalsMap[$row['record_date']] = (int)($row['total_count'] ?? 0);
+            }
+
+            $interval = new DateInterval('P1D');
+            $period = new DatePeriod($startDate, $interval, $today->add($interval));
+
+            $chartData = [];
+            foreach ($period as $date) {
+                $dateStr = $date->format('Y-m-d');
+                $chartData[] = [
+                    'date' => $dateStr,
+                    'date_label' => $date->format('d.m'),
+                    'total_count' => $totalsMap[$dateStr] ?? 0,
+                ];
+            }
+
+            echo json_encode([
+                'success' => true,
+                'data' => $chartData,
+            ]);
+            break;
             
         case 'get_pools':
             // Получить список активных бассейнов с их активными сессиями
