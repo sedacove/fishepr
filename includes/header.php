@@ -3,6 +3,23 @@ if (!function_exists('asset_url')) {
     require_once __DIR__ . '/../config/config.php';
 }
 
+if (!function_exists('asset_url')) {
+    /**
+     * Резервная функция на случай, если конфигурация не подгрузила asset_url.
+     */
+    function asset_url($relativePath)
+    {
+        $relativePath = ltrim((string)$relativePath, '/');
+        if ($relativePath === '') {
+            return BASE_URL;
+        }
+
+        $separator = strpos($relativePath, '?') === false ? '?' : '&';
+
+        return BASE_URL . $relativePath . $separator . 'v=' . time();
+    }
+}
+
 if (!isset($page_title)) {
     $page_title = 'ERP Система';
 }
