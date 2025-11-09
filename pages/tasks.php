@@ -515,7 +515,7 @@ function loadTaskForEdit(taskId) {
                 }
                 if (response.data.items && response.data.items.length > 0) {
                     response.data.items.forEach(function(item) {
-                        addTaskItem(item.title, item.is_completed);
+                        addTaskItem(item.title, item.is_completed, item.id);
                     });
                 } else {
                     addTaskItem();
@@ -545,7 +545,7 @@ function editTask(taskId) {
 // Добавить элемент чеклиста
 let taskItemsSortable = null;
 
-function addTaskItem(title = '', isCompleted = false) {
+function addTaskItem(title = '', isCompleted = false, itemId = null) {
     const index = $('#taskItemsList .task-item').length;
     const sanitizedTitle = escapeHtml(title);
     const itemHtml = `
@@ -565,6 +565,9 @@ function addTaskItem(title = '', isCompleted = false) {
         </div>
     `;
     const $item = $(itemHtml);
+    if (itemId) {
+        $item.attr('data-item-id', itemId);
+    }
     $('#taskItemsList').append($item);
     initTaskItemsSortable();
     return $item.find('.task-item-input');
@@ -684,11 +687,22 @@ $('#taskForm').on('submit', function(e) {
     
     // Собираем элементы чеклиста
     const items = [];
-    $('#taskItemsList .task-item-input').each(function() {
-        const title = $(this).val().trim();
-        if (title) {
-            items.push(title);
+    $('#taskItemsList .task-item').each(function(index) {
+        const $item = $(this);
+        const title = $item.find('.task-item-input').val().trim();
+        if (!title) {
+            return;
         }
+        const itemIdRaw = $item.attr('data-item-id');
+        const parsedId = itemIdRaw !== undefined ? parseInt(itemIdRaw, 10) : NaN;
+        const itemId = isNaN(parsedId) ? null : parsedId;
+        const isCompleted = $item.find('.form-check-input').is(':checked');
+        items.push({
+            id: itemId,
+            title: title,
+            is_completed: isCompleted,
+            sort_order: index
+        });
     });
     formData.items = items;
     

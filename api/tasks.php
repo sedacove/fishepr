@@ -12,6 +12,28 @@ require_once __DIR__ . '/../includes/activity_log.php';
 // Требуем авторизацию
 requireAuth();
 
+if (!function_exists('normalizeTaskItemPayload')) {
+    function normalizeTaskItemPayload($item, int $index = 0): array
+    {
+        if (is_array($item)) {
+            $title = trim((string)($item['title'] ?? ''));
+            $isCompleted = !empty($item['is_completed']);
+            $id = isset($item['id']) ? (int)$item['id'] : null;
+        } else {
+            $title = trim((string)$item);
+            $isCompleted = false;
+            $id = null;
+        }
+
+        return [
+            'id' => $id ?: null,
+            'title' => $title,
+            'is_completed' => $isCompleted,
+            'sort_order' => $index
+        ];
+    }
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
@@ -219,14 +241,25 @@ try {
             // Создание элементов чеклиста, если они есть
             if (isset($data['items']) && is_array($data['items'])) {
                 $stmt = $pdo->prepare("
-                    INSERT INTO task_items (task_id, title, sort_order) 
-                    VALUES (?, ?, ?)
+                    INSERT INTO task_items (task_id, title, is_completed, completed_at, completed_by, sort_order) 
+                    VALUES (?, ?, ?, ?, ?, ?)
                 ");
-                foreach ($data['items'] as $index => $itemTitle) {
-                    $itemTitle = trim($itemTitle);
-                    if (!empty($itemTitle)) {
-                        $stmt->execute([$taskId, $itemTitle, $index]);
+                foreach ($data['items'] as $index => $itemPayload) {
+                    $itemData = normalizeTaskItemPayload($itemPayload, $index);
+                    if (empty($itemData['title'])) {
+                        continue;
                     }
+                    $isCompleted = $itemData['is_completed'] ? 1 : 0;
+                    $completedAt = $isCompleted ? date('Y-m-d H:i:s') : null;
+                    $completedBy = $isCompleted ? $userId : null;
+                    $stmt->execute([
+                        $taskId,
+                        $itemData['title'],
+                        $isCompleted,
+                        $completedAt,
+                        $completedBy,
+                        $itemData['sort_order']
+                    ]);
                 }
             }
             
@@ -300,19 +333,81 @@ try {
             
             // Обновление элементов чеклиста
             if (isset($data['items']) && is_array($data['items'])) {
-                // Удаляем старые элементы
-                $stmt = $pdo->prepare("DELETE FROM task_items WHERE task_id = ?");
-                $stmt->execute([$taskId]);
-                
-                // Создаем новые элементы
-                $stmt = $pdo->prepare("
-                    INSERT INTO task_items (task_id, title, sort_order) 
-                    VALUES (?, ?, ?)
+                $existingStmt = $pdo->prepare("
+                    SELECT id, is_completed, completed_at, completed_by 
+                    FROM task_items 
+                    WHERE task_id = ?
                 ");
-                foreach ($data['items'] as $index => $item) {
-                    $itemTitle = is_array($item) ? trim($item['title'] ?? '') : trim($item);
-                    if (!empty($itemTitle)) {
-                        $stmt->execute([$taskId, $itemTitle, $index]);
+                $existingStmt->execute([$taskId]);
+                $existingItems = [];
+                while ($row = $existingStmt->fetch()) {
+                    $existingItems[(int)$row['id']] = $row;
+                }
+
+                $seenIds = [];
+                $insertStmt = $pdo->prepare("
+                    INSERT INTO task_items (task_id, title, is_completed, completed_at, completed_by, sort_order) 
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ");
+                $updateStmt = $pdo->prepare("
+                    UPDATE task_items 
+                    SET title = ?, sort_order = ?, is_completed = ?, completed_at = ?, completed_by = ?, updated_at = NOW()
+                    WHERE id = ?
+                ");
+
+                foreach ($data['items'] as $index => $itemPayload) {
+                    $itemData = normalizeTaskItemPayload($itemPayload, $index);
+                    if (empty($itemData['title'])) {
+                        continue;
+                    }
+
+                    $itemId = $itemData['id'] ? (int)$itemData['id'] : null;
+                    $isCompleted = $itemData['is_completed'] ? 1 : 0;
+
+                    if ($itemId && isset($existingItems[$itemId])) {
+                        $existing = $existingItems[$itemId];
+                        $completedAt = $existing['completed_at'];
+                        $completedBy = $existing['completed_by'];
+
+                        if ((int)$existing['is_completed'] !== $isCompleted) {
+                            if ($isCompleted) {
+                                $completedAt = date('Y-m-d H:i:s');
+                                $completedBy = $userId;
+                            } else {
+                                $completedAt = null;
+                                $completedBy = null;
+                            }
+                        }
+
+                        $updateStmt->execute([
+                            $itemData['title'],
+                            $itemData['sort_order'],
+                            $isCompleted,
+                            $completedAt,
+                            $completedBy,
+                            $itemId
+                        ]);
+                        $seenIds[] = $itemId;
+                    } else {
+                        $completedAt = $isCompleted ? date('Y-m-d H:i:s') : null;
+                        $completedBy = $isCompleted ? $userId : null;
+                        $insertStmt->execute([
+                            $taskId,
+                            $itemData['title'],
+                            $isCompleted,
+                            $completedAt,
+                            $completedBy,
+                            $itemData['sort_order']
+                        ]);
+                    }
+                }
+
+                if (!empty($existingItems)) {
+                    $idsToDelete = array_diff(array_keys($existingItems), $seenIds);
+                    if (!empty($idsToDelete)) {
+                        $placeholders = implode(',', array_fill(0, count($idsToDelete), '?'));
+                        $deleteStmt = $pdo->prepare("DELETE FROM task_items WHERE id IN ($placeholders)");
+                        $deleteStmt->execute(array_values($idsToDelete));
                     }
                 }
             }
