@@ -223,49 +223,88 @@ function renderMeasurements(measurements, poolId) {
         return;
     }
     
-        measurements.forEach(function(measurement) {
-            const userInfo = measurement.created_by_full_name 
-                ? `${escapeHtml(measurement.created_by_full_name)} (${escapeHtml(measurement.created_by_login)})`
-                : escapeHtml(measurement.created_by_login || 'Неизвестно');
-            
-            // Проверяем, может ли текущий пользователь редактировать этот замер
-            const canEdit = isAdmin || (measurement.can_edit === true);
-            const canDelete = isAdmin;
-            
-            let actionsHtml = '';
-            if (canEdit || canDelete) {
-                actionsHtml = '<td>';
-                
-                if (canEdit) {
-                    actionsHtml += `
-                        <button class="btn btn-sm btn-primary" onclick="openEditModal(${measurement.id})" title="Редактировать">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                    `;
-                }
-                
-                if (canDelete) {
-                    actionsHtml += `
-                        <button class="btn btn-sm btn-danger" onclick="deleteMeasurement(${measurement.id})" title="Удалить">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    `;
-                }
-                
-                actionsHtml += '</td>';
-            }
+    measurements.forEach(function(measurement) {
+        const userInfo = measurement.created_by_full_name 
+            ? `${escapeHtml(measurement.created_by_full_name)} (${escapeHtml(measurement.created_by_login)})`
+            : escapeHtml(measurement.created_by_login || 'Неизвестно');
         
+        // Проверяем, может ли текущий пользователь редактировать этот замер
+        const canEdit = isAdmin || (measurement.can_edit === true);
+        const canDelete = isAdmin;
+        
+        let actionsHtml = '';
+        if (canEdit || canDelete) {
+            actionsHtml = '<td>';
+            
+            if (canEdit) {
+                actionsHtml += `
+                    <button class="btn btn-sm btn-primary" onclick="openEditModal(${measurement.id})" title="Редактировать">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                `;
+            }
+            
+            if (canDelete) {
+                actionsHtml += `
+                    <button class="btn btn-sm btn-danger" onclick="deleteMeasurement(${measurement.id})" title="Удалить">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
+            }
+            
+            actionsHtml += '</td>';
+        }
+        
+        const temperatureCell = formatMeasurementCell(measurement.temperature, measurement.temperature_stratum);
+        const oxygenCell = formatMeasurementCell(measurement.oxygen, measurement.oxygen_stratum);
+
         const row = `
             <tr>
                 <td>${measurement.measured_at_display}</td>
-                <td>${measurement.temperature}</td>
-                <td>${measurement.oxygen}</td>
+                <td>${temperatureCell}</td>
+                <td>${oxygenCell}</td>
                 <td>${userInfo}</td>
                 ${actionsHtml}
             </tr>
         `;
         tbody.append(row);
     });
+}
+
+function formatMeasurementCell(value, stratum) {
+    if (value === null || value === undefined || value === '') {
+        return '<span class="text-muted">—</span>';
+    }
+    const className = getStratumClass(stratum);
+    const formatted = formatMeasurementValue(value);
+    return `<span class="${className}">${formatted}</span>`;
+}
+
+function formatMeasurementValue(value) {
+    const number = parseFloat(value);
+    if (Number.isNaN(number)) {
+        return escapeHtml(String(value));
+    }
+    return number.toLocaleString('ru-RU', {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+    });
+}
+
+function getStratumClass(stratum) {
+    if (!stratum) {
+        return 'text-muted';
+    }
+    switch (stratum) {
+        case 'good':
+            return 'text-success fw-semibold';
+        case 'acceptable':
+            return 'text-warning fw-semibold';
+        case 'bad':
+        case 'critical':
+        default:
+            return 'text-danger fw-semibold';
+    }
 }
 
 // Открыть модальное окно для добавления

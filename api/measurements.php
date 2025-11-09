@@ -20,6 +20,58 @@ $action = $_GET['action'] ?? '';
 try {
     $pdo = getDBConnection();
     $isAdmin = isAdmin();
+
+    $temperatureSettings = [
+        'bad_below' => (float)getSetting('temp_bad_below', 10),
+        'acceptable_min' => (float)getSetting('temp_acceptable_min', 10),
+        'good_min' => (float)getSetting('temp_good_min', 14),
+        'good_max' => (float)getSetting('temp_good_max', 17),
+        'acceptable_max' => (float)getSetting('temp_acceptable_max', 20),
+        'bad_above' => (float)getSetting('temp_bad_above', 20),
+    ];
+
+    $oxygenSettings = [
+        'bad_below' => (float)getSetting('oxygen_bad_below', 8),
+        'acceptable_min' => (float)getSetting('oxygen_acceptable_min', 8),
+        'good_min' => (float)getSetting('oxygen_good_min', 11),
+        'good_max' => (float)getSetting('oxygen_good_max', 16),
+        'acceptable_max' => (float)getSetting('oxygen_acceptable_max', 20),
+        'bad_above' => (float)getSetting('oxygen_bad_above', 20),
+    ];
+
+    $calculateStratum = static function (?float $value, array $settings): ?string {
+        if ($value === null) {
+            return null;
+        }
+
+        if ($value < $settings['bad_below'] || $value > $settings['bad_above']) {
+            return 'bad';
+        }
+
+        $isAcceptableLow = ($value >= $settings['acceptable_min'] && $value < $settings['good_min']);
+        $isAcceptableHigh = ($value > $settings['good_max'] && $value <= $settings['acceptable_max']);
+        if ($isAcceptableLow || $isAcceptableHigh) {
+            return 'acceptable';
+        }
+
+        if ($value >= $settings['good_min'] && $value <= $settings['good_max']) {
+            return 'good';
+        }
+
+        return 'bad';
+    };
+
+    $enrichMeasurement = static function (array &$measurement) use ($calculateStratum, $temperatureSettings, $oxygenSettings) {
+        $temperature = isset($measurement['temperature']) ? (float)$measurement['temperature'] : null;
+        $oxygen = isset($measurement['oxygen']) ? (float)$measurement['oxygen'] : null;
+
+        $measurement['temperature_stratum'] = $temperature !== null
+            ? $calculateStratum($temperature, $temperatureSettings)
+            : null;
+        $measurement['oxygen_stratum'] = $oxygen !== null
+            ? $calculateStratum($oxygen, $oxygenSettings)
+            : null;
+    };
     
     switch ($action) {
         case 'list':
@@ -70,6 +122,8 @@ try {
                         $measurement['can_edit'] = false;
                     }
                 }
+
+                $enrichMeasurement($measurement);
             }
             
             echo json_encode([
@@ -104,6 +158,7 @@ try {
             
             // Преобразование даты
             $measurement['measured_at'] = date('Y-m-d\TH:i', strtotime($measurement['measured_at']));
+            $enrichMeasurement($measurement);
             
             echo json_encode([
                 'success' => true,

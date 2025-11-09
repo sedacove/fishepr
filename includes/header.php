@@ -35,7 +35,7 @@ if (!isset($page_title)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     
     <!-- Основные стили -->
-    <link href="<?php echo BASE_URL; ?>assets/css/style.css" rel="stylesheet">
+    <link href="<?php echo asset_url('assets/css/style.css'); ?>" rel="stylesheet">
     
     <!-- Инициализация темы (предотвращает мерцание) -->
     <script>

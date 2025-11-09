@@ -16,7 +16,7 @@ require_once __DIR__ . '/../includes/settings.php';
 $isAdmin = isAdmin();
 $maxPoolCapacityKg = (float)getSetting('max_pool_capacity_kg', 5000);
 ?>
-<link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/pool_blocks.css">
+<link rel="stylesheet" href="<?php echo asset_url('assets/css/pool_blocks.css'); ?>">
 
 <div class="container mt-4">
     <div class="row">

@@ -19,7 +19,7 @@ $page_title = 'Детали сессии';
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
-<link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/session_details.css">
+<link rel="stylesheet" href="<?php echo asset_url('assets/css/session_details.css'); ?>">
 
 <div class="container mt-4">
     <div class="row mb-3">

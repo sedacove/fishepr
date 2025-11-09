@@ -176,6 +176,11 @@ class MigrationRunner {
         
         echo "\n=== Завершено ===\n";
         echo "Выполнено новых миграций: {$newMigrations}\n";
+        
+        if (function_exists('refresh_asset_version')) {
+            $newAssetVersion = refresh_asset_version();
+            echo "Обновлена версия статических ресурсов: {$newAssetVersion}\n";
+        }
     }
     
     /**

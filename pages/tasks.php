@@ -16,7 +16,7 @@ $isAdmin = isAdmin();
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/section_descriptions.php';
 ?>
-<link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/tasks.css">
+<link rel="stylesheet" href="<?php echo asset_url('assets/css/tasks.css'); ?>">
 <!-- SortableJS для drag-n-drop -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 

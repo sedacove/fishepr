@@ -7,6 +7,6 @@
     </footer>
     
     <!-- Theme Toggle Script -->
-    <script src="<?php echo BASE_URL; ?>assets/js/theme.js"></script>
+    <script src="<?php echo asset_url('assets/js/theme.js'); ?>"></script>
 </body>
 </html>
