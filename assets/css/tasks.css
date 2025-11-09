@@ -6,9 +6,16 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
+    grid-auto-rows: 1fr;
+}
+
+.tasks-grid .task-card {
+    height: 100%;
 }
 
 .task-card {
+    display: flex;
+    flex-direction: column;
     background: #fff;
     border: 1px solid #dee2e6;
     border-radius: 0.5rem;
@@ -69,6 +76,10 @@
     gap: 0.25rem;
 }
 
+.task-due-date {
+    white-space: nowrap;
+}
+
 .task-progress {
     margin-top: 0.5rem;
 }
@@ -81,6 +92,7 @@
 .task-actions {
     border-top: 1px solid #dee2e6;
     padding-top: 0.5rem;
+    margin-top: auto;
 }
 
 .task-items-list {

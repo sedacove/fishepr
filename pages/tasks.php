@@ -547,6 +547,7 @@ let taskItemsSortable = null;
 
 function addTaskItem(title = '', isCompleted = false) {
     const index = $('#taskItemsList .task-item').length;
+    const sanitizedTitle = escapeHtml(title);
     const itemHtml = `
         <div class="task-item mb-2" data-item-index="${index}">
             <div class="input-group">
@@ -556,15 +557,17 @@ function addTaskItem(title = '', isCompleted = false) {
                 <div class="input-group-text">
                     <input class="form-check-input" type="checkbox" ${isCompleted ? 'checked' : ''} disabled>
                 </div>
-                <input type="text" class="form-control task-item-input" value="${escapeHtml(title)}" placeholder="Название пункта">
-                <button type="button" class="btn btn-outline-danger" onclick="removeTaskItem(this)">
-                    <i class="bi bi-x"></i>
+                <input type="text" class="form-control task-item-input" value="${sanitizedTitle}" placeholder="Название пункта">
+                <button type="button" class="btn btn-sm btn-outline-secondary task-item-remove-btn" onclick="removeTaskItem(this)" title="Удалить пункт">
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
         </div>
     `;
-    $('#taskItemsList').append(itemHtml);
+    const $item = $(itemHtml);
+    $('#taskItemsList').append($item);
     initTaskItemsSortable();
+    return $item.find('.task-item-input');
 }
 
 // Инициализация Sortable для элементов чеклиста в форме
@@ -588,6 +591,28 @@ function initTaskItemsSortable() {
 function removeTaskItem(button) {
     $(button).closest('.task-item').remove();
 }
+
+// Навигация по чеклисту с помощью Tab
+$('#taskItemsList').on('keydown', '.task-item-input', function(event) {
+    if (event.key !== 'Tab' || event.shiftKey) {
+        return;
+    }
+
+    event.preventDefault();
+
+    const inputs = $('#taskItemsList .task-item-input');
+    const currentIndex = inputs.index(this);
+
+    if (currentIndex >= 0 && currentIndex < inputs.length - 1) {
+        inputs.eq(currentIndex + 1).focus();
+    } else {
+        const newInput = addTaskItem();
+        // Фокусируемся на вновь созданном поле после добавления
+        setTimeout(function() {
+            newInput.trigger('focus');
+        }, 0);
+    }
+});
 
 // Обработка выбора файлов
 function handleFileSelect(event) {
