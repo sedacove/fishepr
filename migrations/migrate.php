@@ -105,8 +105,11 @@ class MigrationRunner {
             }
         );
         
-        $this->pdo->beginTransaction();
-        
+        $transactionStarted = false;
+        if (!$this->pdo->inTransaction()) {
+            $transactionStarted = $this->pdo->beginTransaction();
+        }
+
         try {
             foreach ($queries as $query) {
                 $query = trim($query);
@@ -124,7 +127,9 @@ class MigrationRunner {
             $stmt = $this->pdo->prepare("INSERT INTO migrations (migration, batch) VALUES (?, ?)");
             $stmt->execute([$name, $batch]);
             
-            $this->pdo->commit();
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->commit();
+            }
             echo "✓ Миграция {$name} выполнена успешно\n";
             return true;
         } catch (Exception $e) {
