@@ -196,6 +196,11 @@ if (!isset($page_title)) {
                                     <i class="bi bi-building"></i> Контрагенты
                                 </a>
                             </li>
+                            <li>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/news.php">
+                                    <i class="bi bi-newspaper"></i> Новости
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/settings.php">

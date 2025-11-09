@@ -20,6 +20,25 @@ require_once __DIR__ . '/includes/header.php';
             
             <div class="row">
                 <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0" id="latestNewsTitle">Последняя новость</h5>
+                                <a href="<?php echo BASE_URL; ?>pages/news.php" class="btn btn-sm btn-outline-primary <?php echo isAdmin() ? '' : 'd-none'; ?>">
+                                    Управлять
+                                </a>
+                            </div>
+                            <div id="latestNewsContainer">
+                                <div class="text-center py-3">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                        <span class="visually-hidden">Загрузка...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Сегодня дежурит</h5>
@@ -33,7 +52,9 @@ require_once __DIR__ . '/includes/header.php';
                         </div>
                     </div>
                 </div>
-                
+            </div>
+            
+            <div class="row">
                 <div class="col-md-6 mb-4">
                     <div class="card">
                         <div class="card-body">
@@ -48,10 +69,7 @@ require_once __DIR__ . '/includes/header.php';
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6 offset-md-6 mb-4">
+                <div class="col-md-6 mb-4">
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -133,6 +151,63 @@ function loadDutyInfo() {
     });
 }
 
+function loadLatestNews() {
+    const container = $('#latestNewsContainer');
+    container.html(`
+        <div class="text-center py-3">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+        </div>
+    `);
+
+    $.ajax({
+        url: '<?php echo BASE_URL; ?>api/news.php?action=latest',
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.success && response.data) {
+                const news = response.data;
+                const title = escapeHtml(news.title || '');
+
+                if (title) {
+                    $('#latestNewsTitle').text(title);
+                }
+                const author = news.author_full_name
+                    ? escapeHtml(news.author_full_name)
+                    : escapeHtml(news.author_login || '');
+                const publishedAt = formatNewsDate(news.published_at);
+                const content = news.content || '';
+
+                container.html(`
+                    <div class="latest-news">
+                        <div class="d-flex justify-content-between text-muted mb-3 flex-column flex-sm-row">
+                            <small class="mb-1 mb-sm-0"><i class="bi bi-calendar-event"></i> ${publishedAt}</small>
+                            ${author ? `<small><i class="bi bi-person"></i> ${author}</small>` : ''}
+                        </div>
+                        <div class="news-content">${content}</div>
+                    </div>
+                `);
+            } else {
+                $('#latestNewsTitle').text('Последняя новость');
+                container.html(`
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-info-circle"></i> Новостей пока нет
+                    </p>
+                `);
+            }
+        },
+        error: function() {
+            $('#latestNewsTitle').text('Последняя новость');
+            container.html(`
+                <p class="text-danger mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> Не удалось загрузить новости
+                </p>
+            `);
+        }
+    });
+}
+
 // Показать ошибку загрузки дежурного
 function showDutyError(containerId) {
     $(`#${containerId}`).html(`
@@ -153,6 +228,24 @@ function escapeHtml(text) {
         "'": '&#039;'
     };
     return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
+function formatNewsDate(value) {
+    if (!value) {
+        return '';
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return '';
+    }
+    const day = date.getDate();
+    const monthNames = [
+        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+    ];
+    const monthName = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day} ${monthName} ${year}`;
 }
 
 // Загрузка задач пользователя
@@ -293,6 +386,7 @@ function getDaysText(days) {
 document.addEventListener('DOMContentLoaded', function() {
     loadDutyInfo();
     loadMyTasks();
+    loadLatestNews();
 });
 </script>
 
