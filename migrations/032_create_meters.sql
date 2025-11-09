@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS meter_readings (
     CONSTRAINT fk_meter_readings_user FOREIGN KEY (recorded_by) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO settings (`key`, `value`, `description`, `created_at`, `updated_at`)
-SELECT 'meter_reading_edit_timeout_minutes', '30', 'Тайм-аут (в минутах) на редактирование показаний приборов учета пользователем', NOW(), NOW()
+INSERT INTO settings (`key`, `value`, `description`)
+SELECT 'meter_reading_edit_timeout_minutes', '30', 'Тайм-аут (в минутах) на редактирование показаний приборов учета пользователем'
 WHERE NOT EXISTS (
     SELECT 1 FROM settings WHERE `key` = 'meter_reading_edit_timeout_minutes'
 );
