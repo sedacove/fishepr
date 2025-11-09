@@ -5,11 +5,22 @@
 
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/duty_helpers.php';
 // Устанавливаем заголовок страницы до подключения header.php
 $page_title = 'Главная страница';
 
 // Требуем авторизацию до вывода каких-либо заголовков
 requireAuth();
+
+$todayDutyDate = getTodayDutyDate();
+$dutyRangeStartObj = new DateTime($todayDutyDate);
+$dutyRangeStartObj->modify('-1 day');
+$dutyRangeEndObj = clone $dutyRangeStartObj;
+$dutyRangeEndObj->modify('+6 day');
+
+$dutyRangeStartIso = $dutyRangeStartObj->format('Y-m-d');
+$dutyRangeEndIso = $dutyRangeEndObj->format('Y-m-d');
+$dutyRangeLabel = $dutyRangeStartObj->format('d.m.Y') . ' — ' . $dutyRangeEndObj->format('d.m.Y');
 
 require_once __DIR__ . '/includes/header.php';
 ?>
@@ -19,7 +30,7 @@ require_once __DIR__ . '/includes/header.php';
             <h1 class="mb-4">Добро пожаловать, <?php echo htmlspecialchars($_SESSION['user_full_name'] ?? $_SESSION['user_login']); ?>!</h1>
             
             <div class="row">
-                <div class="col-md-6 mb-4">
+                <div class="col-lg-6 mb-4">
                     <div class="card h-100">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -38,11 +49,14 @@ require_once __DIR__ . '/includes/header.php';
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 mb-4">
-                    <div class="card">
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
                         <div class="card-body">
-                            <h5 class="card-title">Сегодня дежурит</h5>
-                            <div id="todayDutyInfo">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">Расписание дежурств</h5>
+                                <small class="text-muted" id="dutyWeekRangeLabel"><?php echo htmlspecialchars($dutyRangeLabel); ?></small>
+                            </div>
+                            <div id="dutyWeekContainer" class="duty-week-container">
                                 <div class="text-center py-3">
                                     <div class="spinner-border spinner-border-sm text-primary" role="status">
                                         <span class="visually-hidden">Загрузка...</span>
@@ -55,21 +69,7 @@ require_once __DIR__ . '/includes/header.php';
             </div>
             
             <div class="row">
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Завтра дежурит</h5>
-                            <div id="tomorrowDutyInfo">
-                                <div class="text-center py-3">
-                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                        <span class="visually-hidden">Загрузка...</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-4">
+                <div class="col-12 mb-4">
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -89,66 +89,151 @@ require_once __DIR__ . '/includes/header.php';
                     </div>
                 </div>
             </div>
+            <div id="alert-container"></div>
         </div>
     </div>
 </div>
 
+<style>
+.duty-week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+.duty-week-cell {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.duty-week-cell.today {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 1px rgba(13, 110, 253, 0.25);
+}
+.duty-week-date {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.duty-week-number {
+    font-family: 'Bitter', serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+}
+.duty-week-name {
+    font-size: 0.6rem;
+    margin-top: 0.35rem;
+    line-height: 1.3;
+    min-height: 2.1em;
+}
+.duty-week-fasting {
+    font-size: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #d49100;
+}
+.duty-week-fasting i {
+    font-size: 0.8rem;
+}
+[data-theme="dark"] .dashboard-widget-card .widget-actions .btn {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+[data-theme="dark"] .duty-week-cell {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+[data-theme="dark"] .duty-week-cell.today {
+    border-color: #66b2ff;
+    box-shadow: 0 0 0 1px rgba(102, 178, 255, 0.35);
+}
+[data-theme="dark"] .duty-week-fasting {
+    color: #ffce62;
+}
+@media (max-width: 768px) {
+    .duty-week-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+@media (max-width: 576px) {
+    .duty-week-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+</style>
+
 <script>
-// Загрузка информации о дежурных (сегодня и завтра)
-function loadDutyInfo() {
+const dutyRangeStart = '<?php echo $dutyRangeStartIso; ?>';
+const dutyRangeEnd = '<?php echo $dutyRangeEndIso; ?>';
+
+// Загрузка расписания дежурств на неделю
+function loadDutyWeek() {
+    const container = $('#dutyWeekContainer');
+    container.html(`
+        <div class="text-center py-3">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+        </div>
+    `);
+
     $.ajax({
-        url: '<?php echo BASE_URL; ?>api/duty.php?action=get_current',
+        url: '<?php echo BASE_URL; ?>api/duty.php?action=range&start=' + dutyRangeStart + '&end=' + dutyRangeEnd,
         method: 'GET',
         dataType: 'json',
         success: function(response) {
             if (response.success) {
-                // Сегодняшний дежурный
-                const todayContainer = $('#todayDutyInfo');
-                if (response.data.today.duty) {
-                    const duty = response.data.today.duty;
-                    const userName = duty.user_full_name ? duty.user_full_name : duty.user_login;
-                    todayContainer.html(`
-                        <p class="card-text mb-0">
-                            <strong>${escapeHtml(userName)}</strong><br>
-                            <small class="text-muted">${escapeHtml(duty.user_login)}</small>
-                        </p>
-                    `);
-                } else {
-                    todayContainer.html(`
-                        <p class="card-text text-muted mb-0">
-                            <i class="bi bi-info-circle"></i> Дежурный не назначен
-                        </p>
-                    `);
-                }
-                
-                // Завтрашний дежурный
-                const tomorrowContainer = $('#tomorrowDutyInfo');
-                if (response.data.tomorrow.duty) {
-                    const duty = response.data.tomorrow.duty;
-                    const userName = duty.user_full_name ? duty.user_full_name : duty.user_login;
-                    tomorrowContainer.html(`
-                        <p class="card-text mb-0">
-                            <strong>${escapeHtml(userName)}</strong><br>
-                            <small class="text-muted">${escapeHtml(duty.user_login)}</small>
-                        </p>
-                    `);
-                } else {
-                    tomorrowContainer.html(`
-                        <p class="card-text text-muted mb-0">
-                            <i class="bi bi-info-circle"></i> Дежурный не назначен
-                        </p>
-                    `);
-                }
+                renderDutyWeek(response.data || []);
             } else {
-                showDutyError('todayDutyInfo');
-                showDutyError('tomorrowDutyInfo');
+                container.html('<p class="text-danger mb-0"><i class="bi bi-exclamation-triangle"></i> Не удалось загрузить расписание</p>');
             }
         },
         error: function() {
-            showDutyError('todayDutyInfo');
-            showDutyError('tomorrowDutyInfo');
+            container.html('<p class="text-danger mb-0"><i class="bi bi-exclamation-triangle"></i> Ошибка при загрузке расписания</p>');
         }
     });
+}
+
+function renderDutyWeek(entries) {
+    const container = $('#dutyWeekContainer');
+    const map = {};
+    entries.forEach(function(entry) {
+        map[entry.date] = entry;
+    });
+
+    const startDate = new Date(dutyRangeStart);
+    const todayIso = new Date().toISOString().split('T')[0];
+    const weekDayNames = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+
+    let html = '<div class="duty-week-grid">';
+    for (let i = 0; i < 7; i++) {
+        const current = new Date(startDate);
+        current.setDate(startDate.getDate() + i);
+        const iso = current.toISOString().split('T')[0];
+        const entry = map[iso] || null;
+        const dutyName = entry ? (entry.user_full_name || entry.user_login || '—') : '—';
+        const fasting = entry ? !!entry.is_fasting : false;
+        const weekday = weekDayNames[current.getDay()];
+        const dateNumber = current.getDate();
+        const isToday = iso === todayIso;
+
+        html += `
+            <div class="duty-week-cell ${isToday ? 'today' : ''}">
+                <div class="duty-week-date">
+                    <span>${escapeHtml(weekday)}</span>
+                    <span class="duty-week-number">${escapeHtml(String(dateNumber))}</span>
+                </div>
+                ${fasting ? '<div class="duty-week-fasting"><i class="bi bi-exclamation-triangle-fill"></i>Голодовка</div>' : ''}
+                <div class="duty-week-name">${escapeHtml(dutyName)}</div>
+            </div>
+        `;
+    }
+    html += '</div>';
+    container.html(html);
 }
 
 function loadLatestNews() {
@@ -209,14 +294,6 @@ function loadLatestNews() {
 }
 
 // Показать ошибку загрузки дежурного
-function showDutyError(containerId) {
-    $(`#${containerId}`).html(`
-        <p class="card-text text-danger mb-0">
-            <i class="bi bi-exclamation-triangle"></i> Ошибка загрузки данных
-        </p>
-    `);
-}
-
 // Экранирование HTML
 function escapeHtml(text) {
     if (text === null || text === undefined) return '';
@@ -384,7 +461,7 @@ function getDaysText(days) {
 
 // Загрузка при открытии страницы
 document.addEventListener('DOMContentLoaded', function() {
-    loadDutyInfo();
+    loadDutyWeek();
     loadMyTasks();
     loadLatestNews();
 });

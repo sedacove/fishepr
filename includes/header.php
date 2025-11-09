@@ -139,10 +139,10 @@ if (!isset($page_title)) {
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/tasks.php">Задачи</a>
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/meter_readings.php">Приборы</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/meter_readings.php">Приборы</a>
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/tasks.php">Задачи</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo BASE_URL; ?>pages/duty_calendar.php">

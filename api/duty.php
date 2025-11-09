@@ -58,7 +58,8 @@ try {
                     'extendedProps' => [
                         'user_id' => $duty['user_id'],
                         'user_login' => $duty['user_login'],
-                        'user_full_name' => $duty['user_full_name']
+                        'user_full_name' => $duty['user_full_name'],
+                        'is_fasting' => (bool)$duty['is_fasting']
                     ]
                 ];
             }
@@ -85,7 +86,7 @@ try {
             
             echo json_encode([
                 'success' => true,
-                'data' => $duty ?: null
+                'data' => $duty ? array_merge($duty, ['is_fasting' => (bool)$duty['is_fasting']]) : null
             ]);
             break;
             
@@ -116,11 +117,11 @@ try {
                 'data' => [
                     'today' => [
                         'date' => $todayDate,
-                        'duty' => $todayDuty ?: null
+                        'duty' => $todayDuty ? array_merge($todayDuty, ['is_fasting' => (bool)$todayDuty['is_fasting']]) : null
                     ],
                     'tomorrow' => [
                         'date' => $tomorrowDate,
-                        'duty' => $tomorrowDuty ?: null
+                        'duty' => $tomorrowDuty ? array_merge($tomorrowDuty, ['is_fasting' => (bool)$tomorrowDuty['is_fasting']]) : null
                     ]
                 ]
             ]);
@@ -140,6 +141,7 @@ try {
             
             $date = $data['date'] ?? '';
             $userId = isset($data['user_id']) ? (int)$data['user_id'] : 0;
+            $isFasting = !empty($data['is_fasting']);
             
             if (empty($date)) {
                 throw new Exception('Дата не указана');
@@ -174,28 +176,30 @@ try {
                 $stmt->execute([$oldUserId]);
                 $oldUser = $stmt->fetch();
                 
-                $stmt = $pdo->prepare("UPDATE duty_schedule SET user_id = ?, updated_at = NOW() WHERE date = ?");
-                $stmt->execute([$userId, $date]);
+                $stmt = $pdo->prepare("UPDATE duty_schedule SET user_id = ?, is_fasting = ?, updated_at = NOW() WHERE date = ?");
+                $stmt->execute([$userId, $isFasting ? 1 : 0, $date]);
                 
                 $changes = [
                     'date' => $date,
                     'user_id' => ['old' => $oldUserId, 'new' => $userId],
                     'old_user' => $oldUser ? ($oldUser['full_name'] ?: $oldUser['login']) : null,
-                    'new_user' => $user['full_name'] ?: $user['login']
+                    'new_user' => $user['full_name'] ?: $user['login'],
+                    'is_fasting' => ['old' => (bool)$existing['is_fasting'], 'new' => $isFasting]
                 ];
                 
                 logActivity('update', 'duty', $existing['id'], "Изменен дежурный на {$date}: {$user['full_name']}", $changes);
             } else {
                 // Создание нового дежурства
-                $stmt = $pdo->prepare("INSERT INTO duty_schedule (date, user_id, created_by) VALUES (?, ?, ?)");
-                $stmt->execute([$date, $userId, $createdBy]);
+                $stmt = $pdo->prepare("INSERT INTO duty_schedule (date, user_id, is_fasting, created_by) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$date, $userId, $isFasting ? 1 : 0, $createdBy]);
                 
                 $dutyId = $pdo->lastInsertId();
                 
                 $changes = [
                     'date' => $date,
                     'user_id' => $userId,
-                    'user' => $user['full_name'] ?: $user['login']
+                    'user' => $user['full_name'] ?: $user['login'],
+                    'is_fasting' => $isFasting
                 ];
                 
                 logActivity('create', 'duty', $dutyId, "Назначен дежурный на {$date}: {$user['full_name']}", $changes);
@@ -245,7 +249,8 @@ try {
             $changes = [
                 'date' => $date,
                 'user_id' => $duty['user_id'],
-                'user' => $duty['user_full_name'] ?: $duty['user_login']
+                'user' => $duty['user_full_name'] ?: $duty['user_login'],
+                'is_fasting' => (bool)$duty['is_fasting']
             ];
             
             logActivity('delete', 'duty', $duty['id'], "Удален дежурный на {$date}: {$duty['user_full_name']}", $changes);
@@ -256,6 +261,45 @@ try {
             ]);
             break;
             
+        case 'range':
+            $start = $_GET['start'] ?? null;
+            $end = $_GET['end'] ?? null;
+            if (!$start || !$end) {
+                throw new Exception('Не указан период');
+            }
+
+            $stmt = $pdo->prepare("
+                SELECT 
+                    d.date,
+                    d.user_id,
+                    d.is_fasting,
+                    u.login AS user_login,
+                    u.full_name AS user_full_name
+                FROM duty_schedule d
+                LEFT JOIN users u ON d.user_id = u.id
+                WHERE d.date BETWEEN ? AND ?
+                ORDER BY d.date ASC
+            ");
+            $stmt->execute([$start, $end]);
+            $duties = $stmt->fetchAll();
+
+            $result = [];
+            foreach ($duties as $duty) {
+                $result[] = [
+                    'date' => $duty['date'],
+                    'user_id' => $duty['user_id'],
+                    'user_login' => $duty['user_login'],
+                    'user_full_name' => $duty['user_full_name'],
+                    'is_fasting' => (bool)$duty['is_fasting']
+                ];
+            }
+
+            echo json_encode([
+                'success' => true,
+                'data' => $result
+            ]);
+            break;
+
         case 'get_users':
             // Получить список активных пользователей для выбора (только для админов)
             if (!$isAdmin) {

@@ -102,6 +102,11 @@ $page_title = 'Календарь дежурств';
     border: 2px solid #0d6efd;
 }
 
+.calendar-day.fasting {
+    background-color: rgba(255, 193, 7, 0.12);
+    box-shadow: inset 0 0 0 2px rgba(255, 193, 7, 0.6);
+}
+
 .calendar-day-number {
     font-family: 'Bitter', serif;
     font-size: 1.8rem;
@@ -150,6 +155,11 @@ $page_title = 'Календарь дежурств';
     color: #e0e0e0;
 }
 
+[data-theme="dark"] .calendar-day.fasting {
+    background-color: rgba(255, 193, 7, 0.22);
+    box-shadow: inset 0 0 0 2px rgba(255, 193, 7, 0.8);
+}
+
 [data-theme="dark"] .duty-display {
     border-color: transparent;
     color: #b0b0b0;
@@ -169,6 +179,10 @@ $page_title = 'Календарь дежурств';
 [data-theme="dark"] .calendar-day.today {
     background-color: #1a4d80;
     border-color: #0d6efd;
+}
+
+.fasting-indicator {
+    font-size: 0.75rem;
 }
 
 [data-theme="dark"] .calendar-day-number {
@@ -320,22 +334,28 @@ function createDayCell(date, isOtherMonth) {
     
     let html = '<div class="' + classes + '" data-date="' + dateStr + '">';
     html += '<div class="calendar-day-number">' + day + '</div>';
-    html += '<div class="duty-select-wrapper">';
     if (isAdmin) {
+        html += '<div class="duty-select-wrapper">';
         html += '<select class="form-select form-select-sm duty-select" data-date="' + dateStr + '">';
         html += '<option value="">-</option>';
-        
-        // Заполняем опции пользователями
         usersList.forEach(function(user) {
-            const displayName = user.full_name ? (user.full_name + ' (' + user.login + ')') : user.login;
+            const displayName = user.full_name ? user.full_name : user.login;
             html += '<option value="' + user.id + '">' + escapeHtml(displayName) + '</option>';
         });
-        
         html += '</select>';
+        html += '</div>';
+        html += `
+            <div class="form-check mt-2">
+                <input class="form-check-input fasting-checkbox" type="checkbox" id="f-${dateStr}" data-date="${dateStr}">
+                <label class="form-check-label small" for="f-${dateStr}">Голодовка</label>
+            </div>
+        `;
     } else {
+        html += '<div class="duty-select-wrapper">';
         html += '<div class="duty-display text-muted" data-date="' + dateStr + '">—</div>';
+        html += '</div>';
     }
-    html += '</div>';
+    html += '<div class="fasting-indicator badge bg-warning text-dark mt-2 d-none" data-date="' + dateStr + '"><i class="bi bi-exclamation-triangle-fill me-1"></i>Голодовка</div>';
     html += '</div>';
     
     return html;
@@ -360,26 +380,27 @@ function loadDutiesForMonth(year, month) {
             method: 'GET',
             dataType: 'json',
             success: function(response) {
-                if (response.success && response.data) {
-                    const duty = response.data;
-                    const dutyName = duty.user_full_name || duty.user_login || '';
-                    if (isAdmin) {
-                        const select = document.querySelector('.duty-select[data-date="' + dateStr + '"]');
-                        if (select) {
-                            select.value = duty.user_id || '';
-                        }
-                    } else {
-                        const display = document.querySelector('.duty-display[data-date="' + dateStr + '"]');
-                        if (display) {
-                            display.textContent = dutyName || '—';
-                            display.classList.toggle('text-muted', !dutyName);
-                        }
+                const duty = (response.success && response.data) ? response.data : null;
+                const dutyName = duty ? (duty.user_full_name || duty.user_login || '') : '';
+                const isFasting = duty ? !!duty.is_fasting : false;
+                updateFastingUI(dateStr, isFasting);
+
+                if (isAdmin) {
+                    const select = document.querySelector('.duty-select[data-date="' + dateStr + '"]');
+                    if (select) {
+                        const assignedValue = duty ? (duty.user_id || '') : '';
+                        select.value = assignedValue;
+                        select.dataset.assignedUserId = assignedValue;
                     }
-                } else if (!isAdmin) {
+                    const checkbox = document.querySelector('.fasting-checkbox[data-date="' + dateStr + '"]');
+                    if (checkbox) {
+                        checkbox.checked = isFasting;
+                    }
+                } else {
                     const display = document.querySelector('.duty-display[data-date="' + dateStr + '"]');
                     if (display) {
-                        display.textContent = '—';
-                        display.classList.add('text-muted');
+                        display.textContent = dutyName || '—';
+                        display.classList.toggle('text-muted', !dutyName);
                     }
                 }
             }
@@ -387,30 +408,70 @@ function loadDutiesForMonth(year, month) {
     }
     
     if (isAdmin) {
-        // Устанавливаем обработчики для всех select'ов
         document.querySelectorAll('.duty-select').forEach(function(select) {
             select.addEventListener('change', function() {
-                const userId = this.value ? parseInt(this.value) : null;
+                const userId = this.value ? parseInt(this.value, 10) : null;
                 const date = this.getAttribute('data-date');
-                
+                const checkbox = document.querySelector('.fasting-checkbox[data-date="' + date + '"]');
+                const isFasting = checkbox ? checkbox.checked : false;
+
                 if (userId) {
-                    saveDuty(date, userId);
+                    saveDuty(date, userId, isFasting, this);
                 } else {
-                    deleteDuty(date);
+                    if (checkbox) {
+                        checkbox.checked = false;
+                    }
+                    updateFastingUI(date, false);
+                    deleteDuty(date, this);
                 }
+            });
+        });
+
+        document.querySelectorAll('.fasting-checkbox').forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                const date = this.getAttribute('data-date');
+                const select = document.querySelector('.duty-select[data-date="' + date + '"]');
+                let userId = select && select.value ? parseInt(select.value, 10) : null;
+                if (!userId && select && select.dataset.assignedUserId) {
+                    const parsed = parseInt(select.dataset.assignedUserId, 10);
+                    userId = Number.isNaN(parsed) ? null : parsed;
+                }
+                if (!userId) {
+                    showAlert('warning', 'Сначала назначьте дежурного, затем отмечайте голодовку');
+                    this.checked = false;
+                    updateFastingUI(date, false);
+                    return;
+                }
+                saveDuty(date, userId, this.checked, select);
             });
         });
     }
 }
 
+function updateFastingUI(date, isFasting) {
+    const indicator = document.querySelector('.fasting-indicator[data-date="' + date + '"]');
+    if (indicator) {
+        indicator.classList.toggle('d-none', !isFasting);
+    }
+    const cell = document.querySelector('.calendar-day[data-date="' + date + '"]');
+    if (cell) {
+        cell.classList.toggle('fasting', !!isFasting);
+    }
+    const checkbox = document.querySelector('.fasting-checkbox[data-date="' + date + '"]');
+    if (checkbox) {
+        checkbox.checked = !!isFasting;
+    }
+}
+
 // Сохранить дежурного
-function saveDuty(date, userId) {
+function saveDuty(date, userId, isFasting, selectElement) {
     if (!isAdmin) {
         return;
     }
     const formData = {
         date: date,
-        user_id: userId
+        user_id: userId,
+        is_fasting: !!isFasting
     };
     
     $.ajax({
@@ -422,6 +483,12 @@ function saveDuty(date, userId) {
         success: function(response) {
             if (response.success) {
                 showAlert('success', response.message);
+                updateFastingUI(date, !!isFasting);
+                if (selectElement) {
+                    const assigned = userId || '';
+                    selectElement.dataset.assignedUserId = assigned;
+                    selectElement.value = assigned;
+                }
             } else {
                 showAlert('danger', response.message);
             }
@@ -429,12 +496,13 @@ function saveDuty(date, userId) {
         error: function(xhr) {
             const response = xhr.responseJSON || {};
             showAlert('danger', response.message || 'Ошибка при сохранении дежурного');
+            loadDutiesForMonth(currentDate.getFullYear(), currentDate.getMonth());
         }
     });
 }
 
 // Удалить дежурство
-function deleteDuty(date) {
+function deleteDuty(date, selectElement) {
     if (!isAdmin) {
         return;
     }
@@ -451,6 +519,11 @@ function deleteDuty(date) {
         success: function(response) {
             if (response.success) {
                 showAlert('success', response.message);
+                updateFastingUI(date, false);
+                if (selectElement) {
+                    selectElement.dataset.assignedUserId = '';
+                    selectElement.value = '';
+                }
             } else {
                 showAlert('danger', response.message);
             }
@@ -458,6 +531,7 @@ function deleteDuty(date) {
         error: function(xhr) {
             const response = xhr.responseJSON || {};
             showAlert('danger', response.message || 'Ошибка при удалении дежурства');
+            loadDutiesForMonth(currentDate.getFullYear(), currentDate.getMonth());
         }
     });
 }
