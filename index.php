@@ -62,8 +62,8 @@ window.dashboardConfig = <?php echo json_encode($dashboardConfigPayload, JSON_HE
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-3">
                 <h1 class="mb-0">Добро пожаловать, <?php echo htmlspecialchars($_SESSION['user_full_name'] ?? $_SESSION['user_login']); ?>!</h1>
-                <button type="button" class="btn btn-outline-secondary btn-sm" id="addWidgetBtn">
-                    <i class="bi bi-plus-lg"></i> Добавить виджет
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleEditBtn">
+                    <i class="bi bi-pencil"></i> Редактировать
                 </button>
             </div>
 
@@ -102,9 +102,12 @@ window.dashboardConfig = <?php echo json_encode($dashboardConfigPayload, JSON_HE
     margin-bottom: 0;
 }
 .dashboard-widget-card .widget-actions {
-    display: inline-flex;
+    display: none;
     align-items: center;
     gap: 0.35rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
 }
 .dashboard-widget-card .widget-actions .btn {
     display: inline-flex;
@@ -112,7 +115,9 @@ window.dashboardConfig = <?php echo json_encode($dashboardConfigPayload, JSON_HE
     justify-content: center;
 }
 .dashboard-widget-card .widget-drag-handle {
-    cursor: grab;
+    cursor: default;
+    opacity: 0.3;
+    transition: opacity 0.15s ease-in-out;
 }
 .dashboard-widget-card .widget-subtitle {
     font-size: 0.8rem;
@@ -133,6 +138,37 @@ window.dashboardConfig = <?php echo json_encode($dashboardConfigPayload, JSON_HE
 .add-widget-card .add-widget-icon {
     font-size: 4rem;
     line-height: 1;
+}
+.add-widget-card {
+    cursor: default;
+}
+.add-widget-card .card-body > * {
+    pointer-events: none;
+}
+.dashboard-edit-mode .dashboard-widget-card .widget-actions {
+    display: inline-flex;
+    pointer-events: auto;
+    opacity: 1;
+}
+.dashboard-edit-mode .dashboard-widget-card .widget-drag-handle {
+    cursor: grab;
+    opacity: 1;
+}
+.dashboard-edit-mode .add-widget-card {
+    cursor: pointer;
+    border-style: dashed;
+}
+.dashboard-edit-mode .add-widget-card .card-body > * {
+    pointer-events: none;
+}
+.dashboard-edit-mode .add-widget-card:hover {
+    border-color: rgba(13, 110, 253, 0.6);
+}
+.dashboard-edit-mode .add-widget-card .add-widget-icon {
+    color: #0d6efd;
+}
+.dashboard-edit-mode .add-widget-card .text-muted {
+    color: inherit !important;
 }
 .duty-week-grid {
     display: grid;
@@ -222,19 +258,31 @@ let tasksContainerEl = null;
 let latestNewsContainerEl = null;
 let latestNewsTitleEl = null;
 let dutyWeekContainerEl = null;
+let toggleEditBtn = null;
+let isEditMode = false;
 
 document.addEventListener('DOMContentLoaded', function() {
+    toggleEditBtn = document.getElementById('toggleEditBtn');
+    if (toggleEditBtn) {
+        toggleEditBtn.addEventListener('click', toggleEditMode);
+    }
     renderDashboard();
     initAddWidgetModal();
-    document.getElementById('addWidgetBtn').addEventListener('click', function() {
-        openAddWidgetModal();
-    });
 });
 
 function renderDashboard() {
     const container = document.getElementById('dashboardWidgets');
     if (!container) return;
     container.innerHTML = '';
+
+    document.body.classList.toggle('dashboard-edit-mode', isEditMode);
+    if (toggleEditBtn) {
+        toggleEditBtn.innerHTML = isEditMode
+            ? '<i class="bi bi-check-lg"></i> Готово'
+            : '<i class="bi bi-pencil"></i> Редактировать';
+        toggleEditBtn.classList.toggle('btn-primary', isEditMode);
+        toggleEditBtn.classList.toggle('btn-outline-secondary', !isEditMode);
+    }
 
     dashboardLayout.forEach(function(widgetKey) {
         const widgetCol = createWidgetElement(widgetKey);
@@ -244,7 +292,7 @@ function renderDashboard() {
         }
     });
 
-    if (getAvailableWidgetKeys().length > 0) {
+    if (isEditMode && getAvailableWidgetKeys().length > 0) {
         container.appendChild(createAddWidgetCard());
     }
 
@@ -281,7 +329,7 @@ function createWidgetElement(widgetKey) {
                         <i class="bi bi-grip-vertical"></i>
                     </button>
                     ${canRemove ? `
-                        <button type="button" class="btn btn-outline-danger btn-sm" data-action="remove-widget" data-widget="${widgetKey}" title="Удалить">
+                        <button type="button" class="btn btn-sm btn-danger" data-action="remove-widget" data-widget="${widgetKey}" title="Удалить">
                             <i class="bi bi-x-lg"></i>
                         </button>
                     ` : ''}
@@ -359,6 +407,14 @@ function initializeWidgetContent(widgetKey) {
             loadMortalityChart(body);
             break;
         }
+        case 'temperature_chart': {
+            loadTemperatureChart(body);
+            break;
+        }
+        case 'oxygen_chart': {
+            loadOxygenChart(body);
+            break;
+        }
         default:
             body.innerHTML = '<p class="text-muted mb-0">Виджет пока не реализован</p>';
             break;
@@ -397,6 +453,7 @@ function initDashboardSortable() {
         handle: '.widget-drag-handle',
         draggable: '.dashboard-widget-col',
         filter: '.dashboard-widget-add',
+        disabled: !isEditMode,
         onEnd: function(evt) {
             if (!evt.item || evt.item.classList.contains('dashboard-widget-add')) {
                 return;
@@ -425,6 +482,9 @@ function initAddWidgetModal() {
 }
 
 function openAddWidgetModal() {
+    if (!isEditMode) {
+        return;
+    }
     const availableKeys = getAvailableWidgetKeys();
     if (availableKeys.length === 0) {
         showDashboardAlert('info', 'Все доступные виджеты уже добавлены.');
@@ -527,6 +587,20 @@ function saveDashboardLayout(skipRender) {
     }).catch(function(error) {
         showDashboardAlert('danger', error.message);
     });
+}
+
+function toggleEditMode() {
+    isEditMode = !isEditMode;
+    if (!isEditMode) {
+        const modalEl = document.getElementById('addWidgetModal');
+        if (modalEl) {
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        }
+    }
+    renderDashboard();
 }
 
 function showDashboardAlert(type, message) {
@@ -846,6 +920,177 @@ function renderMortalityChart(container, data) {
             }
         }
     });
+}
+
+function loadTemperatureChart(container) {
+    loadMeasurementChart(container, 'latest_temperatures', 'temperature_chart', {
+        datasetLabel: 'Температура, °C',
+        defaultColor: '#0d6efd',
+        unit: '°C',
+    });
+}
+
+function loadOxygenChart(container) {
+    loadMeasurementChart(container, 'latest_oxygen', 'oxygen_chart', {
+        datasetLabel: 'Кислород, мг/л',
+        defaultColor: '#198754',
+        unit: 'мг/л',
+    });
+}
+
+function loadMeasurementChart(container, endpoint, chartKey, options) {
+    if (!container) return;
+    container.innerHTML = `
+        <div class="text-center py-3">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+        </div>
+    `;
+
+    fetch(`${baseUrl}api/measurements.php?action=${endpoint}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                renderMeasurementChart(container, data.data || [], chartKey, options);
+            } else {
+                container.innerHTML = '<p class="text-danger mb-0">Не удалось загрузить данные замеров</p>';
+            }
+        })
+        .catch(() => {
+            container.innerHTML = '<p class="text-danger mb-0">Ошибка при загрузке данных замеров</p>';
+        });
+}
+
+function renderMeasurementChart(container, data, chartKey, options) {
+    if (!container) return;
+    if (!Array.isArray(data) || data.length === 0) {
+        container.innerHTML = '<p class="text-muted mb-0">Недостаточно данных для построения графика</p>';
+        return;
+    }
+
+    const canvasId = `${chartKey}Canvas`;
+    container.innerHTML = `<canvas id="${canvasId}" height="220"></canvas>`;
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    if (dashboardCharts[chartKey]) {
+        dashboardCharts[chartKey].destroy();
+    }
+
+    const grouped = groupMeasurementsByPool(data);
+    const labels = getUnifiedLabels(grouped);
+
+    const datasets = Object.keys(grouped).map((poolKey, index) => {
+        const series = grouped[poolKey];
+        const color = getSeriesColor(index, options.defaultColor);
+        const values = labels.map(label => {
+            const item = series.find(entry => entry.label === label);
+            return item ? item.value : null;
+        });
+
+        return {
+            label: poolKey,
+            data: values,
+            borderColor: color,
+            backgroundColor: `${color}33`,
+            tension: 0.25,
+            spanGaps: true,
+            fill: false,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+        };
+    });
+
+    dashboardCharts[chartKey] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return `${value} ${options.unit}`;
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const poolLabel = context.dataset.label || '';
+                            return ` ${poolLabel}: ${context.parsed.y} ${options.unit}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function groupMeasurementsByPool(entries) {
+    const grouped = {};
+    entries.forEach(entry => {
+        const poolKey = entry.pool_name || `Бассейн ${entry.pool_id || '—'}`;
+        if (!grouped[poolKey]) {
+            grouped[poolKey] = [];
+        }
+        grouped[poolKey].push(entry);
+    });
+    return grouped;
+}
+
+function getUnifiedLabels(grouped) {
+    const labelSet = new Set();
+    Object.values(grouped).forEach(series => {
+        series.forEach(entry => labelSet.add(entry.label));
+    });
+    return Array.from(labelSet).sort((a, b) => {
+        const [aDay, aMonth, aHour, aMinute] = parseLabel(a);
+        const [bDay, bMonth, bHour, bMinute] = parseLabel(b);
+        const dateA = new Date(2000, aMonth - 1, aDay, aHour, aMinute);
+        const dateB = new Date(2000, bMonth - 1, bDay, bHour, bMinute);
+        return dateA - dateB;
+    });
+}
+
+function parseLabel(label) {
+    const [datePart, timePart] = label.split(' ');
+    const [day, month] = datePart.split('.').map(Number);
+    const [hour, minute] = timePart.split(':').map(Number);
+    return [day, month, hour, minute];
+}
+
+function getSeriesColor(index, fallback) {
+    const palette = [
+        '#0d6efd',
+        '#198754',
+        '#dc3545',
+        '#fd7e14',
+        '#20c997',
+        '#6f42c1',
+        '#6610f2',
+        '#17a2b8',
+        '#ffc107',
+        '#adb5bd'
+    ];
+    return palette[index % palette.length] || fallback;
 }
 
 function escapeHtml(text) {

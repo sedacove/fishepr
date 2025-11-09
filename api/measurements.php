@@ -415,6 +415,58 @@ try {
                 'message' => 'Замер успешно удален'
             ]);
             break;
+
+        case 'latest_temperatures':
+        case 'latest_oxygen':
+            $isTemperature = $action === 'latest_temperatures';
+            $column = $isTemperature ? 'temperature' : 'oxygen';
+            $limit = 20;
+
+            $stmt = $pdo->query("
+                SELECT 
+                    m.id,
+                    m.pool_id,
+                    m.{$column} AS target_value,
+                    m.temperature,
+                    m.oxygen,
+                    m.measured_at,
+                    p.name AS pool_name
+                FROM measurements m
+                LEFT JOIN pools p ON m.pool_id = p.id
+                WHERE m.{$column} IS NOT NULL
+                ORDER BY m.measured_at DESC
+                LIMIT {$limit}
+            ");
+            $rows = $stmt->fetchAll();
+
+            $result = [];
+            foreach ($rows as $row) {
+                $measurement = $row;
+                $measurement['temperature'] = $row['temperature'];
+                $measurement['oxygen'] = $row['oxygen'];
+                $enrichMeasurement($measurement);
+
+                $dateTime = new DateTime($row['measured_at']);
+                $result[] = [
+                    'id' => (int)$row['id'],
+                    'pool_id' => (int)$row['pool_id'],
+                    'pool_name' => $row['pool_name'] ?? null,
+                    'value' => (float)$row['target_value'],
+                    'measured_at' => $row['measured_at'],
+                    'label' => $dateTime->format('d.m H:i'),
+                    'stratum' => $isTemperature
+                        ? ($measurement['temperature_stratum'] ?? null)
+                        : ($measurement['oxygen_stratum'] ?? null),
+                ];
+            }
+
+            $result = array_reverse($result);
+
+            echo json_encode([
+                'success' => true,
+                'data' => $result,
+            ]);
+            break;
             
         case 'get_pools':
             // Получить список активных бассейнов с их активными сессиями
