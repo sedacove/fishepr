@@ -2,6 +2,11 @@
 
 require_once __DIR__ . '/dashboard_widgets.php';
 
+function isSequentialSettingsArray(array $array): bool
+{
+    return array_keys($array) === range(0, count($array) - 1);
+}
+
 /**
  * Получить список всех доступных виджетов.
  *
@@ -136,7 +141,7 @@ function normalizeDashboardLayout(array $layout): array
 
     if (isset($layout['columns']) && is_array($layout['columns'])) {
         $columns = $layout['columns'];
-    } elseif (array_is_list($layout)) {
+    } elseif (is_array($layout) && isSequentialSettingsArray($layout)) {
         $columns = distributeWidgetsAcrossColumns($layout, $columnsCount);
     }
 

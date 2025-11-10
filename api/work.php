@@ -37,6 +37,7 @@ try {
     
     $weighingWarningDays = getSettingInt('weighing_warning_days', 3);
     $weighingWarningMinutes = max(0, $weighingWarningDays * 24 * 60);
+    $measurementWarningTimeout = max(0, getSettingInt('measurement_warning_timeout_minutes', 60));
     
     // Функция для определения страты значения
     function getValueStratum($value, $settings) {
@@ -233,6 +234,9 @@ try {
             $stmt->execute([$pool['id']]);
             $measurements = $stmt->fetchAll();
             
+            $session['measurement_warning'] = false;
+            $session['measurement_warning_label'] = null;
+
             if (count($measurements) > 0) {
                 $lastTemp = (float)$measurements[0]['temperature'];
                 $lastOxygen = (float)$measurements[0]['oxygen'];
@@ -245,6 +249,10 @@ try {
                 $diffMinutes = max(0, (int)floor(($now->getTimestamp() - $lastMeasurementDateTime->getTimestamp()) / 60));
                 $session['last_measurement_diff_minutes'] = $diffMinutes;
                 $session['last_measurement_diff_label'] = formatDiffLabel($diffMinutes);
+                if ($diffMinutes > $measurementWarningTimeout) {
+                    $session['measurement_warning'] = true;
+                    $session['measurement_warning_label'] = formatDiffLabel($diffMinutes);
+                }
                 
                 $session['last_measurement'] = [
                     'temperature' => $lastTemp,
@@ -284,6 +292,8 @@ try {
                 $session['previous_measurement'] = null;
                 $session['last_measurement_diff_minutes'] = null;
                 $session['last_measurement_diff_label'] = formatDiffLabel(null);
+                $session['measurement_warning'] = true;
+                $session['measurement_warning_label'] = null;
             }
             
             // Получаем падеж за последние N часов (в штуках)

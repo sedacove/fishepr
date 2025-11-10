@@ -21,43 +21,38 @@ $maxPoolCapacityKg = (float)getSetting('max_pool_capacity_kg', 5000);
             $currentLoadFishCount = isset($session['current_load']['fish_count']) ? $session['current_load']['fish_count'] : null;
             $weightIsApproximate = isset($session['current_load']['weight_is_approximate']) ? $session['current_load']['weight_is_approximate'] : false;
             if ($session) {
-                $warningTimeout = getSettingInt('measurement_warning_timeout_minutes', 60);
-                
-                if (array_key_exists('last_measurement_diff_minutes', $session)) {
-                    $diffMinutes = $session['last_measurement_diff_minutes'];
-                    $diffLabel = $session['last_measurement_diff_label'] ?? '';
-                    
-                    if ($diffMinutes === null) {
-                        // Замеры ещё не проводились
-                        $showMeasurementWarning = true;
-                        $measurementWarningTooltip = 'Замер ещё не проводился';
-                    } elseif ($diffMinutes > $warningTimeout) {
-                        $showMeasurementWarning = true;
-                        $timeLabel = $diffLabel ?: 'достаточно давно';
-                        $measurementWarningTooltip = 'Последний замер ' . $timeLabel;
-                        if ($diffLabel) {
-                            $measurementWarningTooltip .= ' назад';
-                        }
-                    }
-                } elseif (isset($session['last_measurement_at']) && $session['last_measurement_at']) {
-                    // Fallback на случай отсутствия новых полей
-                    $lastMeasurement = new DateTime($session['last_measurement_at']);
-                    $now = new DateTime();
-                    $minutesSinceLastMeasurement = ($now->getTimestamp() - $lastMeasurement->getTimestamp()) / 60;
-                    
-                    if ($minutesSinceLastMeasurement > $warningTimeout) {
-                        $showMeasurementWarning = true;
-                        $measurementWarningTooltip = 'Последний замер был в ' . $lastMeasurement->format('H:i');
-                    }
-                } else {
-                    // Если замеров вообще не было, тоже показываем предупреждение
+                if (isset($session['measurement_warning']) && $session['measurement_warning']) {
                     $showMeasurementWarning = true;
-                    $measurementWarningTooltip = 'Замер ещё не проводился';
+                    $label = $session['measurement_warning_label'] ?? null;
+                    if ($label) {
+                        $measurementWarningTooltip = 'Последний замер ' . $label;
+                    } else {
+                        $measurementWarningTooltip = 'Последний замер ещё не проводился';
+                    }
+                } elseif (!array_key_exists('measurement_warning', $session)) {
+                    // Fallback на случай устаревших данных
+                    if (array_key_exists('last_measurement_diff_minutes', $session)) {
+                        $diffMinutes = $session['last_measurement_diff_minutes'];
+                        $diffLabel = $session['last_measurement_diff_label'] ?? '';
+                        $warningTimeout = getSettingInt('measurement_warning_timeout_minutes', 60);
+
+                        if ($diffMinutes === null) {
+                            $showMeasurementWarning = true;
+                            $measurementWarningTooltip = 'Последний замер ещё не проводился';
+                        } elseif ($diffMinutes > $warningTimeout) {
+                            $showMeasurementWarning = true;
+                            $timeLabel = $diffLabel ?: 'достаточно давно';
+                            $measurementWarningTooltip = 'Последний замер ' . $timeLabel;
+                        }
+                    } else {
+                        $showMeasurementWarning = true;
+                        $measurementWarningTooltip = 'Последний замер ещё не проводился';
+                    }
                 }
             }
             
             if ($showMeasurementWarning):
-                $tooltipText = $measurementWarningTooltip ?? 'Последний замер отсутствует';
+                $tooltipText = $measurementWarningTooltip ?? 'Последний замер ещё не проводился';
             ?>
                 <i class="bi bi-exclamation-triangle-fill text-danger me-2" 
                    title="<?php echo htmlspecialchars($tooltipText); ?>"
