@@ -72,16 +72,26 @@ try {
     // Падеж
     $stmt = $pdo->prepare("
         SELECT 
-            recorded_at,
-            weight,
-            fish_count
+            DATE(recorded_at) AS day,
+            SUM(weight) AS total_weight,
+            SUM(fish_count) AS total_count
         FROM mortality
         WHERE pool_id = ? 
         AND recorded_at >= ?
-        ORDER BY recorded_at ASC
+        GROUP BY day
+        ORDER BY day ASC
     ");
     $stmt->execute([$session['pool_id'], $session['start_date']]);
-    $mortality = $stmt->fetchAll();
+    $mortalityRaw = $stmt->fetchAll();
+    $mortality = array_map(function ($row) {
+        $day = $row['day'];
+        return [
+            'day' => $day,
+            'day_label' => date('d.m.Y', strtotime($day)),
+            'total_weight' => (float)($row['total_weight'] ?? 0),
+            'total_count' => (int)($row['total_count'] ?? 0),
+        ];
+    }, $mortalityRaw ?: []);
     
     // Отборы
     $stmt = $pdo->prepare("

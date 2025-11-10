@@ -351,9 +351,9 @@ function buildOxygenChart(measurements) {
 function buildMortalityChart(mortality) {
     const ctx = document.getElementById('mortalityChart').getContext('2d');
     
-    const labels = mortality.map(m => formatDateTime(m.recorded_at));
-    const countData = mortality.map(m => parseInt(m.fish_count));
-    const weightData = mortality.map(m => parseFloat(m.weight));
+    const labels = mortality.map(m => formatDate(m.day || m.day_label || m.recorded_at));
+    const countData = mortality.map(m => parseInt(m.total_count ?? m.fish_count ?? 0, 10));
+    const weightData = mortality.map(m => parseFloat(m.total_weight ?? m.weight ?? 0));
     
     const countGradient = ctx.createLinearGradient(0, 0, 0, 400);
     countGradient.addColorStop(0, 'rgba(220, 53, 69, 0.5)');
