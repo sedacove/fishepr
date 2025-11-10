@@ -69,7 +69,10 @@ window.dashboardConfig = <?php echo json_encode($dashboardConfigPayload, JSON_HE
 
             <div id="alert-container"></div>
 
-            <div id="dashboardWidgets" class="row row-cols-1 row-cols-lg-2 g-4"></div>
+            <div id="dashboardWidgets" class="dashboard-columns">
+                <div class="dashboard-column" data-column-index="0"></div>
+                <div class="dashboard-column" data-column-index="1"></div>
+            </div>
 
             <div class="modal fade" id="addWidgetModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -92,6 +95,29 @@ window.dashboardConfig = <?php echo json_encode($dashboardConfigPayload, JSON_HE
 </div>
 
 <style>
+.dashboard-columns {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+.dashboard-column {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0;
+}
+.dashboard-widget-col {
+    width: 100%;
+}
+.dashboard-widget-add {
+    cursor: default;
+}
+@media (max-width: 991.98px) {
+    .dashboard-columns {
+        flex-direction: column;
+    }
+}
 .dashboard-widget-card .card-header {
     display: flex;
     justify-content: space-between;
@@ -252,7 +278,8 @@ let dashboardLayout = Array.isArray(dashboardState.layout) ? [...dashboardState.
 const dashboardWidgetsMap = dashboardState.widgets || {};
 const dutyRange = dashboardState.dutyRange || {};
 const baseUrl = dashboardState.baseUrl || '';
-let dashboardSortable = null;
+const DASHBOARD_COLUMNS = 2;
+let dashboardSortable = [];
 const dashboardCharts = {};
 let tasksContainerEl = null;
 let latestNewsContainerEl = null;
@@ -273,7 +300,9 @@ document.addEventListener('DOMContentLoaded', function() {
 function renderDashboard() {
     const container = document.getElementById('dashboardWidgets');
     if (!container) return;
-    container.innerHTML = '';
+
+    const columns = prepareDashboardColumns(container);
+    columns.forEach(column => column.innerHTML = '');
 
     document.body.classList.toggle('dashboard-edit-mode', isEditMode);
     if (toggleEditBtn) {
@@ -284,19 +313,18 @@ function renderDashboard() {
         toggleEditBtn.classList.toggle('btn-outline-secondary', !isEditMode);
     }
 
-    dashboardLayout.forEach(function(widgetKey) {
-        const widgetCol = createWidgetElement(widgetKey);
-        if (widgetCol) {
-            container.appendChild(widgetCol);
-            initializeWidgetContent(widgetKey);
-        }
+    const layouts = splitLayoutIntoColumns(dashboardLayout, columns.length);
+    layouts.forEach((widgets, index) => {
+        const column = columns[index];
+        if (!column) return;
+        widgets.forEach(widgetKey => appendWidgetToColumn(column, widgetKey));
     });
 
     if (isEditMode && getAvailableWidgetKeys().length > 0) {
-        container.appendChild(createAddWidgetCard());
+        appendAddWidgetCard(columns, layouts);
     }
 
-    initDashboardSortable();
+    initDashboardSortable(columns);
 }
 
 function createWidgetElement(widgetKey) {
@@ -306,7 +334,7 @@ function createWidgetElement(widgetKey) {
     }
 
     const col = document.createElement('div');
-    col.className = 'col dashboard-widget-col';
+    col.className = 'dashboard-widget-col';
     col.dataset.widgetKey = widgetKey;
 
     const titleId = `widget-title-${widgetKey}`;
@@ -318,7 +346,7 @@ function createWidgetElement(widgetKey) {
     const canRemove = !definition.default;
 
     col.innerHTML = `
-        <div class="card h-100 dashboard-widget-card" data-widget="${widgetKey}">
+        <div class="card dashboard-widget-card" data-widget="${widgetKey}">
             <div class="card-header">
                 <div class="flex-grow-1">
                     <h5 class="card-title" id="${titleId}">${escapeHtml(definition.title || widgetKey)}</h5>
@@ -422,10 +450,10 @@ function initializeWidgetContent(widgetKey) {
 }
 
 function createAddWidgetCard() {
-    const col = document.createElement('div');
-    col.className = 'col dashboard-widget-add';
-    col.innerHTML = `
-        <div class="card h-100 add-widget-card">
+    const wrapper = document.createElement('div');
+    wrapper.className = 'dashboard-widget-col dashboard-widget-add';
+    wrapper.innerHTML = `
+        <div class="card add-widget-card">
             <div class="card-body">
                 <div class="add-widget-icon text-primary">
                     <i class="bi bi-plus-lg"></i>
@@ -434,40 +462,96 @@ function createAddWidgetCard() {
             </div>
         </div>
     `;
-    col.querySelector('.card').addEventListener('click', function() {
+    wrapper.querySelector('.card').addEventListener('click', function() {
         openAddWidgetModal();
     });
-    return col;
+    return wrapper;
 }
 
-function initDashboardSortable() {
-    const container = document.getElementById('dashboardWidgets');
-    if (!container) return;
-    if (dashboardSortable) {
-        dashboardSortable.destroy();
-        dashboardSortable = null;
+function prepareDashboardColumns(container) {
+    let columns = Array.from(container.querySelectorAll('.dashboard-column'));
+    if (columns.length === DASHBOARD_COLUMNS) {
+        return columns;
     }
 
-    dashboardSortable = new Sortable(container, {
-        animation: 160,
-        handle: '.widget-drag-handle',
-        draggable: '.dashboard-widget-col',
-        filter: '.dashboard-widget-add',
-        disabled: !isEditMode,
-        onEnd: function(evt) {
-            if (!evt.item || evt.item.classList.contains('dashboard-widget-add')) {
-                return;
-            }
-            const newLayout = [];
-            container.querySelectorAll('.dashboard-widget-col').forEach(function(col) {
-                const key = col.dataset.widgetKey;
-                if (key) {
-                    newLayout.push(key);
-                }
-            });
-            dashboardLayout = newLayout;
-            saveDashboardLayout();
+    container.innerHTML = '';
+    for (let i = 0; i < DASHBOARD_COLUMNS; i++) {
+        const column = document.createElement('div');
+        column.className = 'dashboard-column';
+        column.dataset.columnIndex = String(i);
+        container.appendChild(column);
+    }
+    columns = Array.from(container.querySelectorAll('.dashboard-column'));
+    return columns;
+}
+
+function splitLayoutIntoColumns(layout, columnCount) {
+    const columns = Array.from({ length: columnCount }, () => []);
+    (layout || []).forEach((widgetKey, index) => {
+        const columnIndex = index % columnCount;
+        if (columns[columnIndex]) {
+            columns[columnIndex].push(widgetKey);
         }
+    });
+    return columns;
+}
+
+function appendWidgetToColumn(columnElement, widgetKey) {
+    if (!columnElement) return;
+    const widgetEl = createWidgetElement(widgetKey);
+    if (!widgetEl) return;
+    columnElement.appendChild(widgetEl);
+    initializeWidgetContent(widgetKey);
+}
+
+function appendAddWidgetCard(columns, layouts) {
+    const addCard = createAddWidgetCard();
+    const lengths = layouts.map(list => (Array.isArray(list) ? list.length : 0));
+    const minLength = Math.min(...lengths);
+    const targetIndex = Math.max(0, lengths.indexOf(minLength));
+    const targetColumn = columns[targetIndex] || columns[0];
+    if (targetColumn) {
+        targetColumn.appendChild(addCard);
+    }
+}
+
+function initDashboardSortable(columns) {
+    if (Array.isArray(dashboardSortable) && dashboardSortable.length) {
+        dashboardSortable.forEach(sortable => sortable.destroy());
+    }
+    dashboardSortable = [];
+
+    if (!Array.isArray(columns) || !columns.length) {
+        return;
+    }
+
+    columns.forEach(column => {
+        const sortable = new Sortable(column, {
+            animation: 160,
+            handle: '.widget-drag-handle',
+            draggable: '.dashboard-widget-col',
+            filter: '.dashboard-widget-add',
+            group: 'dashboard-widgets',
+            disabled: !isEditMode,
+            onEnd: function(evt) {
+                if (evt.item && evt.item.classList.contains('dashboard-widget-add')) {
+                    return;
+                }
+                const newOrder = [];
+                columns.forEach(col => {
+                    col.querySelectorAll('.dashboard-widget-col').forEach(widget => {
+                        if (widget.classList.contains('dashboard-widget-add')) return;
+                        const key = widget.dataset.widgetKey;
+                        if (key) {
+                            newOrder.push(key);
+                        }
+                    });
+                });
+                dashboardLayout = newOrder;
+                saveDashboardLayout();
+            }
+        });
+        dashboardSortable.push(sortable);
     });
 }
 
