@@ -430,6 +430,125 @@ try {
                 'data' => $chartData,
             ]);
             break;
+
+        case 'totals_last14_by_pool':
+            $today = new DateTimeImmutable('today');
+            $startDate = $today->sub(new DateInterval('P13D'));
+
+            $labels = [];
+            $interval = new DateInterval('P1D');
+            $period = new DatePeriod($startDate, $interval, $today->add($interval));
+            $dates = [];
+            foreach ($period as $date) {
+                $dates[] = $date;
+                $labels[] = [
+                    'date' => $date->format('Y-m-d'),
+                    'label' => $date->format('d.m'),
+                ];
+            }
+
+            $poolStmt = $pdo->query("
+                SELECT id, name
+                FROM pools
+                WHERE is_active = 1
+                ORDER BY sort_order ASC, name ASC
+            ");
+            $pools = $poolStmt->fetchAll();
+
+            if (!$pools) {
+                echo json_encode([
+                    'success' => true,
+                    'data' => [
+                        'labels' => $labels,
+                        'pools' => [],
+                    ],
+                ]);
+                break;
+            }
+
+            $poolIds = array_map(fn($pool) => (int) $pool['id'], $pools);
+            $metricsByPoolAndDate = [];
+
+            if (!empty($poolIds)) {
+                $placeholders = implode(',', array_fill(0, count($poolIds), '?'));
+                $metricsStmt = $pdo->prepare("
+                    SELECT 
+                        pool_id,
+                        DATE(recorded_at) AS record_date,
+                        COALESCE(SUM(fish_count), 0) AS total_count,
+                        COALESCE(SUM(weight), 0) AS total_weight
+                    FROM mortality
+                    WHERE pool_id IN ($placeholders)
+                        AND recorded_at >= ?
+                        AND recorded_at <= ?
+                    GROUP BY pool_id, DATE(recorded_at)
+                ");
+                $metricsParams = array_merge(
+                    $poolIds,
+                    [
+                        $startDate->format('Y-m-d 00:00:00'),
+                        $today->format('Y-m-d 23:59:59'),
+                    ]
+                );
+                $metricsStmt->execute($metricsParams);
+
+                while ($row = $metricsStmt->fetch()) {
+                    $poolId = (int) $row['pool_id'];
+                    $recordDate = $row['record_date'];
+                    if (!isset($metricsByPoolAndDate[$poolId])) {
+                        $metricsByPoolAndDate[$poolId] = [];
+                    }
+                    $metricsByPoolAndDate[$poolId][$recordDate] = [
+                        'total_count' => isset($row['total_count']) ? (int) $row['total_count'] : 0,
+                        'total_weight' => isset($row['total_weight']) ? (float) $row['total_weight'] : 0.0,
+                    ];
+                }
+            }
+
+            $poolsData = [];
+            foreach ($pools as $pool) {
+                $poolId = (int) $pool['id'];
+                $series = [];
+                $totalCount = 0;
+                $totalWeight = 0.0;
+
+                foreach ($dates as $date) {
+                    $dateStr = $date->format('Y-m-d');
+                    $metrics = $metricsByPoolAndDate[$poolId][$dateStr] ?? [
+                        'total_count' => 0,
+                        'total_weight' => 0.0,
+                    ];
+                    $countValue = (int) ($metrics['total_count'] ?? 0);
+                    $weightValue = (float) ($metrics['total_weight'] ?? 0.0);
+
+                    $series[] = [
+                        'date' => $dateStr,
+                        'label' => $date->format('d.m'),
+                        'total_count' => $countValue,
+                        'total_weight' => $weightValue,
+                    ];
+
+                    $totalCount += $countValue;
+                    $totalWeight += $weightValue;
+                }
+
+                $poolsData[] = [
+                    'pool_id' => $poolId,
+                    'pool_name' => $pool['name'],
+                    'series' => $series,
+                    'total_count' => $totalCount,
+                    'total_weight' => $totalWeight,
+                ];
+            }
+
+            echo json_encode([
+                'success' => true,
+                'data' => [
+                    'labels' => $labels,
+                    'pools' => $poolsData,
+                ],
+            ]);
+            break;
             
         case 'get_pools':
             // Получить список активных бассейнов с их активными сессиями

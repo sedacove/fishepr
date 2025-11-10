@@ -306,6 +306,13 @@ const mortalityChartState = {
     data: [],
     mode: 'count'
 };
+const mortalityByPoolChartState = {
+    data: {
+        labels: [],
+        pools: []
+    },
+    mode: 'count'
+};
 let tasksContainerEl = null;
 let latestNewsContainerEl = null;
 let latestNewsTitleEl = null;
@@ -429,6 +436,16 @@ function getWidgetPlaceholder(widgetKey) {
         `;
     }
 
+    if (widgetKey === 'mortality_by_pool_chart') {
+        return `
+            <div class="text-center py-3 text-muted">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+        `;
+    }
+
     return `
         <div class="text-center py-3">
             <div class="spinner-border spinner-border-sm text-primary" role="status">
@@ -461,6 +478,10 @@ function initializeWidgetContent(widgetKey) {
         }
         case 'mortality_chart': {
             loadMortalityChart(body);
+            break;
+        }
+        case 'mortality_by_pool_chart': {
+            loadMortalityByPoolChart(body);
             break;
         }
         case 'temperature_chart': {
@@ -1099,6 +1120,179 @@ function loadMortalityChart(container) {
         });
 }
 
+function loadMortalityByPoolChart(container) {
+    if (!container) return;
+    container.innerHTML = `
+        <div class="text-center py-3">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+        </div>
+    `;
+
+    fetch(`${baseUrl}api/mortality.php?action=totals_last14_by_pool`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const rawData = data.data || {};
+                const normalised = normaliseMortalityByPoolData(rawData);
+                mortalityByPoolChartState.data = normalised;
+                mortalityByPoolChartState.mode = mortalityByPoolChartState.mode === 'weight' ? 'weight' : 'count';
+                renderMortalityByPoolChart(container);
+            } else {
+                container.innerHTML = '<p class="text-danger mb-0">Не удалось загрузить данные по падежу</p>';
+            }
+        })
+        .catch(() => {
+            container.innerHTML = '<p class="text-danger mb-0">Ошибка при загрузке данных по падежу</p>';
+        });
+}
+
+function renderMortalityByPoolChart(container) {
+    if (!container) return;
+    if (dashboardCharts.mortality_by_pool_chart) {
+        dashboardCharts.mortality_by_pool_chart.destroy();
+        dashboardCharts.mortality_by_pool_chart = null;
+    }
+
+    const state = mortalityByPoolChartState.data || {};
+    const labels = Array.isArray(state.labels) ? state.labels : [];
+    const poolsRaw = Array.isArray(state.pools) ? state.pools : [];
+    const pools = poolsRaw.filter(function(pool) {
+        const series = Array.isArray(pool && pool.series) ? pool.series : [];
+        return series.some(function(point) {
+            const count = point && typeof point.total_count !== 'undefined' ? Number(point.total_count) : 0;
+            const weight = point && typeof point.total_weight !== 'undefined' ? Number(point.total_weight) : 0;
+            return (Number.isFinite(count) && count > 0) || (Number.isFinite(weight) && weight > 0);
+        });
+    });
+    const currentModeKey = mortalityModes[mortalityByPoolChartState.mode] ? mortalityByPoolChartState.mode : 'count';
+    mortalityByPoolChartState.mode = currentModeKey;
+    const modeConfig = mortalityModes[currentModeKey];
+
+    if (!labels.length || !pools.length) {
+        container.innerHTML = '<p class="text-muted mb-0">Недостаточно данных для построения графика</p>';
+        return;
+    }
+
+    const labelValues = labels.map(item => item.label);
+
+    container.innerHTML = `
+        <div class="d-flex justify-content-end mb-3">
+            <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-secondary" data-mode="count">шт</button>
+                <button type="button" class="btn btn-outline-secondary" data-mode="weight">кг</button>
+            </div>
+        </div>
+        <div class="position-relative" style="height: 220px;">
+            <canvas id="mortalityByPoolChartCanvas"></canvas>
+        </div>
+    `;
+
+    const toggleButtons = container.querySelectorAll('[data-mode]');
+    toggleButtons.forEach(button => {
+        const buttonMode = button.dataset.mode;
+        const isActive = buttonMode === mortalityByPoolChartState.mode;
+        button.classList.toggle('btn-primary', isActive);
+        button.classList.toggle('btn-outline-secondary', !isActive);
+        button.classList.toggle('active', isActive);
+        button.disabled = isActive;
+        button.setAttribute('aria-pressed', String(isActive));
+        button.addEventListener('click', () => {
+            if (buttonMode && buttonMode !== mortalityByPoolChartState.mode) {
+                mortalityByPoolChartState.mode = buttonMode;
+                renderMortalityByPoolChart(container);
+            }
+        });
+    });
+
+    const datasets = pools.map((pool, index) => {
+        const series = Array.isArray(pool.series) ? pool.series : [];
+        const values = labelValues.map(label => {
+            const entry = series.find(item => item.label === label);
+            if (!entry || typeof entry !== 'object') {
+                return 0;
+            }
+            const rawValue = typeof entry[modeConfig.key] !== 'undefined' && entry[modeConfig.key] !== null
+                ? entry[modeConfig.key]
+                : 0;
+            const value = Number(rawValue);
+            return Number.isFinite(value) ? value : 0;
+        });
+        const color = getSeriesColor(index, '#dc3545');
+        return {
+            label: pool.pool_name || `Бассейн ${pool.pool_id || index + 1}`,
+            data: values,
+            borderColor: color,
+            backgroundColor: `${color}33`,
+            tension: 0.25,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            fill: false,
+            spanGaps: false
+        };
+    });
+
+    const totalValue = pools.reduce((sum, pool) => {
+        const value = modeConfig.key === 'total_weight'
+            ? Number(pool.total_weight) || 0
+            : Number(pool.total_count) || 0;
+        return sum + value;
+    }, 0);
+
+    updateMortalityByPoolWidgetTitle(totalValue, modeConfig);
+
+    const canvas = container.querySelector('#mortalityByPoolChartCanvas');
+    if (!canvas) {
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+
+    dashboardCharts.mortality_by_pool_chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labelValues,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return `${formatNumericValue(value, modeConfig.format)} ${modeConfig.unit}`;
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context && context.parsed && typeof context.parsed.y !== 'undefined'
+                                ? context.parsed.y
+                                : 0;
+                            const poolLabel = context.dataset && context.dataset.label ? context.dataset.label : '';
+                            return ` ${poolLabel}: ${formatNumericValue(value, modeConfig.format)} ${modeConfig.unit}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
 function renderMortalityChart(container) {
     if (!container) return;
     if (dashboardCharts.mortality_chart) {
@@ -1222,8 +1416,85 @@ function formatNumericValue(value, options = {}) {
     }).format(safeNumber);
 }
 
+function normaliseMortalityByPoolData(rawData) {
+    const result = {
+        labels: [],
+        pools: []
+    };
+
+    if (!rawData || typeof rawData !== 'object') {
+        return result;
+    }
+
+    if (Array.isArray(rawData.labels)) {
+        result.labels = rawData.labels
+            .map(function(item) {
+                const date = item && typeof item.date === 'string' ? item.date : '';
+                const label = item && typeof item.label === 'string' ? item.label : '';
+                return { date, label };
+            })
+            .filter(function(item) {
+                return item.label;
+            });
+    }
+
+    if (Array.isArray(rawData.pools)) {
+        result.pools = rawData.pools.map(function(pool) {
+            const poolId = typeof pool === 'object' && pool !== null && typeof pool.pool_id === 'number'
+                ? pool.pool_id
+                : (pool && typeof pool.pool_id !== 'undefined' ? Number(pool.pool_id) : null);
+            const poolNameRaw = pool && typeof pool.pool_name === 'string' ? pool.pool_name : '';
+            const poolName = poolNameRaw.trim().length
+                ? pool.pool_name.trim()
+                : (poolId !== null ? `Бассейн ${poolId}` : 'Бассейн');
+
+            const series = Array.isArray(pool && pool.series)
+                ? pool.series.map(function(point) {
+                    const date = point && typeof point.date === 'string' ? point.date : '';
+                    const label = point && typeof point.label === 'string' ? point.label : '';
+                    const totalCount = point && typeof point.total_count !== 'undefined' ? Number(point.total_count) : 0;
+                    const totalWeight = point && typeof point.total_weight !== 'undefined' ? Number(point.total_weight) : 0;
+                    return {
+                        date,
+                        label,
+                        total_count: isFinite(totalCount) ? totalCount : 0,
+                        total_weight: isFinite(totalWeight) ? totalWeight : 0
+                    };
+                }).filter(function(point) {
+                    return point.label;
+                })
+                : [];
+
+            return {
+                pool_id: poolId,
+                pool_name: poolName,
+                series,
+                total_count: (pool && typeof pool.total_count !== 'undefined' && isFinite(Number(pool.total_count)))
+                    ? Number(pool.total_count)
+                    : series.reduce(function(acc, item) { return acc + item.total_count; }, 0),
+                total_weight: (pool && typeof pool.total_weight !== 'undefined' && isFinite(Number(pool.total_weight)))
+                    ? Number(pool.total_weight)
+                    : series.reduce(function(acc, item) { return acc + item.total_weight; }, 0)
+            };
+        });
+    }
+
+    return result;
+}
+
 function updateMortalityWidgetTitle(totalValue, modeConfig) {
     const titleEl = document.getElementById('widget-title-mortality_chart');
+    if (!titleEl || !modeConfig) {
+        return;
+    }
+    const baseTitle = titleEl.dataset.baseTitle || titleEl.textContent.replace(/\s*\(.*\)\s*$/, '').trim();
+    titleEl.dataset.baseTitle = baseTitle;
+    const formattedTotal = formatNumericValue(totalValue, modeConfig.format);
+    titleEl.textContent = `${baseTitle} (всего: ${formattedTotal} ${modeConfig.unit})`;
+}
+
+function updateMortalityByPoolWidgetTitle(totalValue, modeConfig) {
+    const titleEl = document.getElementById('widget-title-mortality_by_pool_chart');
     if (!titleEl || !modeConfig) {
         return;
     }
