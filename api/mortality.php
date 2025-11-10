@@ -388,7 +388,10 @@ try {
             $startDate = $today->sub(new DateInterval('P29D'));
 
             $stmt = $pdo->prepare("
-                SELECT DATE(recorded_at) AS record_date, SUM(fish_count) AS total_count
+                SELECT 
+                    DATE(recorded_at) AS record_date,
+                    COALESCE(SUM(fish_count), 0) AS total_count,
+                    COALESCE(SUM(weight), 0) AS total_weight
                 FROM mortality
                 WHERE recorded_at >= ? AND recorded_at <= ?
                 GROUP BY DATE(recorded_at)
@@ -400,9 +403,12 @@ try {
             ]);
             $rows = $stmt->fetchAll();
 
-            $totalsMap = [];
+            $totalsCountMap = [];
+            $totalsWeightMap = [];
             foreach ($rows as $row) {
-                $totalsMap[$row['record_date']] = (int)($row['total_count'] ?? 0);
+                $dateKey = $row['record_date'];
+                $totalsCountMap[$dateKey] = isset($row['total_count']) ? (int) $row['total_count'] : 0;
+                $totalsWeightMap[$dateKey] = isset($row['total_weight']) ? (float) $row['total_weight'] : 0.0;
             }
 
             $interval = new DateInterval('P1D');
@@ -414,7 +420,8 @@ try {
                 $chartData[] = [
                     'date' => $dateStr,
                     'date_label' => $date->format('d.m'),
-                    'total_count' => $totalsMap[$dateStr] ?? 0,
+                    'total_count' => $totalsCountMap[$dateStr] ?? 0,
+                    'total_weight' => $totalsWeightMap[$dateStr] ?? 0.0,
                 ];
             }
 

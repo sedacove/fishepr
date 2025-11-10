@@ -282,6 +282,30 @@ const DASHBOARD_COLUMNS = 2;
 let dashboardLayout = normalizeClientLayout(dashboardState.layout);
 let dashboardSortable = [];
 const dashboardCharts = {};
+const mortalityModes = {
+    count: {
+        key: 'total_count',
+        label: 'Падеж, шт',
+        unit: 'шт',
+        format: {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }
+    },
+    weight: {
+        key: 'total_weight',
+        label: 'Падеж, кг',
+        unit: 'кг',
+        format: {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 1
+        }
+    }
+};
+const mortalityChartState = {
+    data: [],
+    mode: 'count'
+};
 let tasksContainerEl = null;
 let latestNewsContainerEl = null;
 let latestNewsTitleEl = null;
@@ -347,12 +371,13 @@ function createWidgetElement(widgetKey) {
         : (definition.subtitle || '');
 
     const canRemove = !definition.default;
+    const baseTitle = definition.title || widgetKey;
 
     col.innerHTML = `
         <div class="card dashboard-widget-card" data-widget="${widgetKey}">
             <div class="card-header">
                 <div class="flex-grow-1">
-                    <h5 class="card-title" id="${titleId}">${escapeHtml(definition.title || widgetKey)}</h5>
+                    <h5 class="card-title" id="${titleId}" data-base-title="${escapeHtml(baseTitle)}">${escapeHtml(baseTitle)}</h5>
                     ${subtitle ? `<div class="widget-subtitle text-muted">${escapeHtml(subtitle)}</div>` : ''}
                 </div>
                 <div class="widget-actions">
@@ -1048,7 +1073,23 @@ function loadMortalityChart(container) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                renderMortalityChart(container, data.data || []);
+                const rawData = Array.isArray(data.data) ? data.data : [];
+                const normalisedData = rawData.map(item => {
+                    const totalCount = item && typeof item.total_count !== 'undefined' && item.total_count !== null
+                        ? item.total_count
+                        : 0;
+                    const totalWeight = item && typeof item.total_weight !== 'undefined' && item.total_weight !== null
+                        ? item.total_weight
+                        : 0;
+                    return {
+                        ...item,
+                        total_count: Number(totalCount) || 0,
+                        total_weight: Number(totalWeight) || 0
+                    };
+                });
+                mortalityChartState.data = normalisedData;
+                mortalityChartState.mode = mortalityChartState.mode === 'weight' ? 'weight' : 'count';
+                renderMortalityChart(container);
             } else {
                 container.innerHTML = '<p class="text-danger mb-0">Не удалось загрузить данные по падежу</p>';
             }
@@ -1058,34 +1099,82 @@ function loadMortalityChart(container) {
         });
 }
 
-function renderMortalityChart(container, data) {
+function renderMortalityChart(container) {
     if (!container) return;
-    const canvasId = 'mortalityChartCanvas';
-    container.innerHTML = `<canvas id="${canvasId}" height="220"></canvas>`;
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
     if (dashboardCharts.mortality_chart) {
         dashboardCharts.mortality_chart.destroy();
+        dashboardCharts.mortality_chart = null;
     }
 
+    const data = Array.isArray(mortalityChartState.data) ? mortalityChartState.data : [];
+    const currentModeKey = mortalityModes[mortalityChartState.mode] ? mortalityChartState.mode : 'count';
+    mortalityChartState.mode = currentModeKey;
+    const modeConfig = mortalityModes[currentModeKey];
     const labels = data.map(item => item.date_label);
-    const values = data.map(item => item.total_count);
+    const values = data.map(item => {
+        if (!item || typeof item !== 'object') {
+            return 0;
+        }
+        const rawValue = typeof item[modeConfig.key] !== 'undefined' && item[modeConfig.key] !== null
+            ? item[modeConfig.key]
+            : 0;
+        const value = Number(rawValue);
+        return Number.isFinite(value) ? value : 0;
+    });
+    const totalValue = values.reduce((sum, value) => sum + value, 0);
+
+    container.innerHTML = `
+        <div class="d-flex justify-content-end mb-3">
+            <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-secondary" data-mode="count">шт</button>
+                <button type="button" class="btn btn-outline-secondary" data-mode="weight">кг</button>
+            </div>
+        </div>
+        <div class="position-relative" style="height: 220px;">
+            <canvas id="mortalityChartCanvas"></canvas>
+        </div>
+    `;
+
+    const toggleButtons = container.querySelectorAll('[data-mode]');
+    toggleButtons.forEach(button => {
+        const buttonMode = button.dataset.mode;
+        const isActive = buttonMode === mortalityChartState.mode;
+        button.classList.toggle('btn-primary', isActive);
+        button.classList.toggle('btn-outline-secondary', !isActive);
+        button.classList.toggle('active', isActive);
+        button.disabled = isActive;
+        button.setAttribute('aria-pressed', String(isActive));
+        button.addEventListener('click', () => {
+            if (buttonMode && buttonMode !== mortalityChartState.mode) {
+                mortalityChartState.mode = buttonMode;
+                renderMortalityChart(container);
+            }
+        });
+    });
+
+    updateMortalityWidgetTitle(totalValue, modeConfig);
+
+    const canvas = container.querySelector('#mortalityChartCanvas');
+    if (!canvas) {
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
 
     dashboardCharts.mortality_chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Падеж, шт',
+                label: modeConfig.label,
                 data: values,
                 borderColor: '#dc3545',
                 backgroundColor: 'rgba(220, 53, 69, 0.2)',
                 tension: 0.25,
                 fill: true,
                 pointRadius: 3,
-                pointHoverRadius: 4
+                pointHoverRadius: 4,
+                spanGaps: false
             }]
         },
         options: {
@@ -1095,7 +1184,9 @@ function renderMortalityChart(container, data) {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        precision: 0
+                        callback: function(value) {
+                            return `${formatNumericValue(value, modeConfig.format)} ${modeConfig.unit}`;
+                        }
                     }
                 }
             },
@@ -1106,13 +1197,40 @@ function renderMortalityChart(container, data) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return ` ${context.parsed.y} шт`;
+                            const value = context && context.parsed && typeof context.parsed.y !== 'undefined'
+                                ? context.parsed.y
+                                : 0;
+                            return ` ${formatNumericValue(value, modeConfig.format)} ${modeConfig.unit}`;
                         }
                     }
                 }
             }
         }
     });
+}
+
+function formatNumericValue(value, options = {}) {
+    const number = Number(value);
+    const safeNumber = Number.isFinite(number) ? number : 0;
+    const minimumFractionDigits = Number.isInteger(options.minimumFractionDigits) ? options.minimumFractionDigits : 0;
+    const maximumFractionDigits = Number.isInteger(options.maximumFractionDigits)
+        ? options.maximumFractionDigits
+        : minimumFractionDigits;
+    return new Intl.NumberFormat('ru-RU', {
+        minimumFractionDigits,
+        maximumFractionDigits
+    }).format(safeNumber);
+}
+
+function updateMortalityWidgetTitle(totalValue, modeConfig) {
+    const titleEl = document.getElementById('widget-title-mortality_chart');
+    if (!titleEl || !modeConfig) {
+        return;
+    }
+    const baseTitle = titleEl.dataset.baseTitle || titleEl.textContent.replace(/\s*\(.*\)\s*$/, '').trim();
+    titleEl.dataset.baseTitle = baseTitle;
+    const formattedTotal = formatNumericValue(totalValue, modeConfig.format);
+    titleEl.textContent = `${baseTitle} (всего: ${formattedTotal} ${modeConfig.unit})`;
 }
 
 function loadTemperatureChart(container) {
