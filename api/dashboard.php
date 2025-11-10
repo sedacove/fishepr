@@ -38,28 +38,11 @@ try {
             }
 
             $data = json_decode(file_get_contents('php://input'), true);
-            if (!is_array($data) || !isset($data['layout']) || !is_array($data['layout'])) {
+            if (!is_array($data) || !isset($data['layout'])) {
                 throw new Exception('Некорректные данные макета');
             }
 
-            $allWidgets = getAllDashboardWidgets();
-            $newLayout = [];
-            foreach ($data['layout'] as $widgetKey) {
-                if (isset($allWidgets[$widgetKey]) && !in_array($widgetKey, $newLayout, true)) {
-                    $newLayout[] = $widgetKey;
-                }
-            }
-
-            foreach ($allWidgets as $key => $definition) {
-                if (!empty($definition['default']) && !in_array($key, $newLayout, true)) {
-                    $newLayout[] = $key;
-                }
-            }
-
-            if (empty($newLayout)) {
-                throw new Exception('Макет не может быть пустым');
-            }
-
+            $newLayout = normalizeDashboardLayout($data['layout']);
             saveUserDashboardLayout($pdo, $userId, $newLayout);
 
             echo json_encode([

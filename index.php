@@ -42,7 +42,7 @@ foreach ($dashboardWidgetDefinitions as $key => $widgetDefinition) {
 }
 
 $dashboardConfigPayload = [
-    'layout' => array_values($dashboardLayout),
+    'layout' => $dashboardLayout,
     'widgets' => $widgetsPayload,
     'dutyRange' => [
         'start' => $dutyRangeStartIso,
@@ -274,11 +274,12 @@ window.dashboardConfig = <?php echo json_encode($dashboardConfigPayload, JSON_HE
 
 <script>
 const dashboardState = window.dashboardConfig || {};
-let dashboardLayout = Array.isArray(dashboardState.layout) ? [...dashboardState.layout] : [];
 const dashboardWidgetsMap = dashboardState.widgets || {};
 const dutyRange = dashboardState.dutyRange || {};
 const baseUrl = dashboardState.baseUrl || '';
 const DASHBOARD_COLUMNS = 2;
+
+let dashboardLayout = normalizeClientLayout(dashboardState.layout);
 let dashboardSortable = [];
 const dashboardCharts = {};
 let tasksContainerEl = null;
@@ -313,15 +314,17 @@ function renderDashboard() {
         toggleEditBtn.classList.toggle('btn-outline-secondary', !isEditMode);
     }
 
-    const layouts = splitLayoutIntoColumns(dashboardLayout, columns.length);
-    layouts.forEach((widgets, index) => {
+    const layoutColumns = sanitizeLayoutColumnsClient(dashboardLayout.columns || []);
+    dashboardLayout = { columns: layoutColumns };
+
+    layoutColumns.forEach((widgets, index) => {
         const column = columns[index];
         if (!column) return;
         widgets.forEach(widgetKey => appendWidgetToColumn(column, widgetKey));
     });
 
     if (isEditMode && getAvailableWidgetKeys().length > 0) {
-        appendAddWidgetCard(columns, layouts);
+        appendAddWidgetCard(columns, layoutColumns);
     }
 
     initDashboardSortable(columns);
@@ -481,19 +484,7 @@ function prepareDashboardColumns(container) {
         column.dataset.columnIndex = String(i);
         container.appendChild(column);
     }
-    columns = Array.from(container.querySelectorAll('.dashboard-column'));
-    return columns;
-}
-
-function splitLayoutIntoColumns(layout, columnCount) {
-    const columns = Array.from({ length: columnCount }, () => []);
-    (layout || []).forEach((widgetKey, index) => {
-        const columnIndex = index % columnCount;
-        if (columns[columnIndex]) {
-            columns[columnIndex].push(widgetKey);
-        }
-    });
-    return columns;
+    return Array.from(container.querySelectorAll('.dashboard-column'));
 }
 
 function appendWidgetToColumn(columnElement, widgetKey) {
@@ -537,17 +528,20 @@ function initDashboardSortable(columns) {
                 if (evt.item && evt.item.classList.contains('dashboard-widget-add')) {
                     return;
                 }
-                const newOrder = [];
-                columns.forEach(col => {
+                const newColumns = columns.map(col => {
+                    const widgets = [];
                     col.querySelectorAll('.dashboard-widget-col').forEach(widget => {
                         if (widget.classList.contains('dashboard-widget-add')) return;
                         const key = widget.dataset.widgetKey;
                         if (key) {
-                            newOrder.push(key);
+                            widgets.push(key);
                         }
                     });
+                    return widgets;
                 });
-                dashboardLayout = newOrder;
+                dashboardLayout = {
+                    columns: sanitizeLayoutColumnsClient(newColumns),
+                };
                 saveDashboardLayout();
             }
         });
@@ -616,17 +610,22 @@ function populateAvailableWidgetsList() {
 }
 
 function getAvailableWidgetKeys() {
+    const used = new Set(flattenLayoutColumns());
     return Object.keys(dashboardWidgetsMap).filter(function(widgetKey) {
-        return !dashboardLayout.includes(widgetKey);
+        return !used.has(widgetKey);
     });
 }
 
 function addWidgetToLayout(widgetKey) {
-    if (dashboardLayout.includes(widgetKey)) {
+    if (layoutContainsWidget(widgetKey)) {
         showDashboardAlert('warning', 'Этот виджет уже добавлен.');
         return;
     }
-    dashboardLayout.push(widgetKey);
+
+    ensureLayoutColumns();
+    const targetIndex = getShortestColumnIndexClient(dashboardLayout.columns);
+    dashboardLayout.columns[targetIndex].push(widgetKey);
+
     saveDashboardLayout(true);
     const modalEl = document.getElementById('addWidgetModal');
     if (modalEl) {
@@ -639,15 +638,36 @@ function addWidgetToLayout(widgetKey) {
 }
 
 function removeWidget(widgetKey) {
-    if (!dashboardLayout.includes(widgetKey)) {
+    ensureLayoutColumns();
+    let removed = false;
+    dashboardLayout.columns = dashboardLayout.columns.map(column => {
+        if (!Array.isArray(column)) {
+            return [];
+        }
+        const filtered = column.filter(key => {
+            if (key === widgetKey) {
+                removed = true;
+                return false;
+            }
+            return true;
+        });
+        return filtered;
+    });
+
+    if (!removed) {
         return;
     }
-    dashboardLayout = dashboardLayout.filter(key => key !== widgetKey);
+
+    dashboardLayout.columns = sanitizeLayoutColumnsClient(dashboardLayout.columns);
     saveDashboardLayout();
     renderDashboard();
 }
 
 function saveDashboardLayout(skipRender) {
+    dashboardLayout = {
+        columns: sanitizeLayoutColumnsClient(dashboardLayout.columns || []),
+    };
+
     fetch(`${baseUrl}api/dashboard.php?action=save_layout`, {
         method: 'POST',
         headers: {
@@ -703,6 +723,95 @@ function showDashboardAlert(type, message) {
         alert.classList.remove('show');
         alert.addEventListener('transitionend', () => alert.remove(), { once: true });
     }, 3000);
+}
+
+function normalizeClientLayout(rawLayout) {
+    let columns = [];
+    if (rawLayout && typeof rawLayout === 'object' && Array.isArray(rawLayout.columns)) {
+        columns = rawLayout.columns;
+    } else if (Array.isArray(rawLayout)) {
+        columns = distributeWidgetsClient(rawLayout, DASHBOARD_COLUMNS);
+    }
+    return { columns: sanitizeLayoutColumnsClient(columns) };
+}
+
+function sanitizeLayoutColumnsClient(columns) {
+    const sanitized = [];
+    const used = new Set();
+    if (Array.isArray(columns)) {
+        columns.forEach(column => {
+            const list = [];
+            if (Array.isArray(column)) {
+                column.forEach(widgetKey => {
+                    if (typeof widgetKey === 'string' && dashboardWidgetsMap[widgetKey] && !used.has(widgetKey)) {
+                        list.push(widgetKey);
+                        used.add(widgetKey);
+                    }
+                });
+            }
+            sanitized.push(list);
+        });
+    }
+    while (sanitized.length < DASHBOARD_COLUMNS) {
+        sanitized.push([]);
+    }
+    if (sanitized.length > DASHBOARD_COLUMNS) {
+        sanitized.length = DASHBOARD_COLUMNS;
+    }
+    return sanitized;
+}
+
+function distributeWidgetsClient(widgetKeys, columnsCount) {
+    const keys = Array.isArray(widgetKeys)
+        ? widgetKeys.filter(key => typeof key === 'string' && dashboardWidgetsMap[key])
+        : [];
+    const columns = Array.from({ length: Math.max(columnsCount, 1) }, () => []);
+    keys.forEach((key, index) => {
+        columns[index % columns.length].push(key);
+    });
+    return columns;
+}
+
+function flattenLayoutColumns() {
+    const flat = [];
+    if (!dashboardLayout || !Array.isArray(dashboardLayout.columns)) {
+        return flat;
+    }
+    dashboardLayout.columns.forEach(column => {
+        if (Array.isArray(column)) {
+            column.forEach(widgetKey => {
+                if (typeof widgetKey === 'string') {
+                    flat.push(widgetKey);
+                }
+            });
+        }
+    });
+    return flat;
+}
+
+function layoutContainsWidget(widgetKey) {
+    return flattenLayoutColumns().includes(widgetKey);
+}
+
+function ensureLayoutColumns() {
+    if (!dashboardLayout || !Array.isArray(dashboardLayout.columns)) {
+        dashboardLayout = { columns: Array.from({ length: DASHBOARD_COLUMNS }, () => []) };
+    } else {
+        dashboardLayout.columns = sanitizeLayoutColumnsClient(dashboardLayout.columns);
+    }
+}
+
+function getShortestColumnIndexClient(columns) {
+    let minIndex = 0;
+    let minValue = Number.POSITIVE_INFINITY;
+    columns.forEach((column, index) => {
+        const length = Array.isArray(column) ? column.length : 0;
+        if (length < minValue) {
+            minValue = length;
+            minIndex = index;
+        }
+    });
+    return minIndex;
 }
 
 function loadDutyWeek(container) {
