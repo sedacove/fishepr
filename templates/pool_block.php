@@ -71,7 +71,7 @@ $maxPoolCapacityKg = (float)getSetting('max_pool_capacity_kg', 5000);
                    style="font-size: 1.1rem;"></i>
             <?php endif; ?>
             <?php if ($session && isset($session['id'])): ?>
-                <a href="<?php echo BASE_URL; ?>pages/session_details.php?id=<?php echo $session['id']; ?>" class="text-decoration-none">
+                <a href="<?php echo BASE_URL; ?>session-details?id=<?php echo $session['id']; ?>" class="text-decoration-none">
                     <?php echo htmlspecialchars($session['name']); ?>
                 </a>
             <?php else: ?>

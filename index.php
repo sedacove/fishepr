@@ -11,8 +11,14 @@ $router->setBasePath($basePath);
 
 $router->get('/', 'DashboardController@index');
 $router->get('/index.php', 'DashboardController@index');
+$router->get('/work', 'WorkController@index');
+$router->get('/work.php', 'WorkController@index');
 $router->get('/tasks', 'TasksController@index');
 $router->get('/tasks.php', 'TasksController@index');
+$router->get('/meter-readings', 'MeterReadingsController@index');
+$router->get('/meter_readings.php', 'MeterReadingsController@index');
+$router->get('/session-details', 'SessionDetailsController@show');
+$router->get('/session_details.php', 'SessionDetailsController@show');
 
 try {
     $response = $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');

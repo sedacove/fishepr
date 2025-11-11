@@ -136,9 +136,9 @@ if (!isset($page_title)) {
                             <i class="bi bi-speedometer2"></i>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/work.php">Рабочая</a>
-                    </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo BASE_URL; ?>work">Рабочая</a>
+                                </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="poolsDropdown" role="button" data-bs-toggle="dropdown">
                             Бассейны
@@ -158,9 +158,9 @@ if (!isset($page_title)) {
                             </li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/meter_readings.php">Приборы</a>
-                    </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo BASE_URL; ?>meter-readings">Приборы</a>
+                                </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo BASE_URL; ?>tasks">Задачи</a>
                     </li>
