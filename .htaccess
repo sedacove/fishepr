@@ -27,3 +27,8 @@ Options -Indexes
     php_value session.cookie_httponly 1
     php_value session.use_only_cookies 1
 </IfModule>
+
+# Перенаправление запросов через фронт-контроллер
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]

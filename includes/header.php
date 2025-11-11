@@ -57,7 +57,17 @@ if (!isset($page_title)) {
     
     <!-- Основные стили -->
     <link href="<?php echo asset_url('assets/css/style.css'); ?>" rel="stylesheet">
-    
+
+    <?php if (!empty($extra_styles) && is_array($extra_styles)): ?>
+        <?php foreach ($extra_styles as $stylePath): ?>
+            <?php
+                $isAbsolute = is_string($stylePath) && preg_match('~^https?://~i', $stylePath);
+                $href = $isAbsolute ? $stylePath : asset_url(ltrim($stylePath, '/'));
+            ?>
+            <link href="<?php echo $href; ?>" rel="stylesheet">
+        <?php endforeach; ?>
+    <?php endif; ?>
+
     <!-- Инициализация темы (предотвращает мерцание) -->
     <script>
         (function() {
@@ -74,6 +84,16 @@ if (!isset($page_title)) {
     
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <?php if (!empty($extra_head_scripts) && is_array($extra_head_scripts)): ?>
+        <?php foreach ($extra_head_scripts as $scriptPath): ?>
+            <?php
+                $isAbsolute = is_string($scriptPath) && preg_match('~^https?://~i', $scriptPath);
+                $src = $isAbsolute ? $scriptPath : asset_url(ltrim($scriptPath, '/'));
+            ?>
+            <script src="<?php echo $src; ?>"></script>
+        <?php endforeach; ?>
+    <?php endif; ?>
     
     <!-- Обновление времени в хедере -->
     <script>
@@ -142,7 +162,7 @@ if (!isset($page_title)) {
                         <a class="nav-link" href="<?php echo BASE_URL; ?>pages/meter_readings.php">Приборы</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/tasks.php">Задачи</a>
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>tasks">Задачи</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo BASE_URL; ?>pages/duty_calendar.php">

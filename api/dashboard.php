@@ -8,6 +8,11 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/dashboard_layout.php';
+require_once __DIR__ . '/../app/Support/Autoloader.php';
+
+use App\Services\DashboardLayoutService;
+use App\Services\DashboardWidgetRegistry;
+use App\Support\Autoloader;
 
 requireAuth();
 
@@ -15,13 +20,20 @@ $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? 'layout';
 
 try {
+    $autoloader = new Autoloader();
+    $autoloader->addNamespace('App', __DIR__ . '/../app');
+    $autoloader->register();
+
     $pdo = getDBConnection();
     $userId = getCurrentUserId();
 
+    $registry = dashboardWidgetRegistry();
+    $layoutService = new DashboardLayoutService($pdo, $registry);
+
     switch ($action) {
         case 'layout':
-            $layout = getUserDashboardLayout($pdo, $userId);
-            $available = getAvailableWidgetsForUser($layout);
+            $layout = $layoutService->getUserLayout($userId);
+            $available = $layoutService->getAvailableWidgets($layout);
 
             echo json_encode([
                 'success' => true,
@@ -37,13 +49,14 @@ try {
                 throw new Exception('Метод не поддерживается');
             }
 
-            $data = json_decode(file_get_contents('php://input'), true);
+            $raw = file_get_contents('php://input');
+            $data = json_decode($raw, true);
             if (!is_array($data) || !isset($data['layout'])) {
                 throw new Exception('Некорректные данные макета');
             }
 
-            $newLayout = normalizeDashboardLayout($data['layout']);
-            saveUserDashboardLayout($pdo, $userId, $newLayout);
+            $normalized = $layoutService->normalizeLayout($data['layout']);
+            $layoutService->saveUserLayout($userId, $normalized);
 
             echo json_encode([
                 'success' => true,
