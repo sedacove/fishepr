@@ -21,6 +21,8 @@ $router->get('/session-details', 'SessionDetailsController@show');
 $router->get('/session_details.php', 'SessionDetailsController@show');
 $router->get('/measurements', 'MeasurementsController@index');
 $router->get('/measurements.php', 'MeasurementsController@index');
+$router->get('/mortality', 'MortalityController@index');
+$router->get('/mortality.php', 'MortalityController@index');
 
 try {
     $response = $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');

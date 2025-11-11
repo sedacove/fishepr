@@ -151,7 +151,7 @@ if (!isset($page_title)) {
                                 <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/harvests.php">Отборы</a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/mortality.php">Падеж</a>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>mortality">Падеж</a>
                             </li>
                             <li>
                                 <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/weighings.php">Навески</a>
