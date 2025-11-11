@@ -50,13 +50,16 @@
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    renderTasks(response.data, container);
+                    const tasksData = response.data ? response.data : response;
+                    const tasks = Array.isArray(tasksData.tasks) ? tasksData.tasks : Array.isArray(tasksData) ? tasksData : [];
+                    renderTasks(tasks, container);
                 } else {
-                    showAlert('danger', response.message);
+                    showAlert('danger', response.message || 'Ошибка при загрузке задач');
                     container.html('<div class="alert alert-warning">Ошибка загрузки задач</div>');
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                console.error('loadTasks error:', status, error, xhr.responseText);
                 showAlert('danger', 'Ошибка при загрузке задач');
                 container.html('<div class="alert alert-danger">Ошибка при загрузке данных</div>');
             }
@@ -523,9 +526,10 @@
                     loadTasks(currentTab);
                 }
             },
-            error: function(xhr) {
-                const response = xhr.responseJSON || {};
-                showAlert('danger', response.message || 'Ошибка при сохранении задачи');
+        error: function(xhr, status, error) {
+            console.error('save task error:', status, error, xhr.responseText);
+            const response = xhr.responseJSON || {};
+            showAlert('danger', response.message || 'Ошибка при сохранении задачи');
             }
         });
     });
@@ -580,9 +584,10 @@
                     showAlert('danger', response.message);
                 }
             },
-            error: function(xhr) {
-                const response = xhr.responseJSON || {};
-                showAlert('danger', response.message || 'Ошибка при обновлении задачи');
+        error: function(xhr, status, error) {
+            console.error('toggle task error:', status, error, xhr.responseText);
+            const response = xhr.responseJSON || {};
+            showAlert('danger', response.message || 'Ошибка при обновлении задачи');
             }
         });
     }
@@ -604,9 +609,10 @@
                     showAlert('danger', response.message);
                 }
             },
-            error: function(xhr) {
-                const response = xhr.responseJSON || {};
-                showAlert('danger', response.message || 'Ошибка при обновлении элемента');
+        error: function(xhr, status, error) {
+            console.error('toggle checklist item error:', status, error, xhr.responseText);
+            const response = xhr.responseJSON || {};
+            showAlert('danger', response.message || 'Ошибка при обновлении элемента');
             }
         });
     }
@@ -630,9 +636,10 @@
                     showAlert('danger', response.message);
                 }
             },
-            error: function(xhr) {
-                const response = xhr.responseJSON || {};
-                showAlert('danger', response.message || 'Ошибка при удалении задачи');
+        error: function(xhr, status, error) {
+            console.error('delete task error:', status, error, xhr.responseText);
+            const response = xhr.responseJSON || {};
+            showAlert('danger', response.message || 'Ошибка при удалении задачи');
             }
         });
     }
