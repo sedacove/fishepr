@@ -70,6 +70,19 @@ class WeighingRepository extends Repository
         $stmt = $this->pdo->prepare('DELETE FROM weighings WHERE id = ?');
         $stmt->execute([$id]);
     }
+
+    public function listForPoolSince(int $poolId, string $startDate): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT recorded_at, weight, fish_count
+             FROM weighings
+             WHERE pool_id = ?
+               AND recorded_at >= ?
+             ORDER BY recorded_at ASC'
+        );
+        $stmt->execute([$poolId, $startDate]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
 }
 
 

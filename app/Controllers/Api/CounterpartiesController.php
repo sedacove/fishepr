@@ -3,6 +3,7 @@
 namespace App\Controllers\Api;
 
 use App\Services\CounterpartyService;
+use App\Support\Exceptions\ValidationException;
 use App\Support\JsonResponse;
 use App\Support\Request;
 use DomainException;
@@ -86,8 +87,14 @@ class CounterpartiesController
                 default:
                     throw new DomainException('Неизвестное действие');
             }
+        } catch (ValidationException $e) {
+            JsonResponse::send([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'field' => $e->getField(),
+            ], $e->getCode() ?: 422);
         } catch (DomainException | RuntimeException $e) {
-            JsonResponse::error($e->getMessage(), 400);
+            JsonResponse::error($e->getMessage(), $e->getCode() ?: 400);
         } catch (Exception $e) {
             JsonResponse::error($e->getMessage(), 500);
         }

@@ -307,13 +307,13 @@
                     }
                     loadCounterparties();
                 } else {
-                    handleFormError(response.message || 'Ошибка при сохранении контрагента');
+                    handleFormError(response.message || 'Ошибка при сохранении контрагента', response.field || null);
                 }
             },
             error: function(xhr, status, error) {
                 console.error('saveCounterparty error:', status, error, xhr.responseText);
                 const response = xhr.responseJSON || {};
-                handleFormError(response.message || 'Ошибка при сохранении контрагента');
+                handleFormError(response.message || 'Ошибка при сохранении контрагента', response.field || null);
             }
         });
     }
@@ -418,7 +418,20 @@
         });
     }
 
-    function handleFormError(message) {
+    function handleFormError(message, field) {
+        const fieldMap = {
+            name: '#counterpartyName',
+            inn: '#counterpartyInn',
+            phone: '#counterpartyPhone',
+            email: '#counterpartyEmail',
+            color: 'input[name="counterpartyColor"]'
+        };
+
+        if (field && fieldMap[field]) {
+            showFieldError(fieldMap[field], message);
+            return;
+        }
+
         const lower = message ? message.toLowerCase() : '';
         if (lower.includes('название')) {
             showFieldError('#counterpartyName', message);

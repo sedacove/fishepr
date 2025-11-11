@@ -78,6 +78,26 @@ class HarvestRepository extends Repository
         $stmt = $this->pdo->prepare('DELETE FROM harvests WHERE id = ?');
         $stmt->execute([$id]);
     }
+
+    public function listForPoolSince(int $poolId, string $startDate): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT 
+                h.recorded_at,
+                h.weight,
+                h.fish_count,
+                h.counterparty_id,
+                c.name AS counterparty_name,
+                c.color AS counterparty_color
+             FROM harvests h
+             LEFT JOIN counterparties c ON h.counterparty_id = c.id
+             WHERE h.pool_id = ?
+               AND h.recorded_at >= ?
+             ORDER BY h.recorded_at ASC'
+        );
+        $stmt->execute([$poolId, $startDate]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
 }
 
 

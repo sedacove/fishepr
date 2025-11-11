@@ -6,6 +6,7 @@ use App\Models\Counterparty\Counterparty;
 use App\Models\Counterparty\CounterpartyDocument;
 use App\Repositories\CounterpartyDocumentRepository;
 use App\Repositories\CounterpartyRepository;
+use App\Support\Exceptions\ValidationException;
 use DomainException;
 use PDO;
 use RuntimeException;
@@ -247,10 +248,10 @@ class CounterpartyService
     {
         $name = trim($payload['name'] ?? '');
         if ($name === '') {
-            throw new DomainException('Название обязательно для заполнения');
+            throw new ValidationException('name', 'Название обязательно для заполнения');
         }
         if (strlen($name) > 255) {
-            throw new DomainException('Название слишком длинное (максимум 255 символов)');
+            throw new ValidationException('name', 'Название слишком длинное (максимум 255 символов)');
         }
 
         $description = trim($payload['description'] ?? '');
@@ -258,7 +259,7 @@ class CounterpartyService
         $phone = $this->sanitizePhoneValue($payload['phone'] ?? null);
         $email = trim($payload['email'] ?? '');
         if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new DomainException('Укажите корректный email');
+            throw new ValidationException('email', 'Укажите корректный email');
         }
         $color = $this->validateColor($payload['color'] ?? null);
 
@@ -289,7 +290,7 @@ class CounterpartyService
             $digits = '7' . substr($digits, 1);
         }
         if (strlen($digits) !== 11 || $digits[0] !== '7') {
-            throw new DomainException('Телефон должен быть в формате +7XXXXXXXXXX');
+            throw new ValidationException('phone', 'Телефон должен быть в формате +7XXXXXXXXXX');
         }
         return '+' . $digits;
     }
@@ -306,7 +307,7 @@ class CounterpartyService
         }
         $digits = preg_replace('/\D+/', '', $value);
         if (!in_array(strlen($digits), [10, 12], true)) {
-            throw new DomainException('ИНН должен содержать 10 или 12 цифр');
+            throw new ValidationException('inn', 'ИНН должен содержать 10 или 12 цифр');
         }
         return $digits;
     }
@@ -322,7 +323,7 @@ class CounterpartyService
             return null;
         }
         if (!array_key_exists($color, $this->getColorPalette())) {
-            throw new DomainException('Выберите цвет из предустановленной палитры');
+            throw new ValidationException('color', 'Выберите цвет из предустановленной палитры');
         }
         return $color;
     }
