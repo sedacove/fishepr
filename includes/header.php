@@ -200,17 +200,17 @@ if (!isset($page_title)) {
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/pools.php">
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pools">
                                     <i class="bi bi-water"></i> Бассейны
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/plantings.php">
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>plantings">
                                     <i class="bi bi-inbox"></i> Посадки
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/sessions.php">
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>sessions">
                                     <i class="bi bi-diagram-3"></i> Сессии
                                 </a>
                             </li>

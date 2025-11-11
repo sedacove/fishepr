@@ -33,6 +33,12 @@ $router->get('/news', 'NewsController@index');
 $router->get('/news.php', 'NewsController@index');
 $router->get('/meters', 'MetersController@index');
 $router->get('/meters.php', 'MetersController@index');
+$router->get('/pools', 'PoolsController@index');
+$router->get('/pools.php', 'PoolsController@index');
+$router->get('/plantings', 'PlantingsController@index');
+$router->get('/plantings.php', 'PlantingsController@index');
+$router->get('/sessions', 'SessionsController@index');
+$router->get('/sessions.php', 'SessionsController@index');
 $router->get('/users', 'UsersController@index');
 $router->get('/users.php', 'UsersController@index');
 

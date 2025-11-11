@@ -2,43 +2,90 @@
 
 namespace App\Repositories;
 
+use App\Models\Pool\Pool;
 use PDO;
 
 class PoolRepository extends Repository
 {
-    public function findActive(int $id): ?array
+    /**
+     * @return Pool[]
+     */
+    public function all(): array
     {
-        $stmt = $this->pdo->prepare('SELECT id, name FROM pools WHERE id = ? AND is_active = 1');
-        $stmt->execute([$id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result ?: null;
-    }
-
-    public function listActive(): array
-    {
-        $stmt = $this->pdo->query('SELECT id, name, sort_order FROM pools WHERE is_active = 1 ORDER BY sort_order ASC, name ASC');
-        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-    }
-
-    public function getActiveWithSessions(): array
-    {
-        $stmt = $this->pdo->query('SELECT id, name, sort_order FROM pools WHERE is_active = 1 ORDER BY sort_order ASC, name ASC');
-        $pools = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-        if (!$pools) {
-            return [];
-        }
-
-        $sessionStmt = $this->pdo->prepare(
-            'SELECT s.id, s.name AS session_name FROM sessions s WHERE s.pool_id = ? AND s.is_completed = 0 ORDER BY s.start_date DESC LIMIT 1'
+        $stmt = $this->pdo->query(
+            'SELECT p.*, u.login AS created_by_login, u.full_name AS created_by_name
+             FROM pools p
+             LEFT JOIN users u ON u.id = p.created_by
+             ORDER BY p.sort_order ASC, p.created_at ASC'
         );
 
-        foreach ($pools as &$pool) {
-            $sessionStmt->execute([$pool['id']]);
-            $pool['active_session'] = $sessionStmt->fetch(PDO::FETCH_ASSOC) ?: null;
-            $pool['pool_name'] = $pool['name'];
+        return array_map(fn ($row) => new Pool($row), $stmt->fetchAll(PDO::FETCH_ASSOC) ?: []);
+    }
+
+    public function find(int $id): ?Pool
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT p.*, u.login AS created_by_login, u.full_name AS created_by_name
+             FROM pools p
+             LEFT JOIN users u ON u.id = p.created_by
+             WHERE p.id = ?'
+        );
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? new Pool($row) : null;
+    }
+
+    public function create(string $name, int $sortOrder, int $userId): int
+    {
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO pools (name, sort_order, created_by)
+             VALUES (?, ?, ?)'
+        );
+        $stmt->execute([$name, $sortOrder, $userId]);
+
+        return (int) $this->pdo->lastInsertId();
+    }
+
+    public function update(int $id, array $data): void
+    {
+        if (empty($data)) {
+            return;
         }
 
-        return $pools;
+        $columns = [];
+        $params = [];
+        foreach ($data as $column => $value) {
+            $columns[] = "{$column} = ?";
+            $params[] = $value;
+        }
+        $params[] = $id;
+
+        $sql = 'UPDATE pools SET ' . implode(', ', $columns) . ' WHERE id = ?';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+    }
+
+    public function delete(int $id): void
+    {
+        $stmt = $this->pdo->prepare('DELETE FROM pools WHERE id = ?');
+        $stmt->execute([$id]);
+    }
+
+    public function maxSortOrder(): int
+    {
+        $stmt = $this->pdo->query('SELECT MAX(sort_order) AS max_order FROM pools');
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return isset($row['max_order']) ? (int) $row['max_order'] : -1;
+    }
+
+    public function updateOrder(array $ids): void
+    {
+        $stmt = $this->pdo->prepare('UPDATE pools SET sort_order = ? WHERE id = ?');
+        foreach ($ids as $index => $poolId) {
+            $stmt->execute([$index, $poolId]);
+        }
     }
 }
 
