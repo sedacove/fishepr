@@ -40,6 +40,26 @@
         init();
     }
 
+    function clearFormErrors() {
+        $('#recordForm .is-invalid').removeClass('is-invalid');
+        $('#recordForm .invalid-feedback').remove();
+    }
+
+    function showFieldError(selector, message) {
+        const input = $(selector);
+        if (!input.length) {
+            showAlert('danger', message);
+            return;
+        }
+        if (!input.hasClass('is-invalid')) {
+            input.addClass('is-invalid');
+            input.after(`<div class="invalid-feedback">${escapeHtml(message)}</div>`);
+        }
+        if (typeof input.focus === 'function') {
+            input.focus();
+        }
+    }
+
     function loadPools() {
         $.ajax({
             url: apiUrl('api/harvests.php?action=get_pools'),
@@ -361,6 +381,7 @@
 
     function saveRecord() {
         const form = $('#recordForm')[0];
+        clearFormErrors();
         if (!form.checkValidity()) {
             form.reportValidity();
             return;
@@ -403,15 +424,32 @@
                         loadRecords(payload.pool_id);
                     }
                 } else {
-                    showAlert('danger', response.message || 'Не удалось сохранить запись');
+                    handleFormError(response.message || 'Не удалось сохранить запись');
                 }
             },
             error: function(xhr, status, error) {
                 console.error('saveRecord error:', status, error, xhr.responseText);
                 const response = xhr.responseJSON || {};
-                showAlert('danger', response.message || 'Ошибка при сохранении записи');
+                handleFormError(response.message || 'Ошибка при сохранении записи');
             }
         });
+    }
+
+    function handleFormError(message) {
+        const lower = message ? message.toLowerCase() : '';
+        if (lower.includes('бассейн')) {
+            showFieldError('#recordPool', message);
+        } else if (lower.includes('вес')) {
+            showFieldError('#recordWeight', message);
+        } else if (lower.includes('количество')) {
+            showFieldError('#recordFishCount', message);
+        } else if (lower.includes('контрагент')) {
+            showFieldError('#recordCounterparty', message);
+        } else if (lower.includes('дата')) {
+            showFieldError('#recordDateTime', message);
+        } else {
+            showAlert('danger', message);
+        }
     }
 
     function deleteRecord(id) {

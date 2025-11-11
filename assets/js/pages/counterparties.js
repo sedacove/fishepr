@@ -250,8 +250,29 @@
         });
     }
 
+    function clearFormErrors() {
+        $('#counterpartyForm .is-invalid').removeClass('is-invalid');
+        $('#counterpartyForm .invalid-feedback').remove();
+    }
+
+    function showFieldError(selector, message) {
+        const input = $(selector);
+        if (!input.length) {
+            showAlert('danger', message);
+            return;
+        }
+        if (!input.hasClass('is-invalid')) {
+            input.addClass('is-invalid');
+            input.after(`<div class="invalid-feedback">${escapeHtml(message)}</div>`);
+        }
+        if (typeof input.focus === 'function') {
+            input.focus();
+        }
+    }
+
     function saveCounterparty() {
         const form = document.getElementById('counterpartyForm');
+        clearFormErrors();
         if (!form.checkValidity()) {
             form.reportValidity();
             return;
@@ -286,13 +307,13 @@
                     }
                     loadCounterparties();
                 } else {
-                    showAlert('danger', response.message || 'Ошибка при сохранении контрагента');
+                    handleFormError(response.message || 'Ошибка при сохранении контрагента');
                 }
             },
             error: function(xhr, status, error) {
                 console.error('saveCounterparty error:', status, error, xhr.responseText);
                 const response = xhr.responseJSON || {};
-                showAlert('danger', response.message || 'Ошибка при сохранении контрагента');
+                handleFormError(response.message || 'Ошибка при сохранении контрагента');
             }
         });
     }
@@ -395,6 +416,23 @@
                 showAlert('danger', response.message || 'Ошибка при загрузке документов');
             }
         });
+    }
+
+    function handleFormError(message) {
+        const lower = message ? message.toLowerCase() : '';
+        if (lower.includes('название')) {
+            showFieldError('#counterpartyName', message);
+        } else if (lower.includes('инн')) {
+            showFieldError('#counterpartyInn', message);
+        } else if (lower.includes('телефон')) {
+            showFieldError('#counterpartyPhone', message);
+        } else if (lower.includes('email')) {
+            showFieldError('#counterpartyEmail', message);
+        } else if (lower.includes('цвет')) {
+            showFieldError('input[name="counterpartyColor"]', message);
+        } else {
+            showAlert('danger', message);
+        }
     }
 
     function formatBytes(bytes) {
