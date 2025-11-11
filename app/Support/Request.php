@@ -59,7 +59,7 @@ class Request
 
         $decoded = json_decode($this->rawBody, true);
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
-            throw new \RuntimeException('Некорректный JSON в теле запроса');
+            throw new \RuntimeException('Некорректный JSON в теле запроса', 400);
         }
 
         $this->jsonBody = $decoded;

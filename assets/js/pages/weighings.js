@@ -255,6 +255,7 @@
 
     function openAddModal(poolId) {
         currentEditId = null;
+        clearFormErrors();
         $('#recordModalTitle').text('Добавить навеску');
         $('#recordForm')[0].reset();
         $('#recordId').val('');
@@ -287,6 +288,7 @@
 
     function openEditModal(id) {
         currentEditId = id;
+        clearFormErrors();
         $('#recordModalTitle').text('Редактировать навеску');
 
         $.ajax({
@@ -376,18 +378,30 @@
                         loadRecords(payload.pool_id);
                     }
                 } else {
-                    handleFormError(response.message || 'Не удалось сохранить запись');
+                    handleFormError(response.message || 'Не удалось сохранить запись', response.field || null);
                 }
             },
             error: function(xhr, status, error) {
                 console.error('saveRecord error:', status, error, xhr.responseText);
                 const response = xhr.responseJSON || {};
-                handleFormError(response.message || 'Ошибка при сохранении записи');
+                handleFormError(response.message || 'Ошибка при сохранении записи', response.field || null);
             }
         });
     }
 
-    function handleFormError(message) {
+    function handleFormError(message, field) {
+        const fieldMap = {
+            pool_id: '#recordPool',
+            weight: '#recordWeight',
+            fish_count: '#recordFishCount',
+            recorded_at: '#recordDateTime'
+        };
+
+        if (field && fieldMap[field]) {
+            showFieldError(fieldMap[field], message);
+            return;
+        }
+
         const lower = message ? message.toLowerCase() : '';
         if (lower.includes('бассейн')) {
             showFieldError('#recordPool', message);
