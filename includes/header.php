@@ -145,7 +145,7 @@ if (!isset($page_title)) {
                         </a>
                         <ul class="dropdown-menu">
                             <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/measurements.php">Замеры</a>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>measurements">Замеры</a>
                             </li>
                             <li>
                                 <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/harvests.php">Отборы</a>

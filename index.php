@@ -19,6 +19,8 @@ $router->get('/meter-readings', 'MeterReadingsController@index');
 $router->get('/meter_readings.php', 'MeterReadingsController@index');
 $router->get('/session-details', 'SessionDetailsController@show');
 $router->get('/session_details.php', 'SessionDetailsController@show');
+$router->get('/measurements', 'MeasurementsController@index');
+$router->get('/measurements.php', 'MeasurementsController@index');
 
 try {
     $response = $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
