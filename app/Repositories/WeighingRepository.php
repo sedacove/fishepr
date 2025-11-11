@@ -83,6 +83,21 @@ class WeighingRepository extends Repository
         $stmt->execute([$poolId, $startDate]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
+
+    public function findLatestSince(int $poolId, string $startDate): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT weight, fish_count, recorded_at
+             FROM weighings
+             WHERE pool_id = ?
+               AND recorded_at >= ?
+             ORDER BY recorded_at DESC
+             LIMIT 1'
+        );
+        $stmt->execute([$poolId, $startDate]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
 }
 
 

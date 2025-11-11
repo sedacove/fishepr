@@ -14,6 +14,12 @@ class PoolRepository extends Repository
         return $result ?: null;
     }
 
+    public function listActive(): array
+    {
+        $stmt = $this->pdo->query('SELECT id, name, sort_order FROM pools WHERE is_active = 1 ORDER BY sort_order ASC, name ASC');
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
     public function getActiveWithSessions(): array
     {
         $stmt = $this->pdo->query('SELECT id, name, sort_order FROM pools WHERE is_active = 1 ORDER BY sort_order ASC, name ASC');

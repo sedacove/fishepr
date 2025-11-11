@@ -30,6 +30,24 @@ class SessionRepository extends Repository
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ?: null;
     }
+
+    public function findActiveByPool(int $poolId): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT 
+                s.*,
+                pl.name AS planting_name,
+                pl.fish_breed AS planting_fish_breed
+             FROM sessions s
+             LEFT JOIN plantings pl ON s.planting_id = pl.id
+             WHERE s.pool_id = ? AND s.is_completed = 0
+             ORDER BY s.start_date DESC
+             LIMIT 1'
+        );
+        $stmt->execute([$poolId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
 }
 
 

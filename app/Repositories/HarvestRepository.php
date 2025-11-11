@@ -98,6 +98,24 @@ class HarvestRepository extends Repository
         $stmt->execute([$poolId, $startDate]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
+
+    public function sumForPoolSince(int $poolId, string $startDate): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT 
+                COALESCE(SUM(weight), 0) AS total_weight,
+                COALESCE(SUM(fish_count), 0) AS total_count
+             FROM harvests
+             WHERE pool_id = ?
+               AND recorded_at >= ?'
+        );
+        $stmt->execute([$poolId, $startDate]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: ['total_weight' => 0, 'total_count' => 0];
+        return [
+            'total_weight' => (float)$row['total_weight'],
+            'total_count' => (int)$row['total_count'],
+        ];
+    }
 }
 
 
