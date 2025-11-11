@@ -148,13 +148,13 @@ if (!isset($page_title)) {
                                 <a class="dropdown-item" href="<?php echo BASE_URL; ?>measurements">Замеры</a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/harvests.php">Отборы</a>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>harvests">Отборы</a>
                             </li>
                             <li>
                                 <a class="dropdown-item" href="<?php echo BASE_URL; ?>mortality">Падеж</a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/weighings.php">Навески</a>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>weighings">Навески</a>
                             </li>
                         </ul>
                     </li>
@@ -215,7 +215,7 @@ if (!isset($page_title)) {
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/counterparties.php">
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>counterparties">
                                     <i class="bi bi-building"></i> Контрагенты
                                 </a>
                             </li>

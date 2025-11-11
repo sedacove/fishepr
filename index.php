@@ -23,6 +23,12 @@ $router->get('/measurements', 'MeasurementsController@index');
 $router->get('/measurements.php', 'MeasurementsController@index');
 $router->get('/mortality', 'MortalityController@index');
 $router->get('/mortality.php', 'MortalityController@index');
+$router->get('/counterparties', 'CounterpartiesController@index');
+$router->get('/counterparties.php', 'CounterpartiesController@index');
+$router->get('/harvests', 'HarvestsController@index');
+$router->get('/harvests.php', 'HarvestsController@index');
+$router->get('/weighings', 'WeighingsController@index');
+$router->get('/weighings.php', 'WeighingsController@index');
 
 try {
     $response = $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
