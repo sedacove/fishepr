@@ -29,6 +29,12 @@ $router->get('/harvests', 'HarvestsController@index');
 $router->get('/harvests.php', 'HarvestsController@index');
 $router->get('/weighings', 'WeighingsController@index');
 $router->get('/weighings.php', 'WeighingsController@index');
+$router->get('/news', 'NewsController@index');
+$router->get('/news.php', 'NewsController@index');
+$router->get('/meters', 'MetersController@index');
+$router->get('/meters.php', 'MetersController@index');
+$router->get('/users', 'UsersController@index');
+$router->get('/users.php', 'UsersController@index');
 
 try {
     $response = $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');

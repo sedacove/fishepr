@@ -195,7 +195,7 @@ if (!isset($page_title)) {
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/users.php">
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>users">
                                     <i class="bi bi-people"></i> Пользователи
                                 </a>
                             </li>
@@ -220,12 +220,12 @@ if (!isset($page_title)) {
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/meters.php">
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>meters">
                                     <i class="bi bi-speedometer"></i> Приборы учета
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/news.php">
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>news">
                                     <i class="bi bi-newspaper"></i> Новости
                                 </a>
                             </li>
