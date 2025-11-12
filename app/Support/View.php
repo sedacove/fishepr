@@ -20,65 +20,8 @@ class View
 
     public static function make(string $template, array $data = []): string
     {
-        // Убеждаемся, что функция asset_url доступна
-        if (!function_exists('asset_url')) {
-            // Пытаемся загрузить config/config.php
-            $configPath = __DIR__ . '/../../config/config.php';
-            $debug = true; // Установить в false после отладки
-            $logFile = __DIR__ . '/../../storage/debug.log';
-            
-            if ($debug) {
-                @mkdir(dirname($logFile), 0775, true);
-                $log = function($msg) use ($logFile) {
-                    file_put_contents($logFile, "[View::make] " . date('Y-m-d H:i:s') . " - $msg\n", FILE_APPEND);
-                };
-                $log("asset_url() not found, trying to load config from: $configPath");
-                $log("Config file exists: " . (is_file($configPath) ? 'YES' : 'NO'));
-            }
-            
-            if (is_file($configPath)) {
-                require_once $configPath;
-                if ($debug) {
-                    $log("Config loaded, asset_url() exists: " . (function_exists('asset_url') ? 'YES' : 'NO'));
-                }
-            }
-            
-            // Если функция все еще не определена, определяем резервную версию
-            if (!function_exists('asset_url')) {
-                if ($debug) {
-                    $log("Still no asset_url(), defining fallback");
-                }
-                
-                // Резервная функция, если config не загрузился
-                if (!defined('BASE_URL')) {
-                    // Пытаемся определить BASE_URL из окружения
-                    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-                    $basePath = dirname($scriptName);
-                    $basePath = $basePath === '/' ? '' : $basePath;
-                    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-                    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-                    define('BASE_URL', $protocol . '://' . $host . $basePath . '/');
-                    if ($debug) {
-                        $log("Defined BASE_URL: " . BASE_URL);
-                    }
-                }
-                
-                if (!function_exists('asset_url')) {
-                    function asset_url(string $relativePath): string
-                    {
-                        $relativePath = ltrim($relativePath, '/');
-                        if ($relativePath === '') {
-                            return BASE_URL;
-                        }
-                        $separator = strpos($relativePath, '?') === false ? '?' : '&';
-                        return BASE_URL . $relativePath . $separator . 'v=' . time();
-                    }
-                    if ($debug) {
-                        $log("Fallback asset_url() defined");
-                    }
-                }
-            }
-        }
+        // Убеждаемся, что функция asset_url доступна в глобальной области видимости
+        self::ensureAssetUrlFunction();
 
         $templatePath = self::templatePath($template);
         if (!is_file($templatePath)) {
@@ -110,6 +53,123 @@ class View
     {
         $relative = str_replace(['.', '\\'], DIRECTORY_SEPARATOR, $template);
         return self::$basePath . DIRECTORY_SEPARATOR . $relative . '.php';
+    }
+
+    private static function ensureAssetUrlFunction(): void
+    {
+        // Проверяем в глобальной области видимости
+        if (function_exists('asset_url')) {
+            return;
+        }
+
+        $debug = true; // Установить в false после отладки
+        $logFile = __DIR__ . '/../../storage/debug.log';
+        
+        if ($debug) {
+            @mkdir(dirname($logFile), 0775, true);
+            $log = function($msg) use ($logFile) {
+                file_put_contents($logFile, "[View::ensureAssetUrlFunction] " . date('Y-m-d H:i:s') . " - $msg\n", FILE_APPEND);
+            };
+            $log("asset_url() not found, trying to load config");
+        }
+        
+        // Пытаемся загрузить config/config.php
+        // Используем require вместо require_once, чтобы гарантировать выполнение кода
+        $configPath = __DIR__ . '/../../config/config.php';
+        if (is_file($configPath)) {
+            // Проверяем, был ли файл уже загружен
+            $alreadyIncluded = in_array(realpath($configPath), get_included_files());
+            if ($debug) {
+                $log("Config file exists, already included: " . ($alreadyIncluded ? 'YES' : 'NO'));
+            }
+            
+            // Если файл уже был загружен, но функция не определена, 
+            // значит была ошибка при первой загрузке - просто определяем fallback
+            if ($alreadyIncluded && !function_exists('asset_url')) {
+                if ($debug) {
+                    $log("Config was loaded but asset_url() not defined - likely error in config file");
+                }
+            } else if (!$alreadyIncluded) {
+                // Загружаем в глобальной области видимости
+                // Используем try-catch для перехвата возможных ошибок
+                try {
+                    require_once $configPath;
+                    if ($debug) {
+                        $log("Config loaded, asset_url() exists: " . (function_exists('asset_url') ? 'YES' : 'NO'));
+                    }
+                } catch (Throwable $e) {
+                    if ($debug) {
+                        $log("Error loading config: " . $e->getMessage());
+                    }
+                    error_log("Error loading config/config.php in View::ensureAssetUrlFunction: " . $e->getMessage());
+                }
+            }
+        } else {
+            if ($debug) {
+                $log("Config file not found at: $configPath");
+            }
+        }
+        
+        // Если функция все еще не определена, определяем резервную версию
+        if (!function_exists('asset_url')) {
+            if ($debug) {
+                $log("Still no asset_url(), defining fallback");
+            }
+            
+            // Резервная функция, если config не загрузился
+            if (!defined('BASE_URL')) {
+                // Пытаемся определить BASE_URL из окружения
+                $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+                $basePath = dirname($scriptName);
+                $basePath = $basePath === '/' ? '' : $basePath;
+                $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+                $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+                define('BASE_URL', $protocol . '://' . $host . $basePath . '/');
+                if ($debug) {
+                    $log("Defined BASE_URL: " . BASE_URL);
+                }
+            }
+            
+            // Определяем функцию в глобальной области видимости
+            // В PHP функции, определенные внутри методов, все равно определяются глобально
+            $baseUrl = BASE_URL;
+            if (!function_exists('asset_url')) {
+                // Определяем функцию напрямую - она будет доступна глобально
+                // Используем замыкание для BASE_URL, чтобы избежать проблем с eval
+                $GLOBALS['_asset_url_base'] = $baseUrl;
+                if (!function_exists('asset_url')) {
+                    function asset_url(string $relativePath): string {
+                        $baseUrl = $GLOBALS['_asset_url_base'] ?? BASE_URL;
+                        $relativePath = ltrim($relativePath, '/');
+                        if ($relativePath === '') {
+                            return $baseUrl;
+                        }
+                        $separator = strpos($relativePath, '?') === false ? '?' : '&';
+                        return $baseUrl . $relativePath . $separator . 'v=' . time();
+                    }
+                }
+            }
+            
+            if ($debug) {
+                $log("Fallback asset_url() defined, exists: " . (function_exists('asset_url') ? 'YES' : 'NO'));
+                // Финальная проверка - пробуем вызвать функцию
+                if (function_exists('asset_url')) {
+                    try {
+                        $test = asset_url('test');
+                        $log("Function call test successful: $test");
+                    } catch (Throwable $e) {
+                        $log("Function call test failed: " . $e->getMessage());
+                    }
+                } else {
+                    $log("ERROR: Function still not defined after all attempts!");
+                }
+            }
+        }
+        
+        // Финальная проверка перед возвратом
+        if (!function_exists('asset_url')) {
+            error_log("CRITICAL: asset_url() still not defined in View::ensureAssetUrlFunction()");
+        }
     }
 }
 
