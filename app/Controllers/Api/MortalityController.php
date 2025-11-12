@@ -14,7 +14,7 @@ class MortalityController
 
     public function __construct()
     {
-        \requireAuth();
+        // Авторизация проверяется в api/mortality.php
         $this->service = new MortalityService(\getDBConnection());
     }
 

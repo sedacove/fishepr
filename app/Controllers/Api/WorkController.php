@@ -12,7 +12,7 @@ class WorkController
 
     public function __construct()
     {
-        \requireAuth();
+        // Авторизация проверяется в api/work.php
         $this->service = new WorkService(\getDBConnection());
     }
 
@@ -23,7 +23,20 @@ class WorkController
             JsonResponse::success($pools);
         } catch (\Throwable $e) {
             $status = $e->getCode() ?: 500;
-            $message = $status >= 500 ? 'Внутренняя ошибка сервера' : $e->getMessage();
+            
+            // В режиме разработки показываем детали ошибки
+            $isDev = ($_SERVER['HTTP_HOST'] ?? '') === 'localhost' || strpos($_SERVER['HTTP_HOST'] ?? '', '127.0.0.1') !== false;
+            
+            if ($status >= 500) {
+                $message = $isDev 
+                    ? $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
+                    : 'Внутренняя ошибка сервера';
+            } else {
+                $message = $e->getMessage();
+            }
+            
+            error_log("Error in WorkController::handle(): " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine() . "\n" . $e->getTraceAsString());
+            
             JsonResponse::error($message, $status);
         }
     }

@@ -14,7 +14,7 @@ class MeasurementsController
 
     public function __construct()
     {
-        \requireAuth();
+        // Авторизация проверяется в api/measurements.php
         $this->service = new MeasurementService(\getDBConnection());
     }
 

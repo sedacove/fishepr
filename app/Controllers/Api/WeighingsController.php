@@ -15,7 +15,7 @@ class WeighingsController
 
     public function __construct()
     {
-        \requireAuth();
+        // Авторизация проверяется в api/weighings.php
         $this->service = new WeighingService(\getDBConnection());
     }
 

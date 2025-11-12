@@ -183,6 +183,28 @@ class SessionRepository extends Repository
         );
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
+
+    /**
+     * Найти активную сессию для указанного бассейна
+     * @return array|null
+     */
+    public function findActiveByPool(int $poolId): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT s.*,
+                    pl.name AS planting_name,
+                    pl.fish_breed AS planting_fish_breed
+             FROM sessions s
+             LEFT JOIN plantings pl ON pl.id = s.planting_id
+             WHERE s.pool_id = ? AND s.is_completed = 0
+             ORDER BY s.start_date DESC, s.created_at DESC
+             LIMIT 1'
+        );
+        $stmt->execute([$poolId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ?: null;
+    }
 }
 
 

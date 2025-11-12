@@ -1,20 +1,21 @@
 <?php
 
-require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/settings.php';
-require_once __DIR__ . '/../includes/activity_log.php';
+require_once __DIR__ . '/_bootstrap.php';
 require_once __DIR__ . '/../includes/telegram.php';
-require_once __DIR__ . '/../app/Support/Autoloader.php';
-
-$autoloader = new App\Support\Autoloader();
-$autoloader->addNamespace('App', __DIR__ . '/../app');
-$autoloader->register();
 
 use App\Controllers\Api\MortalityController;
 use App\Support\Request;
 
-$request = Request::fromGlobals();
-$controller = new MortalityController();
-$controller->handle($request);
+try {
+    $request = Request::fromGlobals();
+    $controller = new MortalityController();
+    $controller->handle($request);
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Внутренняя ошибка сервера: ' . $e->getMessage()
+    ], JSON_UNESCAPED_UNICODE);
+    error_log("Error in api/mortality.php: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+}
 

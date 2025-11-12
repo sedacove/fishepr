@@ -14,7 +14,7 @@ class SessionDetailsController
 
     public function __construct()
     {
-        \requireAuth();
+        // Авторизация проверяется в api/session_details.php
         $this->service = new SessionDetailsService(\getDBConnection());
     }
 

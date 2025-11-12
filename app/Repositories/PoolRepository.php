@@ -87,6 +87,70 @@ class PoolRepository extends Repository
             $stmt->execute([$index, $poolId]);
         }
     }
+
+    /**
+     * Получить список активных бассейнов
+     * @return array<array{id:int,name:string}>
+     */
+    public function listActive(): array
+    {
+        $stmt = $this->pdo->query(
+            'SELECT id, name
+             FROM pools
+             WHERE is_active = 1
+             ORDER BY sort_order ASC, name ASC'
+        );
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    /**
+     * Получить активные бассейны с информацией об активных сессиях
+     * @return array<array{id:int,name:string,pool_name:string,active_session:array|null}>
+     */
+    public function getActiveWithSessions(): array
+    {
+        $stmt = $this->pdo->query(
+            'SELECT 
+                p.id,
+                p.name,
+                p.name AS pool_name,
+                s.id AS active_session_id,
+                s.name AS active_session_name,
+                s.start_date AS active_session_start_date
+             FROM pools p
+             LEFT JOIN sessions s ON s.pool_id = p.id AND s.is_completed = 0
+             WHERE p.is_active = 1
+             ORDER BY p.sort_order ASC, p.name ASC'
+        );
+        
+        $result = [];
+        $processed = [];
+        
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) ?: [] as $row) {
+            $poolId = (int)$row['id'];
+            
+            if (!isset($processed[$poolId])) {
+                $processed[$poolId] = [
+                    'id' => $poolId,
+                    'name' => $row['name'],
+                    'pool_name' => $row['pool_name'],
+                    'active_session' => null,
+                ];
+                
+                if ($row['active_session_id']) {
+                    $processed[$poolId]['active_session'] = [
+                        'id' => (int)$row['active_session_id'],
+                        'name' => $row['active_session_name'],
+                        'start_date' => $row['active_session_start_date'],
+                    ];
+                }
+                
+                $result[] = &$processed[$poolId];
+            }
+        }
+        
+        return $result;
+    }
 }
 
 

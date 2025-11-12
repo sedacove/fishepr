@@ -1,23 +1,31 @@
 <?php
 
-header('Content-Type: application/json');
+require_once __DIR__ . '/_bootstrap.php';
 
-require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/activity_log.php';
-require_once __DIR__ . '/../app/Support/Autoloader.php';
-
-requireAdmin();
-
-$autoloader = new App\Support\Autoloader();
-$autoloader->addNamespace('App', __DIR__ . '/../app');
-$autoloader->register();
+// Проверка прав администратора
+if (!isAdmin()) {
+    http_response_code(403);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Доступ запрещен. Требуются права администратора.'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
 use App\Controllers\Api\CounterpartiesController;
 use App\Support\Request;
 
-$request = Request::fromGlobals();
-$controller = new CounterpartiesController();
-$controller->handle($request);
+try {
+    $request = Request::fromGlobals();
+    $controller = new CounterpartiesController();
+    $controller->handle($request);
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Внутренняя ошибка сервера: ' . $e->getMessage()
+    ], JSON_UNESCAPED_UNICODE);
+    error_log("Error in api/counterparties.php: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+}
 
 

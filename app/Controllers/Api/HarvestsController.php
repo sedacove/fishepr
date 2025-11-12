@@ -15,7 +15,7 @@ class HarvestsController
 
     public function __construct()
     {
-        \requireAuth();
+        // Авторизация проверяется в api/harvests.php
         $this->service = new HarvestService(\getDBConnection());
     }
 
