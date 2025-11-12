@@ -131,21 +131,41 @@ class View
             }
             
             // Определяем функцию в глобальной области видимости
-            // В PHP функции, определенные внутри методов, все равно определяются глобально
+            // Проблема: функции, определенные внутри методов, могут не работать правильно
+            // Используем eval для определения в глобальной области видимости
             $baseUrl = BASE_URL;
             if (!function_exists('asset_url')) {
-                // Определяем функцию напрямую - она будет доступна глобально
-                // Используем замыкание для BASE_URL, чтобы избежать проблем с eval
+                // Сохраняем BASE_URL в глобальной переменной для использования в функции
                 $GLOBALS['_asset_url_base'] = $baseUrl;
+                
+                // Определяем функцию через eval в глобальной области видимости
+                // Важно: eval выполняется в текущей области видимости, но функции всегда глобальны
+                $funcDefinition = 'if (!function_exists("asset_url")) { function asset_url(string $relativePath): string { $baseUrl = isset($GLOBALS["_asset_url_base"]) ? $GLOBALS["_asset_url_base"] : (defined("BASE_URL") ? BASE_URL : "http://localhost/"); $relativePath = ltrim($relativePath, "/"); if ($relativePath === "") { return $baseUrl; } $separator = strpos($relativePath, "?") === false ? "?" : "&"; return $baseUrl . $relativePath . $separator . "v=" . time(); } }';
+                
+                // Выполняем eval в глобальной области видимости
+                $result = eval($funcDefinition);
+                
+                if ($debug) {
+                    $log("After eval, asset_url() exists: " . (function_exists('asset_url') ? 'YES' : 'NO'));
+                    $log("Eval result: " . ($result === false ? 'FALSE (error)' : 'OK'));
+                }
+                
+                // Если eval не сработал, пробуем через создание временного файла
                 if (!function_exists('asset_url')) {
-                    function asset_url(string $relativePath): string {
-                        $baseUrl = $GLOBALS['_asset_url_base'] ?? BASE_URL;
-                        $relativePath = ltrim($relativePath, '/');
-                        if ($relativePath === '') {
-                            return $baseUrl;
+                    if ($debug) {
+                        $log("Eval failed, trying temporary file approach");
+                    }
+                    
+                    // Создаем временный файл с определением функции
+                    $tempFile = sys_get_temp_dir() . '/asset_url_' . md5(__FILE__) . '.php';
+                    $funcCode = "<?php\nif (!function_exists('asset_url')) {\n    function asset_url(string \$relativePath): string {\n        \$baseUrl = isset(\$GLOBALS['_asset_url_base']) ? \$GLOBALS['_asset_url_base'] : (defined('BASE_URL') ? BASE_URL : 'http://localhost/');\n        \$relativePath = ltrim(\$relativePath, '/');\n        if (\$relativePath === '') {\n            return \$baseUrl;\n        }\n        \$separator = strpos(\$relativePath, '?') === false ? '?' : '&';\n        return \$baseUrl . \$relativePath . \$separator . 'v=' . time();\n    }\n}\n";
+                    
+                    if (file_put_contents($tempFile, $funcCode)) {
+                        require_once $tempFile;
+                        @unlink($tempFile); // Удаляем временный файл
+                        if ($debug) {
+                            $log("After temp file, asset_url() exists: " . (function_exists('asset_url') ? 'YES' : 'NO'));
                         }
-                        $separator = strpos($relativePath, '?') === false ? '?' : '&';
-                        return $baseUrl . $relativePath . $separator . 'v=' . time();
                     }
                 }
             }
