@@ -2,12 +2,38 @@
 
 use App\Support\Exceptions\HttpException;
 
+// Отладка (удалить после диагностики)
+$debug = true; // Установить в false после отладки
+$logFile = __DIR__ . '/storage/debug.log';
+
+if ($debug) {
+    @mkdir(dirname($logFile), 0775, true);
+    $log = function($message) use ($logFile) {
+        $timestamp = date('Y-m-d H:i:s');
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        $caller = $trace[1]['function'] ?? 'unknown';
+        $line = $trace[1]['line'] ?? 0;
+        file_put_contents($logFile, "[$timestamp] [$caller:$line] $message\n", FILE_APPEND);
+    };
+    
+    $log("=== REQUEST START ===");
+    $log("REQUEST_URI: " . ($_SERVER['REQUEST_URI'] ?? 'NULL'));
+    $log("SCRIPT_NAME: " . ($_SERVER['SCRIPT_NAME'] ?? 'NULL'));
+    $log("REQUEST_METHOD: " . ($_SERVER['REQUEST_METHOD'] ?? 'NULL'));
+    $log("QUERY_STRING: " . ($_SERVER['QUERY_STRING'] ?? 'NULL'));
+    $log("SESSION: " . (isset($_SESSION) ? json_encode($_SESSION) : 'NOT_STARTED'));
+}
+
 $router = require __DIR__ . '/app/bootstrap.php';
 
 $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
 $basePath = str_replace('\\', '/', dirname($scriptName));
 $basePath = $basePath === '\\' ? '/' : $basePath;
 $router->setBasePath($basePath);
+
+if ($debug) {
+    $log("BasePath set to: $basePath");
+}
 
 $router->get('/', 'DashboardController@index');
 $router->get('/index.php', 'DashboardController@index');
@@ -43,7 +69,15 @@ $router->get('/users', 'UsersController@index');
 $router->get('/users.php', 'UsersController@index');
 
 try {
+    if ($debug) {
+        $log("Dispatching route...");
+    }
+    
     $response = $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
+
+    if ($debug) {
+        $log("Response type: " . gettype($response));
+    }
 
     if (is_string($response)) {
         echo $response;
@@ -51,10 +85,21 @@ try {
         header('Content-Type: application/json');
         echo json_encode($response, JSON_UNESCAPED_UNICODE);
     }
+    
+    if ($debug) {
+        $log("=== REQUEST END ===");
+    }
 } catch (HttpException $httpException) {
+    if ($debug) {
+        $log("HttpException: " . $httpException->getStatusCode() . " - " . $httpException->getMessage());
+    }
     http_response_code($httpException->getStatusCode());
     echo $httpException->getMessage() ?: 'Ошибка';
 } catch (Throwable $exception) {
+    if ($debug) {
+        $log("Exception: " . $exception->getMessage());
+        $log("Trace: " . $exception->getTraceAsString());
+    }
     http_response_code(500);
     if (function_exists('logMessage')) {
         logMessage('error', 'Unhandled exception on front controller', [

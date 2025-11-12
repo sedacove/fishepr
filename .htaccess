@@ -29,6 +29,9 @@ Options -Indexes
 </IfModule>
 
 # Перенаправление запросов через фронт-контроллер
+# Исключаем существующие файлы, директории и auth директорию
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/auth/
+RewriteCond %{REQUEST_URI} !^auth/
 RewriteRule ^ index.php [L]
