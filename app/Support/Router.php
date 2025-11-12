@@ -48,12 +48,33 @@ class Router
 
     public function dispatch(string $method, string $uri): mixed
     {
+        $debug = true; // Установить в false после отладки
+        $logFile = __DIR__ . '/../../storage/debug.log';
+        
         $path = parse_url($uri, PHP_URL_PATH) ?: '/';
+        $originalPath = $path;
         $path = $this->stripBasePath($path);
         $key = strtoupper($method) . ' ' . $this->normalizePath($path);
 
+        if ($debug) {
+            @mkdir(dirname($logFile), 0775, true);
+            $log = function($msg) use ($logFile) {
+                file_put_contents($logFile, "[Router::dispatch] " . date('Y-m-d H:i:s') . " - $msg\n", FILE_APPEND);
+            };
+            $log("URI: $uri");
+            $log("Original path: $originalPath");
+            $log("BasePath: " . $this->basePath);
+            $log("Path after stripBasePath: $path");
+            $log("Normalized path: " . $this->normalizePath($path));
+            $log("Route key: $key");
+            $log("Available routes: " . implode(', ', array_keys($this->routes)));
+        }
+
         if (!isset($this->routes[$key])) {
-            throw new HttpException(404, 'Route not found');
+            if ($debug) {
+                $log("Route not found! Looking for: $key");
+            }
+            throw new HttpException(404, 'Route not found: ' . $key);
         }
 
         $target = $this->routes[$key];
@@ -98,12 +119,38 @@ class Router
             return $path ?: '/';
         }
 
+        $debug = true; // Установить в false после отладки
+        $logFile = __DIR__ . '/../../storage/debug.log';
+        
+        if ($debug) {
+            @mkdir(dirname($logFile), 0775, true);
+            $log = function($msg) use ($logFile) {
+                file_put_contents($logFile, "[Router::stripBasePath] " . date('Y-m-d H:i:s') . " - $msg\n", FILE_APPEND);
+            };
+            $log("Input path: $path");
+            $log("BasePath: " . $this->basePath);
+        }
+
         if (strpos($path, $this->basePath) === 0) {
             $path = substr($path, strlen($this->basePath));
+            if ($debug) {
+                $log("Path starts with basePath, stripped to: $path");
+            }
+        } else {
+            if ($debug) {
+                $log("Path does NOT start with basePath, keeping original");
+            }
         }
 
         if ($path === '') {
+            if ($debug) {
+                $log("Path is empty after strip, returning '/'");
+            }
             return '/';
+        }
+
+        if ($debug) {
+            $log("Final path: $path");
         }
 
         return $path;
