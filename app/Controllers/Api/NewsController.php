@@ -9,12 +9,42 @@ use DomainException;
 use Exception;
 use RuntimeException;
 
+/**
+ * API контроллер для работы с новостями
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для новостей:
+ * - list: получение списка всех новостей (только для админов)
+ * - get: получение одной новости (только для админов)
+ * - create: создание новой новости (только для админов)
+ * - update: обновление новости (только для админов)
+ * - delete: удаление новости (только для админов)
+ * - latest: получение последней опубликованной новости (доступно всем авторизованным)
+ * 
+ * Авторизация проверяется в api/news.php
+ */
 class NewsController
 {
+    /**
+     * @var NewsService Сервис для работы с новостями
+     */
     private NewsService $service;
+    
+    /**
+     * @var int ID текущего пользователя
+     */
     private int $userId;
+    
+    /**
+     * @var bool Является ли пользователь администратором
+     */
     private bool $isAdmin;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Инициализирует сервис и получает информацию о текущем пользователе.
+     * Авторизация проверяется в api/news.php.
+     */
     public function __construct()
     {
         // Авторизация проверяется в api/news.php
@@ -24,6 +54,12 @@ class NewsController
         $this->isAdmin = \isAdmin();
     }
 
+    /**
+     * Обрабатывает входящий запрос и направляет его к соответствующему обработчику
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         $action = $request->getQuery('action', 'list');
@@ -67,6 +103,13 @@ class NewsController
         }
     }
 
+    /**
+     * Обрабатывает запрос на получение одной новости
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws DomainException Если ID новости не указан
+     */
     private function handleGet(Request $request): void
     {
         $id = (int)$request->getQuery('id', 0);
@@ -77,6 +120,12 @@ class NewsController
         JsonResponse::success($news);
     }
 
+    /**
+     * Обрабатывает запрос на создание новой новости
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     private function handleCreate(Request $request): void
     {
         $payload = $request->getJsonBody();
@@ -84,6 +133,12 @@ class NewsController
         JsonResponse::success(['id' => $newsId], 'Новость добавлена');
     }
 
+    /**
+     * Обрабатывает запрос на обновление новости
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     private function handleUpdate(Request $request): void
     {
         $payload = $request->getJsonBody();
@@ -91,6 +146,13 @@ class NewsController
         JsonResponse::success([], 'Новость обновлена');
     }
 
+    /**
+     * Обрабатывает запрос на удаление новости
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws DomainException Если ID новости не указан
+     */
     private function handleDelete(Request $request): void
     {
         $payload = $request->getJsonBody();
@@ -102,12 +164,25 @@ class NewsController
         JsonResponse::success([], 'Новость удалена');
     }
 
+    /**
+     * Обрабатывает запрос на получение последней новости
+     * 
+     * Доступно всем авторизованным пользователям (не только админам).
+     * 
+     * @return void
+     */
     private function handleLatest(): void
     {
         $news = $this->service->getLatestNews();
         JsonResponse::success($news ?: null);
     }
 
+    /**
+     * Проверяет, что текущий пользователь является администратором
+     * 
+     * @return void
+     * @throws DomainException Если пользователь не является администратором
+     */
     private function ensureAdmin(): void
     {
         if (!$this->isAdmin) {
@@ -115,6 +190,13 @@ class NewsController
         }
     }
 
+    /**
+     * Проверяет, что запрос использует метод POST
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws DomainException Если метод не POST
+     */
     private function requirePost(Request $request): void
     {
         if (!$request->isMethod('POST')) {

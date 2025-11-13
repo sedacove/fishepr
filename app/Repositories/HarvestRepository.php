@@ -4,8 +4,26 @@ namespace App\Repositories;
 
 use PDO;
 
+/**
+ * Репозиторий для работы с отборами
+ * 
+ * Выполняет SQL запросы к таблице harvests:
+ * - получение списка отборов по бассейну
+ * - поиск отбора по ID
+ * - создание, обновление, удаление отборов
+ * - получение сводной информации по отборам
+ */
 class HarvestRepository extends Repository
 {
+    /**
+     * Получает список всех отборов для указанного бассейна
+     * 
+     * Включает информацию о пользователе, создавшем отбор, и контрагенте.
+     * Отсортированы по дате (от новых к старым).
+     * 
+     * @param int $poolId ID бассейна
+     * @return array Массив отборов с информацией о пользователе и контрагенте
+     */
     public function listByPool(int $poolId): array
     {
         $stmt = $this->pdo->prepare(
@@ -22,6 +40,14 @@ class HarvestRepository extends Repository
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
+    /**
+     * Находит отбор по ID
+     * 
+     * Включает информацию о пользователе, контрагенте и бассейне.
+     * 
+     * @param int $id ID отбора
+     * @return array|null Данные отбора или null, если не найден
+     */
     public function find(int $id): ?array
     {
         $stmt = $this->pdo->prepare(
@@ -40,6 +66,12 @@ class HarvestRepository extends Repository
         return $result ?: null;
     }
 
+    /**
+     * Создает новый отбор
+     * 
+     * @param array $data Данные отбора (pool_id, weight, fish_count, counterparty_id, recorded_at, created_by)
+     * @return int ID созданного отбора
+     */
     public function insert(array $data): int
     {
         $stmt = $this->pdo->prepare(
@@ -56,6 +88,16 @@ class HarvestRepository extends Repository
         return (int)$this->pdo->lastInsertId();
     }
 
+    /**
+     * Обновляет данные отбора
+     * 
+     * Динамически формирует SQL запрос на основе переданных данных.
+     * Обновляет только те поля, которые переданы в массиве $data.
+     * 
+     * @param int $id ID отбора
+     * @param array $data Ассоциативный массив полей для обновления (column => value)
+     * @return void
+     */
     public function update(int $id, array $data): void
     {
         $columns = [];
@@ -73,12 +115,27 @@ class HarvestRepository extends Repository
         $stmt->execute($params);
     }
 
+    /**
+     * Удаляет отбор
+     * 
+     * @param int $id ID отбора для удаления
+     * @return void
+     */
     public function delete(int $id): void
     {
         $stmt = $this->pdo->prepare('DELETE FROM harvests WHERE id = ?');
         $stmt->execute([$id]);
     }
 
+    /**
+     * Получает список отборов для бассейна с определенной даты
+     * 
+     * Используется для построения истории отборов с начала сессии.
+     * 
+     * @param int $poolId ID бассейна
+     * @param string $startDate Дата начала (в формате БД)
+     * @return array Массив отборов с информацией о контрагенте, отсортированных по дате (от старых к новым)
+     */
     public function listForPoolSince(int $poolId, string $startDate): array
     {
         $stmt = $this->pdo->prepare(
@@ -99,6 +156,13 @@ class HarvestRepository extends Repository
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
+    /**
+     * Получает сумму отборов для бассейна с определенной даты
+     * 
+     * @param int $poolId ID бассейна
+     * @param string $startDate Дата начала (в формате БД)
+     * @return array Массив с ключами total_weight и total_count
+     */
     public function sumForPoolSince(int $poolId, string $startDate): array
     {
         $stmt = $this->pdo->prepare(

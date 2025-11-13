@@ -14,13 +14,42 @@ use RuntimeException;
 require_once __DIR__ . '/../../includes/settings.php';
 require_once __DIR__ . '/../../includes/activity_log.php';
 
+/**
+ * Сервис для работы с отборами
+ * 
+ * Содержит бизнес-логику для работы с отборами:
+ * - валидация данных
+ * - проверка прав доступа на редактирование
+ * - логирование действий
+ * - форматирование данных для отображения
+ */
 class HarvestService
 {
+    /**
+     * @var HarvestRepository Репозиторий для работы с отборами
+     */
     private HarvestRepository $harvests;
+    
+    /**
+     * @var PoolRepository Репозиторий для работы с бассейнами
+     */
     private PoolRepository $pools;
+    
+    /**
+     * @var CounterpartyRepository Репозиторий для работы с контрагентами
+     */
     private CounterpartyRepository $counterparties;
+    
+    /**
+     * @var PDO Подключение к базе данных
+     */
     private PDO $pdo;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
@@ -29,6 +58,15 @@ class HarvestService
         $this->counterparties = new CounterpartyRepository($pdo);
     }
 
+    /**
+     * Получает список отборов для указанного бассейна
+     * 
+     * @param int $poolId ID бассейна
+     * @param int $currentUserId ID текущего пользователя
+     * @param bool $isAdmin Является ли пользователь администратором
+     * @return array Массив отборов с дополнительными полями (can_edit, display dates, etc.)
+     * @throws ValidationException Если бассейн не указан или не найден
+     */
     public function listByPool(int $poolId, int $currentUserId, bool $isAdmin): array
     {
         if ($poolId <= 0) {
@@ -59,6 +97,13 @@ class HarvestService
         return $result;
     }
 
+    /**
+     * Получает один отбор по ID
+     * 
+     * @param int $id ID отбора
+     * @return array Данные отбора с форматированными датами
+     * @throws RuntimeException Если отбор не найден
+     */
     public function get(int $id): array
     {
         $record = $this->harvests->find($id);
@@ -75,6 +120,21 @@ class HarvestService
         return $model->toArray();
     }
 
+    /**
+     * Создает новый отбор
+     * 
+     * Валидация:
+     * - бассейн должен быть указан и существовать
+     * - вес должен быть указан и положительным
+     * - количество рыбы должно быть указано и положительным
+     * - контрагент (если указан) должен существовать
+     * 
+     * @param array $payload Данные отбора (pool_id, weight, fish_count, counterparty_id, recorded_at)
+     * @param int $userId ID пользователя, создающего отбор
+     * @param bool $isAdmin Является ли пользователь администратором
+     * @return int ID созданного отбора
+     * @throws ValidationException Если данные некорректны
+     */
     public function create(array $payload, int $userId, bool $isAdmin): int
     {
         $data = $this->validatePayload($payload, $isAdmin);

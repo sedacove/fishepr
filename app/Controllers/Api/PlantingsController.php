@@ -8,10 +8,33 @@ use App\Support\JsonResponse;
 use App\Support\Request;
 use RuntimeException;
 
+/**
+ * API контроллер для работы с посадками
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для посадок:
+ * - list: получение списка посадок (активных или архивных)
+ * - get: получение одной посадки с файлами
+ * - create: создание новой посадки
+ * - update: обновление посадки
+ * - delete: удаление посадки
+ * - archive: архивирование/разархивирование посадки
+ * - delete_file: удаление файла посадки
+ * 
+ * Доступен только администраторам.
+ */
 class PlantingsController
 {
+    /**
+     * @var PlantingService Сервис для работы с посадками
+     */
     private PlantingService $service;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Проверяет авторизацию и права администратора.
+     * Инициализирует сервис для работы с посадками.
+     */
     public function __construct()
     {
         \requireAuth();
@@ -19,6 +42,12 @@ class PlantingsController
         $this->service = new PlantingService(\getDBConnection());
     }
 
+    /**
+     * Обрабатывает входящий запрос и направляет его к соответствующему обработчику
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         $action = $request->getQuery('action', 'list');
@@ -96,6 +125,13 @@ class PlantingsController
         }
     }
 
+    /**
+     * Проверяет, что запрос использует метод POST
+     * 
+     * @param string $method HTTP метод запроса
+     * @return void
+     * @throws RuntimeException Если метод не POST
+     */
     private function assertPost(string $method): void
     {
         if ($method !== 'POST') {

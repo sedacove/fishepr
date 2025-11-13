@@ -11,14 +11,42 @@ use RuntimeException;
 
 require_once __DIR__ . '/../../includes/activity_log.php';
 
+/**
+ * Сервис для работы с посадками
+ * 
+ * Содержит бизнес-логику для работы с посадками:
+ * - валидация данных
+ * - управление файлами посадок
+ * - логирование действий
+ * - форматирование данных для отображения
+ */
 class PlantingService
 {
+    /**
+     * @var string Директория для загрузки файлов посадок
+     */
     private const UPLOAD_DIR = 'uploads/plantings/';
+    
+    /**
+     * @var int Максимальный размер файла (10 MB)
+     */
     private const MAX_FILE_SIZE = 10485760; // 10 MB
 
+    /**
+     * @var PlantingRepository Репозиторий для работы с посадками
+     */
     private PlantingRepository $plantings;
+    
+    /**
+     * @var PDO Подключение к базе данных
+     */
     private PDO $pdo;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
@@ -26,7 +54,10 @@ class PlantingService
     }
 
     /**
-     * @return array<int,array<string,mixed>>
+     * Получает список посадок (активных или архивных)
+     * 
+     * @param bool $archived true для архивных посадок, false для активных
+     * @return array<int,array<string,mixed>> Массив посадок с форматированными датами
      */
     public function list(bool $archived): array
     {
@@ -42,6 +73,13 @@ class PlantingService
         }, $items);
     }
 
+    /**
+     * Получает посадку по ID с файлами
+     * 
+     * @param int $id ID посадки
+     * @return array Данные посадки с файлами и форматированными датами
+     * @throws RuntimeException Если посадка не найдена
+     */
     public function get(int $id): array
     {
         $planting = $this->plantings->find($id);
@@ -58,6 +96,19 @@ class PlantingService
         return $data;
     }
 
+    /**
+     * Создает новую посадку
+     * 
+     * Валидация:
+     * - название посадки обязательно
+     * - дата посадки обязательна
+     * - количество рыбы обязательно и должно быть положительным
+     * 
+     * @param array $payload Данные посадки (name, fish_breed, planting_date, hatch_date, fish_count, etc.)
+     * @param int $userId ID пользователя, создающего посадку
+     * @return int ID созданной посадки
+     * @throws ValidationException Если данные некорректны
+     */
     public function create(array $payload, int $userId): int
     {
         $data = $this->validatePayload($payload);

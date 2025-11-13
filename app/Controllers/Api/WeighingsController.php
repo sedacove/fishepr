@@ -9,16 +9,44 @@ use App\Support\Request;
 use DomainException;
 use RuntimeException;
 
+/**
+ * API контроллер для работы с навесками
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для навесок:
+ * - get_pools: получение списка бассейнов
+ * - list: получение списка навесок для бассейна
+ * - get: получение одной навески
+ * - create: создание новой навески
+ * - update: обновление навески
+ * - delete: удаление навески
+ * 
+ * Авторизация проверяется в api/weighings.php
+ */
 class WeighingsController
 {
+    /**
+     * @var WeighingService Сервис для работы с навесками
+     */
     private WeighingService $service;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Инициализирует сервис для работы с навесками.
+     * Авторизация проверяется в api/weighings.php.
+     */
     public function __construct()
     {
         // Авторизация проверяется в api/weighings.php
         $this->service = new WeighingService(\getDBConnection());
     }
 
+    /**
+     * Обрабатывает входящий запрос и направляет его к соответствующему обработчику
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         $action = $request->getQuery('action', 'list');
@@ -101,6 +129,13 @@ class WeighingsController
         }
     }
 
+    /**
+     * Проверяет, что запрос использует метод POST
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws DomainException Если метод не POST
+     */
     private function requirePost(Request $request): void
     {
         if (!$request->isMethod('POST')) {

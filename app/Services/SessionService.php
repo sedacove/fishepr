@@ -10,11 +10,32 @@ use RuntimeException;
 
 require_once __DIR__ . '/../../includes/activity_log.php';
 
+/**
+ * Сервис для работы с сессиями
+ * 
+ * Содержит бизнес-логику для работы с сессиями:
+ * - валидация данных
+ * - расчет FCR (Feed Conversion Ratio)
+ * - логирование действий
+ * - форматирование данных для отображения
+ */
 class SessionService
 {
+    /**
+     * @var SessionRepository Репозиторий для работы с сессиями
+     */
     private SessionRepository $sessions;
+    
+    /**
+     * @var PDO Подключение к базе данных
+     */
     private PDO $pdo;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
@@ -22,7 +43,12 @@ class SessionService
     }
 
     /**
-     * @return array<int,array<string,mixed>>
+     * Получает список сессий (активных или завершенных)
+     * 
+     * Для каждой сессии рассчитывает FCR, если есть все необходимые данные.
+     * 
+     * @param bool $completed true для завершенных сессий, false для активных
+     * @return array<int,array<string,mixed>> Массив сессий с форматированными датами и рассчитанным FCR
      */
     public function list(bool $completed): array
     {
@@ -45,6 +71,15 @@ class SessionService
         }, $items);
     }
 
+    /**
+     * Получает сессию по ID
+     * 
+     * Рассчитывает FCR, если есть все необходимые данные.
+     * 
+     * @param int $id ID сессии
+     * @return array Данные сессии с форматированными датами и рассчитанным FCR
+     * @throws RuntimeException Если сессия не найдена
+     */
     public function get(int $id): array
     {
         $session = $this->sessions->find($id);
@@ -68,7 +103,11 @@ class SessionService
     }
 
     /**
-     * @return array<int,array{id:int,name:string}>
+     * Получает список активных бассейнов
+     * 
+     * Используется для выпадающих списков при создании/редактировании сессий.
+     * 
+     * @return array<int,array{id:int,name:string}> Массив бассейнов (id, name)
      */
     public function getActivePools(): array
     {

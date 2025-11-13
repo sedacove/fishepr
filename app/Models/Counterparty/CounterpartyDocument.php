@@ -5,41 +5,65 @@ namespace App\Models\Counterparty;
 use App\Models\Model;
 
 /**
- * DTO describing a document uploaded for a counterparty.
- * Values are used when serialising responses or when auditing updates.
+ * Модель документа контрагента
+ * 
+ * DTO (Data Transfer Object) для представления данных документа, загруженного для контрагента.
+ * Содержит метаданные загруженного файла.
  */
 class CounterpartyDocument extends Model
 {
-    /** Primary identifier */
+    /**
+     * @var int ID документа
+     */
     public int $id;
 
-    /** Owning counterparty identifier */
+    /**
+     * @var int ID контрагента, которому принадлежит документ
+     */
     public int $counterparty_id;
 
-    /** Original file name provided by the user */
+    /**
+     * @var string Оригинальное имя файла, предоставленное пользователем
+     */
     public string $original_name;
 
-    /** Stored file name */
+    /**
+     * @var string Имя файла на сервере
+     */
     public string $file_name;
 
-    /** Relative path to the file in storage */
+    /**
+     * @var string Относительный путь к файлу в хранилище
+     */
     public string $file_path;
 
-    /** File size in bytes */
+    /**
+     * @var int Размер файла (в байтах)
+     */
     public int $file_size;
 
-    /** Reported MIME type */
+    /**
+     * @var string|null MIME-тип файла
+     */
     public ?string $mime_type = null;
 
-    /** User identifier who uploaded the file */
+    /**
+     * @var int ID пользователя, загрузившего файл
+     */
     public int $uploaded_by;
 
-    /** Upload timestamp (formatted later before output) */
+    /**
+     * @var string Дата и время загрузки (форматируется позже перед выводом)
+     */
     public string $uploaded_at;
 
-    /** Login of the uploader */
+    /**
+     * @var string|null Логин пользователя, загрузившего файл (из JOIN)
+     */
     public ?string $uploaded_by_login = null;
 
-    /** Full name of the uploader */
+    /**
+     * @var string|null Полное имя пользователя, загрузившего файл (из JOIN)
+     */
     public ?string $uploaded_by_name = null;
 }

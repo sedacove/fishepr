@@ -7,22 +7,54 @@ use DomainException;
 use PDO;
 use RuntimeException;
 
+/**
+ * Сервис для работы с новостями
+ * 
+ * Содержит бизнес-логику для работы с новостями:
+ * - валидация данных
+ * - логирование действий
+ * - форматирование дат публикации
+ */
 class NewsService
 {
+    /**
+     * @var NewsRepository Репозиторий для работы с новостями
+     */
     private NewsRepository $news;
+    
+    /**
+     * @var PDO Подключение к базе данных
+     */
     private PDO $pdo;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
         $this->news = new NewsRepository($pdo);
     }
 
+    /**
+     * Получает список всех новостей
+     * 
+     * @return array Массив новостей, отсортированных по дате публикации (от новых к старым)
+     */
     public function listNews(): array
     {
         return $this->news->getAll();
     }
 
+    /**
+     * Получает новость по ID
+     * 
+     * @param int $id ID новости
+     * @return array Данные новости
+     * @throws RuntimeException Если новость не найдена
+     */
     public function getNews(int $id): array
     {
         $news = $this->news->find($id);
@@ -32,11 +64,28 @@ class NewsService
         return $news;
     }
 
+    /**
+     * Получает последнюю опубликованную новость
+     * 
+     * @return array|null Данные новости или null, если новостей нет
+     */
     public function getLatestNews(): ?array
     {
         return $this->news->getLatest();
     }
 
+    /**
+     * Создает новую новость
+     * 
+     * Валидация:
+     * - заголовок обязателен
+     * - текст новости обязателен
+     * 
+     * @param array $payload Данные новости (title, content, published_at)
+     * @param int $authorId ID автора новости
+     * @return int ID созданной новости
+     * @throws DomainException Если данные некорректны
+     */
     public function createNews(array $payload, int $authorId): int
     {
         $title = trim($payload['title'] ?? '');

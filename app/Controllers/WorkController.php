@@ -5,13 +5,33 @@ namespace App\Controllers;
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/settings.php';
 
+/**
+ * Контроллер страницы "Работа"
+ * 
+ * Отвечает за отображение страницы "Работа":
+ * - список активных бассейнов с их статусами
+ * - статусы измерений (температура, кислород)
+ * - статусы навесок и отборов
+ * - статусы смертности
+ * - информация об активных сессиях
+ */
 class WorkController extends Controller
 {
+    /**
+     * Конструктор контроллера
+     * 
+     * Проверяет авторизацию пользователя
+     */
     public function __construct()
     {
         requireAuth();
     }
 
+    /**
+     * Отображает страницу "Работа"
+     * 
+     * @return string HTML содержимое страницы
+     */
     public function index(): string
     {
         $config = [

@@ -8,10 +8,34 @@ use App\Support\JsonResponse;
 use App\Support\Request;
 use RuntimeException;
 
+/**
+ * API контроллер для работы с сессиями
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для сессий:
+ * - list: получение списка сессий (активных или завершенных)
+ * - get: получение одной сессии
+ * - get_pools: получение списка активных бассейнов
+ * - get_plantings: получение списка активных посадок
+ * - create: создание новой сессии
+ * - update: обновление сессии
+ * - complete: завершение сессии
+ * - delete: удаление сессии
+ * 
+ * Доступен только администраторам.
+ */
 class SessionsController
 {
+    /**
+     * @var SessionService Сервис для работы с сессиями
+     */
     private SessionService $service;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Проверяет авторизацию и права администратора.
+     * Инициализирует сервис для работы с сессиями.
+     */
     public function __construct()
     {
         \requireAuth();
@@ -19,6 +43,12 @@ class SessionsController
         $this->service = new SessionService(\getDBConnection());
     }
 
+    /**
+     * Обрабатывает входящий запрос и направляет его к соответствующему обработчику
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         $action = $request->getQuery('action', 'list');
@@ -92,6 +122,13 @@ class SessionsController
         }
     }
 
+    /**
+     * Проверяет, что запрос использует метод POST
+     * 
+     * @param string $method HTTP метод запроса
+     * @return void
+     * @throws RuntimeException Если метод не POST
+     */
     private function assertPost(string $method): void
     {
         if ($method !== 'POST') {

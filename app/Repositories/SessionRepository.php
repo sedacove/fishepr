@@ -34,6 +34,12 @@ class SessionRepository extends Repository
         );
     }
 
+    /**
+     * Находит сессию по ID
+     * 
+     * @param int $id ID сессии
+     * @return Session|null Модель сессии или null, если не найдена
+     */
     public function find(int $id): ?Session
     {
         $stmt = $this->pdo->prepare(
@@ -51,6 +57,12 @@ class SessionRepository extends Repository
         return $row ? new Session($row) : null;
     }
 
+    /**
+     * Создает новую сессию
+     * 
+     * @param array $data Данные сессии (name, pool_id, planting_id, start_date, start_mass, start_fish_count, previous_fcr, created_by)
+     * @return int ID созданной сессии
+     */
     public function create(array $data): int
     {
         $stmt = $this->pdo->prepare(
@@ -73,6 +85,13 @@ class SessionRepository extends Repository
         return (int) $this->pdo->lastInsertId();
     }
 
+    /**
+     * Обновляет данные сессии
+     * 
+     * @param int $id ID сессии
+     * @param array $data Данные для обновления (name, pool_id, planting_id, start_date, start_mass, start_fish_count, previous_fcr)
+     * @return void
+     */
     public function update(int $id, array $data): void
     {
         $stmt = $this->pdo->prepare(
@@ -98,6 +117,16 @@ class SessionRepository extends Repository
         ]);
     }
 
+    /**
+     * Обновляет данные завершения сессии
+     * 
+     * Динамически формирует SQL запрос на основе переданных данных.
+     * Используется для частичного обновления данных завершения сессии.
+     * 
+     * @param int $id ID сессии
+     * @param array $data Данные для обновления (end_date, end_mass, feed_amount, fcr, is_completed)
+     * @return void
+     */
     public function updateCompletion(int $id, array $data): void
     {
         $columns = [];
@@ -115,6 +144,15 @@ class SessionRepository extends Repository
         $stmt->execute($params);
     }
 
+    /**
+     * Отмечает сессию как завершенную
+     * 
+     * Устанавливает is_completed = 1 и сохраняет данные завершения сессии.
+     * 
+     * @param int $id ID сессии
+     * @param array $data Данные завершения (end_date, end_mass, feed_amount, fcr)
+     * @return void
+     */
     public function markCompleted(int $id, array $data): void
     {
         $stmt = $this->pdo->prepare(
@@ -135,12 +173,25 @@ class SessionRepository extends Repository
         ]);
     }
 
+    /**
+     * Удаляет сессию
+     * 
+     * @param int $id ID сессии для удаления
+     * @return void
+     */
     public function delete(int $id): void
     {
         $stmt = $this->pdo->prepare('DELETE FROM sessions WHERE id = ?');
         $stmt->execute([$id]);
     }
 
+    /**
+     * Проверяет, есть ли активная сессия в указанном бассейне
+     * 
+     * @param int $poolId ID бассейна
+     * @param int|null $excludeId ID сессии для исключения из проверки (например, при обновлении текущей сессии)
+     * @return bool true, если есть активная сессия, false в противном случае
+     */
     public function hasActiveSessionInPool(int $poolId, ?int $excludeId = null): bool
     {
         $sql = 'SELECT id FROM sessions WHERE pool_id = ? AND is_completed = 0';
@@ -157,7 +208,11 @@ class SessionRepository extends Repository
     }
 
     /**
-     * @return array<int,array{id:int,name:string}>
+     * Получает список активных бассейнов
+     * 
+     * Используется для выпадающих списков при создании/редактировании сессий.
+     * 
+     * @return array<int,array{id:int,name:string}> Массив активных бассейнов (id, name)
      */
     public function getActivePools(): array
     {
@@ -171,7 +226,11 @@ class SessionRepository extends Repository
     }
 
     /**
-     * @return array<int,array{id:int,name:string,fish_breed:string}>
+     * Получает список активных посадок
+     * 
+     * Используется для выпадающих списков при создании/редактировании сессий.
+     * 
+     * @return array<int,array{id:int,name:string,fish_breed:string}> Массив активных посадок (id, name, fish_breed)
      */
     public function getActivePlantings(): array
     {
@@ -185,8 +244,10 @@ class SessionRepository extends Repository
     }
 
     /**
-     * Найти активную сессию для указанного бассейна
-     * @return array|null
+     * Находит активную сессию для указанного бассейна
+     * 
+     * @param int $poolId ID бассейна
+     * @return array|null Данные активной сессии или null, если активной сессии нет
      */
     public function findActiveByPool(int $poolId): ?array
     {
@@ -207,8 +268,12 @@ class SessionRepository extends Repository
     }
 
     /**
-     * Найти сессию со всеми связанными данными для детальной страницы
-     * @return array|null
+     * Находит сессию со всеми связанными данными для детальной страницы
+     * 
+     * Возвращает полную информацию о сессии, включая данные о бассейне, посадке и создателе.
+     * 
+     * @param int $id ID сессии
+     * @return array|null Данные сессии со связанными данными или null, если сессия не найдена
      */
     public function findWithRelations(int $id): ?array
     {

@@ -8,10 +8,32 @@ use App\Support\JsonResponse;
 use App\Support\Request;
 use RuntimeException;
 
+/**
+ * API контроллер для работы с пользователями
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для пользователей:
+ * - list: получение списка пользователей
+ * - get: получение одного пользователя
+ * - create: создание нового пользователя
+ * - update: обновление пользователя
+ * - delete: удаление пользователя (мягкое удаление)
+ * - toggle_active: переключение статуса активности пользователя
+ * 
+ * Доступен только администраторам.
+ */
 class UsersController
 {
+    /**
+     * @var UserService Сервис для работы с пользователями
+     */
     private UserService $service;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Проверяет авторизацию и права администратора.
+     * Инициализирует сервис для работы с пользователями.
+     */
     public function __construct()
     {
         \requireAuth();
@@ -19,6 +41,12 @@ class UsersController
         $this->service = new UserService(\getDBConnection());
     }
 
+    /**
+     * Обрабатывает входящий запрос и направляет его к соответствующему обработчику
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         $action = $request->getQuery('action', 'list');
@@ -86,6 +114,13 @@ class UsersController
         }
     }
 
+    /**
+     * Проверяет, что запрос использует метод POST
+     * 
+     * @param string $method HTTP метод запроса
+     * @return void
+     * @throws RuntimeException Если метод не POST
+     */
     private function assertPost(string $method): void
     {
         if ($method !== 'POST') {

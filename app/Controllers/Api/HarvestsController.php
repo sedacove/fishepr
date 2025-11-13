@@ -9,16 +9,44 @@ use App\Support\Request;
 use DomainException;
 use RuntimeException;
 
+/**
+ * API контроллер для работы с отборами
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для отборов:
+ * - get_pools: получение списка бассейнов
+ * - list: получение списка отборов для бассейна
+ * - get: получение одного отбора
+ * - create: создание нового отбора
+ * - update: обновление отбора
+ * - delete: удаление отбора
+ * 
+ * Авторизация проверяется в api/harvests.php
+ */
 class HarvestsController
 {
+    /**
+     * @var HarvestService Сервис для работы с отборами
+     */
     private HarvestService $service;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Инициализирует сервис для работы с отборами.
+     * Авторизация проверяется в api/harvests.php.
+     */
     public function __construct()
     {
         // Авторизация проверяется в api/harvests.php
         $this->service = new HarvestService(\getDBConnection());
     }
 
+    /**
+     * Обрабатывает входящий запрос и направляет его к соответствующему обработчику
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         $action = $request->getQuery('action', 'list');
@@ -101,6 +129,13 @@ class HarvestsController
         }
     }
 
+    /**
+     * Проверяет, что запрос использует метод POST
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws DomainException Если метод не POST
+     */
     private function requirePost(Request $request): void
     {
         if (!$request->isMethod('POST')) {

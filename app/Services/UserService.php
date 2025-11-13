@@ -11,17 +11,37 @@ use RuntimeException;
 require_once __DIR__ . '/../../includes/activity_log.php';
 require_once __DIR__ . '/../../includes/settings.php';
 
+/**
+ * Сервис для работы с пользователями
+ * 
+ * Содержит бизнес-логику для работы с пользователями:
+ * - валидация данных
+ * - хеширование паролей
+ * - санитизация телефонов
+ * - логирование действий
+ * - управление активностью пользователей
+ */
 class UserService
 {
+    /**
+     * @var UserRepository Репозиторий для работы с пользователями
+     */
     private UserRepository $users;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->users = new UserRepository($pdo);
     }
 
     /**
-     * @return array<int,array<string,mixed>>
+     * Получает список всех активных пользователей
+     * 
+     * @return array<int,array<string,mixed>> Массив пользователей
      */
     public function list(): array
     {
@@ -39,6 +59,14 @@ class UserService
         return $result;
     }
 
+    /**
+     * Получает пользователя по ID
+     * 
+     * @param int $id ID пользователя
+     * @return array Данные пользователя
+     * @throws ValidationException Если ID не указан
+     * @throws RuntimeException Если пользователь не найден
+     */
     public function get(int $id): array
     {
         if ($id <= 0) {
@@ -53,6 +81,25 @@ class UserService
         return $user;
     }
 
+    /**
+     * Создает нового пользователя
+     * 
+     * Валидация:
+     * - логин обязателен и должен быть уникальным
+     * - пароль обязателен, минимум 6 символов
+     * - тип пользователя должен быть 'admin' или 'user'
+     * 
+     * Автоматически:
+     * - хеширует пароль
+     * - санитизирует телефоны
+     * - нормализует зарплату
+     * 
+     * @param array $payload Данные пользователя (login, password, user_type, full_name, email, salary, phone, etc.)
+     * @param int $currentUserId ID текущего пользователя (для логирования)
+     * @return int ID созданного пользователя
+     * @throws ValidationException Если данные некорректны
+     * @throws RuntimeException Если пользователь с таким логином уже существует
+     */
     public function create(array $payload, int $currentUserId): int
     {
         $login = trim($payload['login'] ?? '');
@@ -109,6 +156,25 @@ class UserService
         return $userId;
     }
 
+    /**
+     * Обновляет данные пользователя
+     * 
+     * Валидация:
+     * - ID пользователя должен быть указан
+     * - нельзя редактировать свой собственный профиль через эту форму
+     * - пароль (если указан) должен быть минимум 6 символов
+     * - тип пользователя должен быть 'admin' или 'user'
+     * 
+     * Обновляет только те поля, которые переданы в payload.
+     * Автоматически хеширует пароль и санитизирует телефоны.
+     * 
+     * @param int $id ID пользователя для обновления
+     * @param array $payload Данные для обновления (user_type, full_name, email, password, salary, phone, etc.)
+     * @param int $currentUserId ID текущего пользователя (для проверки и логирования)
+     * @return void
+     * @throws ValidationException Если данные некорректны
+     * @throws RuntimeException Если пользователь не найден или нет данных для обновления
+     */
     public function update(int $id, array $payload, int $currentUserId): void
     {
         if ($id <= 0) {
@@ -214,6 +280,22 @@ class UserService
         }
     }
 
+    /**
+     * Удаляет пользователя (мягкое удаление)
+     * 
+     * Валидация:
+     * - ID пользователя должен быть указан
+     * - нельзя удалить свой собственный аккаунт
+     * 
+     * Выполняет мягкое удаление (soft delete) - устанавливает deleted_at,
+     * пользователь остается в базе данных, но не отображается в списках.
+     * 
+     * @param int $id ID пользователя для удаления
+     * @param int $currentUserId ID текущего пользователя (для проверки)
+     * @return void
+     * @throws ValidationException Если ID не указан
+     * @throws RuntimeException Если пользователь не найден или попытка удалить свой аккаунт
+     */
     public function delete(int $id, int $currentUserId): void
     {
         if ($id <= 0) {
@@ -236,6 +318,19 @@ class UserService
         ]);
     }
 
+    /**
+     * Переключает статус активности пользователя
+     * 
+     * Валидация:
+     * - ID пользователя должен быть указан
+     * - нельзя заблокировать свой собственный аккаунт
+     * 
+     * @param int $id ID пользователя
+     * @param int $currentUserId ID текущего пользователя (для проверки)
+     * @return bool Новый статус активности (true = активен, false = заблокирован)
+     * @throws ValidationException Если ID не указан
+     * @throws RuntimeException Если пользователь не найден или попытка заблокировать свой аккаунт
+     */
     public function toggleActive(int $id, int $currentUserId): bool
     {
         if ($id <= 0) {
@@ -255,6 +350,13 @@ class UserService
         return $newStatus;
     }
 
+    /**
+     * Парсит и валидирует значение зарплаты
+     * 
+     * @param mixed $value Значение зарплаты
+     * @return float|null Зарплата как число с 2 знаками после запятой, или null если пусто
+     * @throws ValidationException Если значение не является числом или отрицательное
+     */
     private function parseSalary($value): ?float
     {
         if ($value === null || $value === '') {
@@ -270,6 +372,16 @@ class UserService
         return $salary;
     }
 
+    /**
+     * Санитизирует и валидирует номер телефона
+     * 
+     * Удаляет все символы, кроме цифр, плюса и дефиса.
+     * Если результат пустой, возвращает null.
+     * 
+     * @param mixed $value Значение телефона
+     * @param string $field Имя поля (для сообщений об ошибках)
+     * @return string|null Санитизированный телефон или null если пусто
+     */
     private function sanitizePhone($value, string $field): ?string
     {
         if ($value === null) {
@@ -294,6 +406,12 @@ class UserService
         return '+' . $digits;
     }
 
+    /**
+     * Нормализует строковое значение (trim и преобразование пустой строки в null)
+     * 
+     * @param mixed $value Значение для нормализации
+     * @return string|null Обрезанная строка или null если пусто
+     */
     private function normalizeNullableString($value): ?string
     {
         if ($value === null) {
@@ -303,6 +421,12 @@ class UserService
         return $value === '' ? null : $value;
     }
 
+    /**
+     * Форматирует дату и время для отображения
+     * 
+     * @param string $value Дата в формате БД (Y-m-d H:i:s)
+     * @return string Дата в формате для отображения (d.m.Y H:i)
+     */
     private function formatDateTime(string $value): string
     {
         return date('d.m.Y H:i', strtotime($value));

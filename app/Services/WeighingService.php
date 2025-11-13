@@ -13,12 +13,37 @@ use RuntimeException;
 require_once __DIR__ . '/../../includes/settings.php';
 require_once __DIR__ . '/../../includes/activity_log.php';
 
+/**
+ * Сервис для работы с навесками
+ * 
+ * Содержит бизнес-логику для работы с навесками:
+ * - валидация данных
+ * - проверка прав доступа на редактирование
+ * - логирование действий
+ * - форматирование данных для отображения
+ */
 class WeighingService
 {
+    /**
+     * @var WeighingRepository Репозиторий для работы с навесками
+     */
     private WeighingRepository $weighings;
+    
+    /**
+     * @var PoolRepository Репозиторий для работы с бассейнами
+     */
     private PoolRepository $pools;
+    
+    /**
+     * @var PDO Подключение к базе данных
+     */
     private PDO $pdo;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
@@ -26,6 +51,15 @@ class WeighingService
         $this->pools = new PoolRepository($pdo);
     }
 
+    /**
+     * Получает список навесок для указанного бассейна
+     * 
+     * @param int $poolId ID бассейна
+     * @param int $currentUserId ID текущего пользователя
+     * @param bool $isAdmin Является ли пользователь администратором
+     * @return array Массив навесок с дополнительными полями (can_edit, display dates, etc.)
+     * @throws ValidationException Если бассейн не указан или не найден
+     */
     public function listByPool(int $poolId, int $currentUserId, bool $isAdmin): array
     {
         if ($poolId <= 0) {
@@ -55,6 +89,13 @@ class WeighingService
         return $result;
     }
 
+    /**
+     * Получает одну навеску по ID
+     * 
+     * @param int $id ID навески
+     * @return array Данные навески с форматированными датами
+     * @throws RuntimeException Если навеска не найдена
+     */
     public function get(int $id): array
     {
         $record = $this->weighings->find($id);
@@ -70,6 +111,20 @@ class WeighingService
         return $model->toArray();
     }
 
+    /**
+     * Создает новую навеску
+     * 
+     * Валидация:
+     * - бассейн должен быть указан и существовать
+     * - вес должен быть указан и положительным
+     * - количество рыбы должно быть указано и положительным
+     * 
+     * @param array $payload Данные навески (pool_id, weight, fish_count, recorded_at)
+     * @param int $userId ID пользователя, создающего навеску
+     * @param bool $isAdmin Является ли пользователь администратором
+     * @return int ID созданной навески
+     * @throws ValidationException Если данные некорректны
+     */
     public function create(array $payload, int $userId, bool $isAdmin): int
     {
         $data = $this->validatePayload($payload, $isAdmin);

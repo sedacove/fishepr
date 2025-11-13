@@ -7,16 +7,41 @@ use App\Support\JsonResponse;
 use App\Support\Request;
 use RuntimeException;
 
+/**
+ * API контроллер для работы с настройками системы
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для настроек:
+ * - list: получение списка всех настроек
+ * - get: получение значения настройки по ключу
+ * - update: обновление настройки
+ * 
+ * Авторизация проверяется в api/settings.php
+ */
 class SettingsController
 {
+    /**
+     * @var SettingsService Сервис для работы с настройками
+     */
     private SettingsService $service;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Инициализирует сервис для работы с настройками.
+     * Авторизация проверяется в api/settings.php.
+     */
     public function __construct()
     {
         // Авторизация проверяется в api/settings.php
         $this->service = new SettingsService(\getDBConnection());
     }
 
+    /**
+     * Обрабатывает входящий запрос и направляет его к соответствующему обработчику
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         $action = $request->getQuery('action', 'list');
@@ -78,6 +103,13 @@ class SettingsController
         }
     }
 
+    /**
+     * Проверяет, что запрос использует метод POST
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws RuntimeException Если метод не POST
+     */
     private function requirePost(Request $request): void
     {
         if (!$request->isMethod('POST')) {

@@ -6,16 +6,42 @@ use App\Services\WorkService;
 use App\Support\JsonResponse;
 use App\Support\Request;
 
+/**
+ * API контроллер для работы со страницей "Работа"
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для страницы "Работа":
+ * - получение списка активных бассейнов с их статусами
+ * 
+ * Авторизация проверяется в api/work.php
+ */
 class WorkController
 {
+    /**
+     * @var WorkService Сервис для работы со страницей "Работа"
+     */
     private WorkService $service;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Инициализирует сервис для работы со страницей "Работа".
+     * Авторизация проверяется в api/work.php.
+     */
     public function __construct()
     {
         // Авторизация проверяется в api/work.php
         $this->service = new WorkService(\getDBConnection());
     }
 
+    /**
+     * Обрабатывает входящий запрос
+     * 
+     * Возвращает список активных бассейнов с их статусами
+     * (измерения, навески, отборы, смертность, сессии).
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         try {

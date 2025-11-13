@@ -8,10 +8,32 @@ use App\Support\JsonResponse;
 use App\Support\Request;
 use RuntimeException;
 
+/**
+ * API контроллер для работы с бассейнами
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для бассейнов:
+ * - list: получение списка всех бассейнов
+ * - get: получение одного бассейна
+ * - create: создание нового бассейна
+ * - update: обновление бассейна
+ * - delete: удаление бассейна
+ * - update_order: изменение порядка сортировки бассейнов
+ * 
+ * Доступен только администраторам.
+ */
 class PoolsController
 {
+    /**
+     * @var PoolService Сервис для работы с бассейнами
+     */
     private PoolService $service;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Проверяет авторизацию и права администратора.
+     * Инициализирует сервис для работы с бассейнами.
+     */
     public function __construct()
     {
         \requireAuth();
@@ -19,6 +41,12 @@ class PoolsController
         $this->service = new PoolService(\getDBConnection());
     }
 
+    /**
+     * Обрабатывает входящий запрос и направляет его к соответствующему обработчику
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         $action = $request->getQuery('action', 'list');
@@ -83,6 +111,13 @@ class PoolsController
         }
     }
 
+    /**
+     * Проверяет, что запрос использует метод POST
+     * 
+     * @param string $method HTTP метод запроса
+     * @return void
+     * @throws RuntimeException Если метод не POST
+     */
     private function assertPost(string $method): void
     {
         if ($method !== 'POST') {

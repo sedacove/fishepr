@@ -15,15 +15,56 @@ use RuntimeException;
 require_once __DIR__ . '/../../includes/settings.php';
 require_once __DIR__ . '/../../includes/activity_log.php';
 
+/**
+ * Сервис для работы с измерениями
+ * 
+ * Содержит бизнес-логику для работы с измерениями:
+ * - валидация данных
+ * - расчет статусов измерений (температура, кислород)
+ * - проверка прав доступа на редактирование
+ * - логирование действий
+ * - форматирование данных для отображения
+ * - построение графиков измерений
+ */
 class MeasurementService
 {
+    /**
+     * @var MeasurementRepository Репозиторий для работы с измерениями
+     */
     private MeasurementRepository $measurements;
+    
+    /**
+     * @var PoolRepository Репозиторий для работы с бассейнами
+     */
     private PoolRepository $pools;
+    
+    /**
+     * @var array Настройки температуры (bad_below, acceptable_min, good_min, good_max, acceptable_max, bad_above)
+     */
     private array $temperatureSettings;
+    
+    /**
+     * @var array Настройки кислорода (bad_below, acceptable_min, good_min, good_max, acceptable_max, bad_above)
+     */
     private array $oxygenSettings;
+    
+    /**
+     * @var int Тайм-аут редактирования измерений (в минутах)
+     */
     private int $editTimeoutMinutes;
+    
+    /**
+     * @var int Лимит последних точек для построения графиков
+     */
     private int $latestSeriesLimit = 20;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * Инициализирует репозитории и загружает настройки из системы.
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->measurements = new MeasurementRepository($pdo);
@@ -50,6 +91,18 @@ class MeasurementService
         $this->editTimeoutMinutes = \getSettingInt('measurement_edit_timeout_minutes', 30);
     }
 
+    /**
+     * Получает список измерений для указанного бассейна
+     * 
+     * Для каждого измерения рассчитывает статусы температуры и кислорода
+     * на основе настроек системы.
+     * 
+     * @param int $poolId ID бассейна
+     * @param int $currentUserId ID текущего пользователя
+     * @param bool $isAdmin Является ли пользователь администратором
+     * @return array Массив измерений с расчетными статусами и правами доступа
+     * @throws ValidationException Если бассейн не указан
+     */
     public function listByPool(int $poolId, int $currentUserId, bool $isAdmin): array
     {
         if ($poolId <= 0) {

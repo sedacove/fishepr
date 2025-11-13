@@ -12,18 +12,37 @@ use PDO;
 use RuntimeException;
 
 /**
- * High-level business logic for the counterparty domain.
- *
- * Responsible for validation, normalisation of input data, coordinating
- * repositories, preparing DTOs for responses and handling file storage
- * operations associated with counterparty documents.
+ * Сервис для работы с контрагентами
+ * 
+ * Содержит бизнес-логику для работы с контрагентами:
+ * - валидация данных
+ * - нормализация входных данных
+ * - координация работы репозиториев
+ * - подготовка DTO для ответов
+ * - работа с файлами документов контрагентов
  */
 class CounterpartyService
 {
+    /**
+     * @var CounterpartyRepository Репозиторий для работы с контрагентами
+     */
     private CounterpartyRepository $counterparties;
+    
+    /**
+     * @var CounterpartyDocumentRepository Репозиторий для работы с документами контрагентов
+     */
     private CounterpartyDocumentRepository $documents;
+    
+    /**
+     * @var PDO Подключение к базе данных
+     */
     private PDO $pdo;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
@@ -31,7 +50,11 @@ class CounterpartyService
         $this->documents = new CounterpartyDocumentRepository($pdo);
     }
 
-    /** Returns available colours that can be assigned to counterparties. */
+    /**
+     * Возвращает доступные цвета, которые можно назначить контрагентам
+     * 
+     * @return array Массив цветов в формате [['value' => hex, 'label' => название], ...]
+     */
     public function palette(): array
     {
         $result = [];
@@ -41,7 +64,11 @@ class CounterpartyService
         return $result;
     }
 
-    /** Returns list of counterparties enriched with document counters. */
+    /**
+     * Возвращает список контрагентов с количеством документов
+     * 
+     * @return array Массив контрагентов с полем documents_count
+     */
     public function list(): array
     {
         $items = $this->counterparties->listAll();
@@ -61,7 +88,13 @@ class CounterpartyService
         return $result;
     }
 
-    /** Returns a fully detailed counterparty including its documents. */
+    /**
+     * Возвращает полную информацию о контрагенте, включая его документы
+     * 
+     * @param int $id ID контрагента
+     * @return array Данные контрагента с массивом документов
+     * @throws RuntimeException Если контрагент не найден
+     */
     public function get(int $id): array
     {
         $data = $this->counterparties->findById($id);

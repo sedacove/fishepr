@@ -4,13 +4,33 @@ namespace App\Controllers;
 
 require_once __DIR__ . '/../../includes/auth.php';
 
+/**
+ * Контроллер страницы задач
+ * 
+ * Отвечает за отображение страницы задач:
+ * - список задач пользователя (мои задачи и назначенные мной)
+ * - формы для добавления/редактирования задач (только для админов)
+ * - управление подзадачами
+ * - drag-and-drop сортировка подзадач (SortableJS)
+ * - управление файлами задач
+ */
 class TasksController extends Controller
 {
+    /**
+     * Конструктор контроллера
+     * 
+     * Проверяет авторизацию пользователя
+     */
     public function __construct()
     {
         requireAuth();
     }
 
+    /**
+     * Отображает страницу задач
+     * 
+     * @return string HTML содержимое страницы
+     */
     public function index(): string
     {
         $isAdmin = isAdmin();

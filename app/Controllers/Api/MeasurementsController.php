@@ -8,16 +8,46 @@ use App\Support\JsonResponse;
 use App\Support\Request;
 use RuntimeException;
 
+/**
+ * API контроллер для работы с измерениями
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для измерений:
+ * - list: получение списка измерений для бассейна
+ * - get: получение одного измерения
+ * - create: создание нового измерения
+ * - update: обновление измерения
+ * - delete: удаление измерения
+ * - latest_temperatures: получение последних измерений температуры
+ * - latest_oxygen: получение последних измерений кислорода
+ * - get_pools: получение списка бассейнов
+ * 
+ * Авторизация проверяется в api/measurements.php
+ */
 class MeasurementsController
 {
+    /**
+     * @var MeasurementService Сервис для работы с измерениями
+     */
     private MeasurementService $service;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Инициализирует сервис для работы с измерениями.
+     * Авторизация проверяется в api/measurements.php.
+     */
     public function __construct()
     {
         // Авторизация проверяется в api/measurements.php
         $this->service = new MeasurementService(\getDBConnection());
     }
 
+    /**
+     * Обрабатывает входящий запрос и направляет его к соответствующему обработчику
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         $action = $request->getQuery('action', 'list');
@@ -99,6 +129,13 @@ class MeasurementsController
         }
     }
 
+    /**
+     * Проверяет, что запрос использует метод POST
+     * 
+     * @param string $method HTTP метод запроса
+     * @return void
+     * @throws RuntimeException Если метод не POST
+     */
     private function assertPost(string $method): void
     {
         if ($method !== 'POST') {

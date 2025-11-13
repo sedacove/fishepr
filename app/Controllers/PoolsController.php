@@ -5,14 +5,34 @@ namespace App\Controllers;
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/section_descriptions.php';
 
+/**
+ * Контроллер страницы управления бассейнами
+ * 
+ * Отвечает за отображение страницы управления бассейнами:
+ * - список всех бассейнов
+ * - формы для добавления/редактирования бассейнов
+ * - drag-and-drop сортировка бассейнов (SortableJS)
+ * 
+ * Доступна только администраторам.
+ */
 class PoolsController extends Controller
 {
+    /**
+     * Конструктор контроллера
+     * 
+     * Проверяет авторизацию и права администратора
+     */
     public function __construct()
     {
         requireAuth();
         requireAdmin();
     }
 
+    /**
+     * Отображает страницу управления бассейнами
+     * 
+     * @return string HTML содержимое страницы
+     */
     public function index(): string
     {
         $config = [

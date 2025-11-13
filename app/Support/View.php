@@ -2,22 +2,63 @@
 
 namespace App\Support;
 
+/**
+ * Класс для работы с представлениями (views)
+ * 
+ * Предоставляет функциональность для рендеринга PHP шаблонов:
+ * - загрузка и рендеринг шаблонов
+ * - поддержка layouts (макетов)
+ * - общие данные для всех представлений
+ * - автоматическое определение функции asset_url
+ */
 class View
 {
+    /**
+     * @var string Базовый путь к директории с представлениями
+     */
     private static string $basePath;
+    
+    /**
+     * @var string|null Имя layout для текущего представления
+     */
     private static ?string $layout = null;
+    
+    /**
+     * @var array Общие данные, доступные во всех представлениях
+     */
     private static array $shared = [];
 
+    /**
+     * Устанавливает базовый путь к директории с представлениями
+     * 
+     * @param string $path Путь к директории
+     * @return void
+     */
     public static function setBasePath(string $path): void
     {
         self::$basePath = rtrim($path, DIRECTORY_SEPARATOR);
     }
 
+    /**
+     * Добавляет общие данные, доступные во всех представлениях
+     * 
+     * @param string $key Ключ для данных
+     * @param mixed $value Значение
+     * @return void
+     */
     public static function share(string $key, mixed $value): void
     {
         self::$shared[$key] = $value;
     }
 
+    /**
+     * Рендерит представление с переданными данными
+     * 
+     * @param string $template Имя шаблона (например, 'users.index' для app/Views/users/index.php)
+     * @param array $data Данные для передачи в представление
+     * @return string HTML содержимое представления
+     * @throws \RuntimeException Если шаблон не найден
+     */
     public static function make(string $template, array $data = []): string
     {
         // Убеждаемся, что функция asset_url доступна в глобальной области видимости
@@ -44,17 +85,40 @@ class View
         return $content;
     }
 
+    /**
+     * Указывает, что текущее представление должно использовать layout
+     * 
+     * Вызывается в начале файла представления:
+     * View::extends('layouts.app');
+     * 
+     * @param string $layout Имя layout (например, 'layouts.app')
+     * @return void
+     */
     public static function extends(string $layout): void
     {
         self::$layout = $layout;
     }
 
+    /**
+     * Преобразует имя шаблона в путь к файлу
+     * 
+     * @param string $template Имя шаблона (например, 'users.index')
+     * @return string Полный путь к файлу шаблона
+     */
     private static function templatePath(string $template): string
     {
         $relative = str_replace(['.', '\\'], DIRECTORY_SEPARATOR, $template);
         return self::$basePath . DIRECTORY_SEPARATOR . $relative . '.php';
     }
 
+    /**
+     * Убеждается, что функция asset_url доступна в глобальной области видимости
+     * 
+     * Если функция не определена, пытается загрузить config/config.php
+     * или определяет резервную версию функции
+     * 
+     * @return void
+     */
     private static function ensureAssetUrlFunction(): void
     {
         // Проверяем в глобальной области видимости

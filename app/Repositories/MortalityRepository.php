@@ -4,8 +4,24 @@ namespace App\Repositories;
 
 use PDO;
 
+/**
+ * Репозиторий для работы со смертностью
+ * 
+ * Выполняет SQL запросы к таблице mortality:
+ * - получение списка записей смертности для бассейна
+ * - поиск записи смертности по ID
+ * - создание, обновление, удаление записей смертности
+ * - получение дневных итогов смертности
+ * - получение суммы смертности за период
+ */
 class MortalityRepository extends Repository
 {
+    /**
+     * Получает список записей смертности для указанного бассейна
+     * 
+     * @param int $poolId ID бассейна
+     * @return array Массив записей смертности, отсортированных по дате записи (от новых к старым)
+     */
     public function listByPool(int $poolId): array
     {
         $stmt = $this->pdo->prepare(
@@ -22,6 +38,12 @@ class MortalityRepository extends Repository
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
+    /**
+     * Находит запись смертности по ID с информацией о пользователе и бассейне
+     * 
+     * @param int $id ID записи смертности
+     * @return array|null Данные записи с информацией о создателе и бассейне или null, если не найдено
+     */
     public function findWithUser(int $id): ?array
     {
         $stmt = $this->pdo->prepare(
@@ -40,6 +62,16 @@ class MortalityRepository extends Repository
         return $result ?: null;
     }
 
+    /**
+     * Создает новую запись смертности
+     * 
+     * @param int $poolId ID бассейна
+     * @param float $weight Вес
+     * @param int $fishCount Количество рыбы
+     * @param string $recordedAt Дата и время записи
+     * @param int $userId ID пользователя, создающего запись
+     * @return int ID созданной записи
+     */
     public function insert(int $poolId, float $weight, int $fishCount, string $recordedAt, int $userId): int
     {
         $stmt = $this->pdo->prepare(
@@ -50,6 +82,16 @@ class MortalityRepository extends Repository
         return (int)$this->pdo->lastInsertId();
     }
 
+    /**
+     * Обновляет данные записи смертности
+     * 
+     * Динамически формирует SQL запрос на основе переданных данных.
+     * Обновляет только те поля, которые переданы в массиве $data.
+     * 
+     * @param int $id ID записи смертности
+     * @param array $data Ассоциативный массив полей для обновления (column => value)
+     * @return void
+     */
     public function update(int $id, array $data): void
     {
         $columns = [];
@@ -67,12 +109,28 @@ class MortalityRepository extends Repository
         $stmt->execute($params);
     }
 
+    /**
+     * Удаляет запись смертности
+     * 
+     * @param int $id ID записи для удаления
+     * @return void
+     */
     public function delete(int $id): void
     {
         $stmt = $this->pdo->prepare('DELETE FROM mortality WHERE id = ?');
         $stmt->execute([$id]);
     }
 
+    /**
+     * Получает дневные итоги смертности для бассейна с определенной даты
+     * 
+     * Группирует записи смертности по дням и суммирует вес и количество.
+     * Используется для построения графиков смертности.
+     * 
+     * @param int $poolId ID бассейна
+     * @param string $startDate Дата начала (в формате БД)
+     * @return array Массив дневных итогов, отсортированных по дате (от старых к новым)
+     */
     public function getDailyTotalsForPoolSince(int $poolId, string $startDate): array
     {
         $stmt = $this->pdo->prepare(
@@ -90,6 +148,13 @@ class MortalityRepository extends Repository
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
+    /**
+     * Получает сумму смертности для бассейна с определенной даты
+     * 
+     * @param int $poolId ID бассейна
+     * @param string $startDate Дата начала (в формате БД)
+     * @return array Массив с ключами total_weight и total_count
+     */
     public function sumForPoolSince(int $poolId, string $startDate): array
     {
         $stmt = $this->pdo->prepare(
@@ -108,6 +173,15 @@ class MortalityRepository extends Repository
         ];
     }
 
+    /**
+     * Получает сумму количества смертности для бассейна за указанное количество часов
+     * 
+     * Используется для расчета статусов смертности на странице "Работа".
+     * 
+     * @param int $poolId ID бассейна
+     * @param int $hours Количество часов для расчета
+     * @return int Сумма количества смертности за период
+     */
     public function sumCountForHours(int $poolId, int $hours): int
     {
         $stmt = $this->pdo->prepare(
@@ -122,6 +196,15 @@ class MortalityRepository extends Repository
         return (int)($stmt->fetchColumn() ?: 0);
     }
 
+    /**
+     * Получает дневные итоги смертности за указанный период (для всех бассейнов)
+     * 
+     * Используется для виджетов дашборда.
+     * 
+     * @param string $startDate Дата начала (в формате БД)
+     * @param string $endDate Дата окончания (в формате БД)
+     * @return array Массив дневных итогов, отсортированных по дате (от старых к новым)
+     */
     public function getDailyTotalsInRange(string $startDate, string $endDate): array
     {
         $stmt = $this->pdo->prepare(
@@ -139,6 +222,16 @@ class MortalityRepository extends Repository
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
+    /**
+     * Получает дневные итоги смертности по бассейнам за указанный период
+     * 
+     * Используется для виджетов дашборда, показывающих смертность по бассейнам.
+     * 
+     * @param array $poolIds Массив ID бассейнов
+     * @param string $startDate Дата начала (в формате БД)
+     * @param string $endDate Дата окончания (в формате БД)
+     * @return array Ассоциативный массив: [pool_id => [date => [total_count, total_weight]]]
+     */
     public function getDailyTotalsByPool(array $poolIds, string $startDate, string $endDate): array
     {
         if (empty($poolIds)) {

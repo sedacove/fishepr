@@ -16,14 +16,48 @@ use App\Support\Exceptions\ValidationException;
 use PDO;
 use RuntimeException;
 
+/**
+ * Сервис для работы с деталями сессии
+ * 
+ * Содержит бизнес-логику для получения полной информации о сессии:
+ * - основная информация о сессии (посадка, бассейн)
+ * - история измерений (температура, кислород)
+ * - история смертности
+ * - история отборов
+ * - история навесок
+ */
 class SessionDetailsService
 {
+    /**
+     * @var SessionRepository Репозиторий для работы с сессиями
+     */
     private SessionRepository $sessions;
+    
+    /**
+     * @var MeasurementRepository Репозиторий для работы с измерениями
+     */
     private MeasurementRepository $measurements;
+    
+    /**
+     * @var MortalityRepository Репозиторий для работы со смертностью
+     */
     private MortalityRepository $mortality;
+    
+    /**
+     * @var HarvestRepository Репозиторий для работы с отборами
+     */
     private HarvestRepository $harvests;
+    
+    /**
+     * @var WeighingRepository Репозиторий для работы с навесками
+     */
     private WeighingRepository $weighings;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->sessions = new SessionRepository($pdo);
@@ -33,6 +67,21 @@ class SessionDetailsService
         $this->weighings = new WeighingRepository($pdo);
     }
 
+    /**
+     * Получает полную информацию о сессии со всеми связанными данными
+     * 
+     * Возвращает:
+     * - основную информацию о сессии (посадка, бассейн, даты, массы, FCR)
+     * - историю измерений (температура, кислород) с начала сессии
+     * - историю смертности (дневные итоги) с начала сессии
+     * - историю отборов с начала сессии
+     * - историю навесок с начала сессии
+     * 
+     * @param int $sessionId ID сессии
+     * @return array Массив с ключами: session, measurements, mortality, harvests, weighings
+     * @throws ValidationException Если ID сессии не указан
+     * @throws RuntimeException Если сессия не найдена
+     */
     public function getDetails(int $sessionId): array
     {
         if ($sessionId <= 0) {

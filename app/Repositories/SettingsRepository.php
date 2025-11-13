@@ -4,18 +4,36 @@ namespace App\Repositories;
 
 use PDO;
 
+/**
+ * Репозиторий для работы с настройками системы
+ * 
+ * Выполняет SQL запросы к таблице settings:
+ * - получение списка всех настроек
+ * - поиск настройки по ключу
+ * - получение значения настройки
+ * - обновление настройки
+ */
 class SettingsRepository
 {
+    /**
+     * @var PDO Подключение к базе данных
+     */
     private PDO $pdo;
 
+    /**
+     * Конструктор репозитория
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
     }
 
     /**
-     * Получить все настройки
-     * @return array<array{id:int,key:string,value:string,description:string|null,updated_at:string,updated_by:int|null,updated_by_login:string|null,updated_by_name:string|null}>
+     * Получает все настройки системы
+     * 
+     * @return array<array{id:int,key:string,value:string,description:string|null,updated_at:string,updated_by:int|null,updated_by_login:string|null,updated_by_name:string|null}> Массив всех настроек, отсортированных по ключу
      */
     public function findAll(): array
     {
@@ -32,8 +50,10 @@ class SettingsRepository
     }
 
     /**
-     * Найти настройку по ключу
-     * @return array{id:int,key:string,value:string,description:string|null,updated_at:string,updated_by:int|null}|null
+     * Находит настройку по ключу
+     * 
+     * @param string $key Ключ настройки
+     * @return array{id:int,key:string,value:string,description:string|null,updated_at:string,updated_by:int|null}|null Данные настройки или null, если не найдена
      */
     public function findByKey(string $key): ?array
     {
@@ -44,7 +64,10 @@ class SettingsRepository
     }
 
     /**
-     * Получить значение настройки по ключу
+     * Получает значение настройки по ключу
+     * 
+     * @param string $key Ключ настройки
+     * @return string|null Значение настройки или null, если настройка не найдена
      */
     public function getValue(string $key): ?string
     {
@@ -53,7 +76,12 @@ class SettingsRepository
     }
 
     /**
-     * Обновить настройку
+     * Обновляет настройку
+     * 
+     * @param string $key Ключ настройки
+     * @param string $value Новое значение настройки
+     * @param int $updatedBy ID пользователя, обновляющего настройку
+     * @return void
      */
     public function update(string $key, string $value, int $updatedBy): void
     {

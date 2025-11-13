@@ -5,10 +5,22 @@ namespace App\Repositories;
 use App\Models\Pool\Pool;
 use PDO;
 
+/**
+ * Репозиторий для работы с бассейнами
+ * 
+ * Выполняет SQL запросы к таблице pools:
+ * - получение списка всех бассейнов
+ * - поиск бассейна по ID
+ * - создание, обновление, удаление бассейнов
+ * - управление порядком сортировки
+ * - получение активных бассейнов
+ */
 class PoolRepository extends Repository
 {
     /**
-     * @return Pool[]
+     * Получает список всех бассейнов
+     * 
+     * @return Pool[] Массив бассейнов, отсортированных по порядку сортировки и дате создания
      */
     public function all(): array
     {
@@ -22,6 +34,12 @@ class PoolRepository extends Repository
         return array_map(fn ($row) => new Pool($row), $stmt->fetchAll(PDO::FETCH_ASSOC) ?: []);
     }
 
+    /**
+     * Находит бассейн по ID
+     * 
+     * @param int $id ID бассейна
+     * @return Pool|null Модель бассейна или null, если не найден
+     */
     public function find(int $id): ?Pool
     {
         $stmt = $this->pdo->prepare(
@@ -37,8 +55,10 @@ class PoolRepository extends Repository
     }
 
     /**
-     * Найти активный бассейн по ID
-     * @return array|null
+     * Находит активный бассейн по ID
+     * 
+     * @param int $id ID бассейна
+     * @return array|null Данные бассейна или null, если не найден или неактивен
      */
     public function findActive(int $id): ?array
     {
@@ -54,6 +74,14 @@ class PoolRepository extends Repository
         return $row ?: null;
     }
 
+    /**
+     * Создает новый бассейн
+     * 
+     * @param string $name Название бассейна
+     * @param int $sortOrder Порядок сортировки
+     * @param int $userId ID пользователя, создающего бассейн
+     * @return int ID созданного бассейна
+     */
     public function create(string $name, int $sortOrder, int $userId): int
     {
         $stmt = $this->pdo->prepare(
@@ -65,6 +93,16 @@ class PoolRepository extends Repository
         return (int) $this->pdo->lastInsertId();
     }
 
+    /**
+     * Обновляет данные бассейна
+     * 
+     * Динамически формирует SQL запрос на основе переданных данных.
+     * Обновляет только те поля, которые переданы в массиве $data.
+     * 
+     * @param int $id ID бассейна
+     * @param array $data Ассоциативный массив полей для обновления (column => value)
+     * @return void
+     */
     public function update(int $id, array $data): void
     {
         if (empty($data)) {
@@ -84,12 +122,25 @@ class PoolRepository extends Repository
         $stmt->execute($params);
     }
 
+    /**
+     * Удаляет бассейн
+     * 
+     * @param int $id ID бассейна для удаления
+     * @return void
+     */
     public function delete(int $id): void
     {
         $stmt = $this->pdo->prepare('DELETE FROM pools WHERE id = ?');
         $stmt->execute([$id]);
     }
 
+    /**
+     * Получает максимальный порядок сортировки среди всех бассейнов
+     * 
+     * Используется для назначения порядка новым бассейнам.
+     * 
+     * @return int Максимальный порядок сортировки или -1, если бассейнов нет
+     */
     public function maxSortOrder(): int
     {
         $stmt = $this->pdo->query('SELECT MAX(sort_order) AS max_order FROM pools');
@@ -98,6 +149,14 @@ class PoolRepository extends Repository
         return isset($row['max_order']) ? (int) $row['max_order'] : -1;
     }
 
+    /**
+     * Обновляет порядок сортировки бассейнов
+     * 
+     * Устанавливает порядок сортировки в соответствии с порядком ID в массиве.
+     * 
+     * @param array $ids Массив ID бассейнов в новом порядке
+     * @return void
+     */
     public function updateOrder(array $ids): void
     {
         $stmt = $this->pdo->prepare('UPDATE pools SET sort_order = ? WHERE id = ?');
@@ -107,8 +166,9 @@ class PoolRepository extends Repository
     }
 
     /**
-     * Получить список активных бассейнов
-     * @return array<array{id:int,name:string}>
+     * Получает список активных бассейнов
+     * 
+     * @return array<array{id:int,name:string}> Массив активных бассейнов (id, name)
      */
     public function listActive(): array
     {
@@ -122,8 +182,11 @@ class PoolRepository extends Repository
     }
 
     /**
-     * Получить активные бассейны с информацией об активных сессиях
-     * @return array<array{id:int,name:string,pool_name:string,active_session:array|null}>
+     * Получает активные бассейны с информацией об активных сессиях
+     * 
+     * Для каждого активного бассейна возвращает информацию об активной (не завершенной) сессии, если она есть.
+     * 
+     * @return array<array{id:int,name:string,pool_name:string,active_session:array|null}> Массив бассейнов с информацией об активных сессиях
      */
     public function getActiveWithSessions(): array
     {

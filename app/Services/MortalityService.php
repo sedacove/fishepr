@@ -20,13 +20,46 @@ require_once __DIR__ . '/../../includes/settings.php';
 require_once __DIR__ . '/../../includes/activity_log.php';
 require_once __DIR__ . '/../../includes/telegram.php';
 
+/**
+ * Сервис для работы со смертностью
+ * 
+ * Содержит бизнес-логику для работы со смертностью:
+ * - валидация данных
+ * - проверка прав доступа на редактирование
+ * - логирование действий
+ * - отправка уведомлений в Telegram при превышении порогов
+ * - форматирование данных для отображения
+ * - построение графиков смертности
+ */
 class MortalityService
 {
+    /**
+     * @var MortalityRepository Репозиторий для работы со смертностью
+     */
     private MortalityRepository $mortality;
+    
+    /**
+     * @var PoolRepository Репозиторий для работы с бассейнами
+     */
     private PoolRepository $pools;
+    
+    /**
+     * @var SessionRepository Репозиторий для работы с сессиями
+     */
     private SessionRepository $sessions;
+    
+    /**
+     * @var int Тайм-аут редактирования записей смертности (в минутах)
+     */
     private int $editTimeoutMinutes;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * Инициализирует репозитории и загружает настройки из системы.
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->mortality = new MortalityRepository($pdo);
@@ -35,6 +68,15 @@ class MortalityService
         $this->editTimeoutMinutes = \getSettingInt('measurement_edit_timeout_minutes', 30);
     }
 
+    /**
+     * Получает список записей смертности для указанного бассейна
+     * 
+     * @param int $poolId ID бассейна
+     * @param int $currentUserId ID текущего пользователя
+     * @param bool $isAdmin Является ли пользователь администратором
+     * @return array Массив записей смертности с правами доступа
+     * @throws ValidationException Если бассейн не указан
+     */
     public function listByPool(int $poolId, int $currentUserId, bool $isAdmin): array
     {
         if ($poolId <= 0) {

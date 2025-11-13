@@ -5,10 +5,30 @@ namespace App\Services;
 use PDO;
 use JsonException;
 
+/**
+ * Сервис для работы с макетом дашборда
+ * 
+ * Содержит бизнес-логику для управления макетом виджетов дашборда:
+ * - получение макета виджетов пользователя
+ * - сохранение макета виджетов пользователя
+ * - нормализация макета
+ * - получение списка доступных виджетов
+ * - распределение виджетов по колонкам
+ */
 class DashboardLayoutService
 {
+    /**
+     * @var int Количество колонок по умолчанию
+     */
     private const DEFAULT_COLUMNS = 2;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     * @param DashboardWidgetRegistry $registry Реестр виджетов дашборда
+     * @param int $columnsCount Количество колонок в макете
+     */
     public function __construct(
         private readonly PDO $pdo,
         private readonly DashboardWidgetRegistry $registry,
@@ -16,6 +36,14 @@ class DashboardLayoutService
     ) {
     }
 
+    /**
+     * Получает макет виджетов пользователя
+     * 
+     * Если у пользователя нет сохраненного макета, возвращает макет по умолчанию.
+     * 
+     * @param int $userId ID пользователя
+     * @return array Нормализованный макет виджетов
+     */
     public function getUserLayout(int $userId): array
     {
         $stmt = $this->pdo->prepare('SELECT layout FROM user_dashboard_layouts WHERE user_id = ?');
@@ -32,6 +60,17 @@ class DashboardLayoutService
         return $this->getDefaultLayout();
     }
 
+    /**
+     * Сохраняет макет виджетов пользователя
+     * 
+     * Сохраняет макет в таблицу user_dashboard_layouts.
+     * Если макет уже существует, обновляет его.
+     * 
+     * @param int $userId ID пользователя
+     * @param array $layout Макет виджетов для сохранения
+     * @return void
+     * @throws \RuntimeException Если не удалось сериализовать макет в JSON
+     */
     public function saveUserLayout(int $userId, array $layout): void
     {
         $normalized = $this->normalizeLayout($layout);
@@ -50,6 +89,13 @@ class DashboardLayoutService
         $stmt->execute([$userId, $json]);
     }
 
+    /**
+     * Получает макет виджетов по умолчанию
+     * 
+     * Использует виджеты, помеченные как виджеты по умолчанию в реестре.
+     * 
+     * @return array Макет виджетов по умолчанию
+     */
     public function getDefaultLayout(): array
     {
         $defaultKeys = $this->registry->defaultKeys();
@@ -59,8 +105,13 @@ class DashboardLayoutService
     }
 
     /**
-     * @param array $layout
-     * @return array[]
+     * Получает список доступных виджетов
+     * 
+     * Возвращает список всех виджетов из реестра с информацией о том,
+     * какие из них уже добавлены в макет пользователя.
+     * 
+     * @param array $layout Текущий макет виджетов
+     * @return array[] Массив виджетов с информацией (id, title, description, in_layout, default)
      */
     public function getAvailableWidgets(array $layout): array
     {

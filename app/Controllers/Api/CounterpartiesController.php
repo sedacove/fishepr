@@ -11,12 +11,32 @@ use Exception;
 use RuntimeException;
 
 /**
- * Thin API controller that proxies requests to CounterpartyService.
+ * API контроллер для работы с контрагентами
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для контрагентов:
+ * - palette: получение доступных цветов для контрагентов
+ * - list: получение списка контрагентов
+ * - get: получение одного контрагента с документами
+ * - create: создание нового контрагента
+ * - update: обновление контрагента
+ * - delete: удаление контрагента
+ * - upload_document: загрузка документа контрагента
+ * - delete_document: удаление документа контрагента
+ * 
+ * Доступен только администраторам.
  */
 class CounterpartiesController
 {
+    /**
+     * @var CounterpartyService Сервис для работы с контрагентами
+     */
     private CounterpartyService $service;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Проверяет права администратора и инициализирует сервис.
+     */
     public function __construct()
     {
         requireAdmin();
@@ -24,7 +44,12 @@ class CounterpartiesController
     }
 
     /**
-     * Dispatches action based on `action` query parameter.
+     * Обрабатывает входящий запрос и направляет его к соответствующему обработчику
+     * 
+     * Действие определяется параметром `action` в query string.
+     * 
+     * @param Request $request Объект запроса
+     * @return void
      */
     public function handle(Request $request): void
     {
@@ -100,7 +125,16 @@ class CounterpartiesController
         }
     }
 
-    /** Handles file upload via multipart form submission. */
+    /**
+     * Обрабатывает загрузку файлов через multipart form submission
+     * 
+     * Ожидает POST запрос с полями:
+     * - counterparty_id: ID контрагента
+     * - files: массив файлов (может быть несколько)
+     * 
+     * @return void
+     * @throws DomainException Если метод не POST, ID не указан или файлы не переданы
+     */
     private function handleUpload(): void
     {
         if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
@@ -120,7 +154,13 @@ class CounterpartiesController
         JsonResponse::success(['files' => $saved], 'Файлы успешно загружены');
     }
 
-    /** Ensures request method is POST, otherwise throws exception. */
+    /**
+     * Проверяет, что запрос использует метод POST
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws DomainException Если метод не POST
+     */
     private function requirePost(Request $request): void
     {
         if (!$request->isMethod('POST')) {

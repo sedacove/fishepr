@@ -5,14 +5,20 @@ namespace App\Repositories;
 use PDO;
 
 /**
- * Storage abstraction for counterparties.
+ * Репозиторий для работы с контрагентами
+ * 
+ * Выполняет SQL запросы к таблице counterparties:
+ * - получение списка всех контрагентов
+ * - поиск контрагента по ID
+ * - создание, обновление, удаление контрагентов
+ * - подсчет документов для контрагентов
  */
 class CounterpartyRepository extends Repository
 {
     /**
-     * Returns all counterparties with author/updater information.
-     *
-     * @return array<int,array<string,mixed>>
+     * Получает список всех контрагентов с информацией о создателе и обновителе
+     * 
+     * @return array<int,array<string,mixed>> Массив контрагентов, отсортированных по названию
      */
     public function listAll(): array
     {
@@ -29,10 +35,10 @@ class CounterpartyRepository extends Repository
     }
 
     /**
-     * Returns a map counterparty_id => documents_count.
-     *
-     * @param array<int,int> $ids
-     * @return array<int,int>
+     * Возвращает карту количества документов для указанных контрагентов
+     * 
+     * @param array<int,int> $ids Массив ID контрагентов
+     * @return array<int,int> Ассоциативный массив [counterparty_id => documents_count]
      */
     public function countDocumentsFor(array $ids): array
     {
@@ -48,7 +54,12 @@ class CounterpartyRepository extends Repository
     }
 
     /**
-     * Returns detailed counterparty record or null when not found.
+     * Находит контрагента по ID с полной информацией
+     * 
+     * Включает информацию о создателе и обновителе.
+     * 
+     * @param int $id ID контрагента
+     * @return array|null Данные контрагента или null, если не найден
      */
     public function findById(int $id): ?array
     {
@@ -67,9 +78,10 @@ class CounterpartyRepository extends Repository
     }
 
     /**
-     * Creates a new counterparty entry.
-     *
-     * @param array<string,mixed> $data
+     * Создает нового контрагента
+     * 
+     * @param array<string,mixed> $data Данные контрагента (name, description, inn, phone, email, color, created_by, updated_by)
+     * @return int ID созданного контрагента
      */
     public function insert(array $data): int
     {
@@ -90,9 +102,14 @@ class CounterpartyRepository extends Repository
     }
 
     /**
-     * Applies partial updates for a counterparty.
-     *
-     * @param array<string,mixed> $data column => value pairs
+     * Обновляет данные контрагента
+     * 
+     * Динамически формирует SQL запрос на основе переданных данных.
+     * Обновляет только те поля, которые переданы в массиве $data.
+     * 
+     * @param int $id ID контрагента
+     * @param array<string,mixed> $data Ассоциативный массив полей для обновления (column => value)
+     * @return void
      */
     public function update(int $id, array $data): void
     {
@@ -111,7 +128,12 @@ class CounterpartyRepository extends Repository
         $stmt->execute($params);
     }
 
-    /** Deletes counterparty row. */
+    /**
+     * Удаляет контрагента
+     * 
+     * @param int $id ID контрагента для удаления
+     * @return void
+     */
     public function delete(int $id): void
     {
         $stmt = $this->pdo->prepare('DELETE FROM counterparties WHERE id = ?');

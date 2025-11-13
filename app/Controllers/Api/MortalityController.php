@@ -8,16 +8,46 @@ use App\Support\JsonResponse;
 use App\Support\Request;
 use RuntimeException;
 
+/**
+ * API контроллер для работы со смертностью
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для смертности:
+ * - list: получение списка записей смертности для бассейна
+ * - get: получение одной записи смертности
+ * - create: создание новой записи смертности
+ * - update: обновление записи смертности
+ * - delete: удаление записи смертности
+ * - totals_last30: получение сводки смертности за последние 30 дней
+ * - totals_last14_by_pool: получение сводки смертности за последние 14 дней по бассейнам
+ * - get_pools: получение списка бассейнов
+ * 
+ * Авторизация проверяется в api/mortality.php
+ */
 class MortalityController
 {
+    /**
+     * @var MortalityService Сервис для работы со смертностью
+     */
     private MortalityService $service;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Инициализирует сервис для работы со смертностью.
+     * Авторизация проверяется в api/mortality.php.
+     */
     public function __construct()
     {
         // Авторизация проверяется в api/mortality.php
         $this->service = new MortalityService(\getDBConnection());
     }
 
+    /**
+     * Обрабатывает входящий запрос и направляет его к соответствующему обработчику
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         $action = $request->getQuery('action', 'list');
@@ -98,6 +128,13 @@ class MortalityController
         }
     }
 
+    /**
+     * Проверяет, что запрос использует метод POST
+     * 
+     * @param string $method HTTP метод запроса
+     * @return void
+     * @throws RuntimeException Если метод не POST
+     */
     private function assertPost(string $method): void
     {
         if ($method !== 'POST') {

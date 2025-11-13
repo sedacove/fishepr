@@ -10,11 +10,33 @@ use RuntimeException;
 
 require_once __DIR__ . '/../../../includes/dashboard_layout.php';
 
+/**
+ * API контроллер для работы с дашбордом
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для дашборда:
+ * - layout: получение макета виджетов пользователя
+ * - save_layout: сохранение макета виджетов пользователя
+ * 
+ * Авторизация проверяется в api/dashboard.php
+ */
 class DashboardController
 {
+    /**
+     * @var DashboardLayoutService Сервис для работы с макетом дашборда
+     */
     private DashboardLayoutService $layoutService;
+    
+    /**
+     * @var int ID текущего пользователя
+     */
     private int $userId;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Инициализирует сервис для работы с макетом дашборда.
+     * Авторизация проверяется в api/dashboard.php.
+     */
     public function __construct()
     {
         // Авторизация проверяется в api/dashboard.php
@@ -25,6 +47,12 @@ class DashboardController
         $this->layoutService = new DashboardLayoutService($pdo, $registry);
     }
 
+    /**
+     * Обрабатывает входящий запрос и направляет его к соответствующему обработчику
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         $action = $request->getQuery('action', 'layout');
@@ -66,6 +94,13 @@ class DashboardController
         }
     }
 
+    /**
+     * Обрабатывает запрос на получение макета виджетов пользователя
+     * 
+     * Возвращает текущий макет виджетов и список доступных виджетов.
+     * 
+     * @return void
+     */
     private function handleLayout(): void
     {
         $layout = $this->layoutService->getUserLayout($this->userId);
@@ -77,6 +112,13 @@ class DashboardController
         ]);
     }
 
+    /**
+     * Обрабатывает запрос на сохранение макета виджетов пользователя
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws RuntimeException Если данные макета некорректны
+     */
     private function handleSaveLayout(Request $request): void
     {
         $payload = $request->getJsonBody();
@@ -91,6 +133,13 @@ class DashboardController
         JsonResponse::success(null, 'Макет сохранён');
     }
 
+    /**
+     * Проверяет, что запрос использует метод POST
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws RuntimeException Если метод не POST
+     */
     private function requirePost(Request $request): void
     {
         if (!$request->isMethod('POST')) {

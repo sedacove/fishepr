@@ -4,8 +4,26 @@ namespace App\Repositories;
 
 use PDO;
 
+/**
+ * Репозиторий для работы с навесками
+ * 
+ * Выполняет SQL запросы к таблице weighings:
+ * - получение списка навесок по бассейну
+ * - поиск навески по ID
+ * - создание, обновление, удаление навесок
+ * - получение сводной информации по навескам
+ */
 class WeighingRepository extends Repository
 {
+    /**
+     * Получает список всех навесок для указанного бассейна
+     * 
+     * Включает информацию о пользователе, создавшем навеску.
+     * Отсортированы по дате (от новых к старым).
+     * 
+     * @param int $poolId ID бассейна
+     * @return array Массив навесок с информацией о пользователе
+     */
     public function listByPool(int $poolId): array
     {
         $stmt = $this->pdo->prepare(
@@ -19,6 +37,14 @@ class WeighingRepository extends Repository
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
+    /**
+     * Находит навеску по ID
+     * 
+     * Включает информацию о пользователе и бассейне.
+     * 
+     * @param int $id ID навески
+     * @return array|null Данные навески или null, если не найдена
+     */
     public function find(int $id): ?array
     {
         $stmt = $this->pdo->prepare(
@@ -33,6 +59,12 @@ class WeighingRepository extends Repository
         return $result ?: null;
     }
 
+    /**
+     * Создает новую навеску
+     * 
+     * @param array $data Данные навески (pool_id, weight, fish_count, recorded_at, created_by)
+     * @return int ID созданной навески
+     */
     public function insert(array $data): int
     {
         $stmt = $this->pdo->prepare(
@@ -48,6 +80,16 @@ class WeighingRepository extends Repository
         return (int)$this->pdo->lastInsertId();
     }
 
+    /**
+     * Обновляет данные навески
+     * 
+     * Динамически формирует SQL запрос на основе переданных данных.
+     * Обновляет только те поля, которые переданы в массиве $data.
+     * 
+     * @param int $id ID навески
+     * @param array $data Ассоциативный массив полей для обновления (column => value)
+     * @return void
+     */
     public function update(int $id, array $data): void
     {
         $columns = [];
@@ -65,12 +107,27 @@ class WeighingRepository extends Repository
         $stmt->execute($params);
     }
 
+    /**
+     * Удаляет навеску
+     * 
+     * @param int $id ID навески для удаления
+     * @return void
+     */
     public function delete(int $id): void
     {
         $stmt = $this->pdo->prepare('DELETE FROM weighings WHERE id = ?');
         $stmt->execute([$id]);
     }
 
+    /**
+     * Получает список навесок для бассейна с определенной даты
+     * 
+     * Используется для построения истории навесок с начала сессии.
+     * 
+     * @param int $poolId ID бассейна
+     * @param string $startDate Дата начала (в формате БД)
+     * @return array Массив навесок, отсортированных по дате (от старых к новым)
+     */
     public function listForPoolSince(int $poolId, string $startDate): array
     {
         $stmt = $this->pdo->prepare(
@@ -84,6 +141,15 @@ class WeighingRepository extends Repository
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
+    /**
+     * Находит последнюю навеску для бассейна с определенной даты
+     * 
+     * Используется для расчета статусов на странице "Работа".
+     * 
+     * @param int $poolId ID бассейна
+     * @param string $startDate Дата начала (в формате БД)
+     * @return array|null Данные последней навески или null, если навесок нет
+     */
     public function findLatestSince(int $poolId, string $startDate): ?array
     {
         $stmt = $this->pdo->prepare(

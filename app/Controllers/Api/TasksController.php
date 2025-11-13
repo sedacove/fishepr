@@ -8,12 +8,45 @@ use App\Support\Request;
 use Exception;
 use PDO;
 
+/**
+ * API контроллер для работы с задачами
+ * 
+ * Обрабатывает HTTP запросы к API endpoints для задач:
+ * - get_users: получение списка активных пользователей
+ * - list: получение списка задач (мои или назначенные мной)
+ * - get: получение одной задачи с подзадачами и файлами
+ * - create: создание новой задачи (только для админов)
+ * - update: обновление задачи (только для админов)
+ * - complete: переключение статуса выполнения задачи
+ * - update_items_order: изменение порядка подзадач
+ * - complete_item: переключение статуса выполнения подзадачи
+ * - delete: удаление задачи (только для админов)
+ * 
+ * Авторизация проверяется в api/tasks.php
+ */
 class TasksController
 {
+    /**
+     * @var TaskService Сервис для работы с задачами
+     */
     private TaskService $service;
+    
+    /**
+     * @var int ID текущего пользователя
+     */
     private int $userId;
+    
+    /**
+     * @var bool Является ли пользователь администратором
+     */
     private bool $isAdmin;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Инициализирует сервис и получает информацию о текущем пользователе.
+     * Авторизация проверяется в api/tasks.php.
+     */
     public function __construct()
     {
         // Авторизация проверяется в api/tasks.php
@@ -23,6 +56,12 @@ class TasksController
         $this->isAdmin = \isAdmin();
     }
 
+    /**
+     * Обрабатывает входящий запрос и направляет его к соответствующему обработчику
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         $action = $request->getQuery('action');
@@ -70,12 +109,23 @@ class TasksController
         }
     }
 
+    /**
+     * Обрабатывает запрос на получение списка активных пользователей
+     * 
+     * @return void
+     */
     private function handleGetUsers(): void
     {
         $users = $this->service->listUsers();
         JsonResponse::success($users);
     }
 
+    /**
+     * Обрабатывает запрос на получение списка задач
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     private function handleList(Request $request): void
     {
         $tab = $request->getQuery('tab', 'my');
@@ -90,6 +140,13 @@ class TasksController
         JsonResponse::success($tasks);
     }
 
+    /**
+     * Обрабатывает запрос на получение одной задачи
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws Exception Если ID задачи не указан
+     */
     private function handleGet(Request $request): void
     {
         $taskId = (int) $request->getQuery('id', 0);
@@ -101,6 +158,15 @@ class TasksController
         JsonResponse::success($data);
     }
 
+    /**
+     * Обрабатывает запрос на создание новой задачи
+     * 
+     * Доступно только администраторам.
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws Exception Если доступ запрещен
+     */
     private function handleCreate(Request $request): void
     {
         if (!$this->isAdmin) {
@@ -111,6 +177,15 @@ class TasksController
         JsonResponse::success(['id' => $taskId], 'Задача успешно создана');
     }
 
+    /**
+     * Обрабатывает запрос на обновление задачи
+     * 
+     * Доступно только администраторам.
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws Exception Если доступ запрещен
+     */
     private function handleUpdate(Request $request): void
     {
         if (!$this->isAdmin) {
@@ -121,6 +196,13 @@ class TasksController
         JsonResponse::success([], 'Задача успешно обновлена');
     }
 
+    /**
+     * Обрабатывает запрос на изменение порядка подзадач
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws Exception Если ID задачи не указан
+     */
     private function handleUpdateItemsOrder(Request $request): void
     {
         $payload = $request->getJsonBody();
@@ -133,6 +215,13 @@ class TasksController
         JsonResponse::success([], 'Порядок элементов обновлен');
     }
 
+    /**
+     * Обрабатывает запрос на переключение статуса выполнения задачи
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws Exception Если ID задачи не указан
+     */
     private function handleCompleteTask(Request $request): void
     {
         $payload = $request->getJsonBody();
@@ -145,6 +234,13 @@ class TasksController
         JsonResponse::success([], $isCompleted ? 'Задача отмечена как выполненная' : 'Задача возвращена в работу');
     }
 
+    /**
+     * Обрабатывает запрос на переключение статуса выполнения подзадачи
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws Exception Если ID подзадачи не указан
+     */
     private function handleCompleteItem(Request $request): void
     {
         $payload = $request->getJsonBody();
@@ -157,6 +253,15 @@ class TasksController
         JsonResponse::success([], $isCompleted ? 'Элемент отмечен как выполненный' : 'Элемент возвращен в работу');
     }
 
+    /**
+     * Обрабатывает запрос на удаление задачи
+     * 
+     * Доступно только администраторам.
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws Exception Если доступ запрещен или ID задачи не указан
+     */
     private function handleDelete(Request $request): void
     {
         if (!$this->isAdmin) {
@@ -171,6 +276,13 @@ class TasksController
         JsonResponse::success([], 'Задача удалена');
     }
 
+    /**
+     * Проверяет, что запрос использует метод POST
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     * @throws Exception Если метод не POST
+     */
     private function requirePost(Request $request): void
     {
         if (!$request->isMethod('POST')) {

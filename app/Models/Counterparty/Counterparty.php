@@ -5,66 +5,95 @@ namespace App\Models\Counterparty;
 use App\Models\Model;
 
 /**
- * Data transfer object that represents a counterparty (customer / buyer).
- *
- * This model is mainly used to pass data from the service layer to controllers
- * and eventually to JSON responses. All properties are strictly typed for
- * clarity; optional fields are nullable.
+ * Модель контрагента
+ * 
+ * DTO (Data Transfer Object) для представления данных контрагента (клиента/покупателя).
+ * Содержит основные свойства контрагента и дополнительную информацию о пользователях и документах.
  */
 class Counterparty extends Model
 {
-    /** Primary identifier */
+    /**
+     * @var int ID контрагента
+     */
     public int $id;
 
-    /** Display name of the counterparty */
+    /**
+     * @var string Название контрагента
+     */
     public string $name;
 
-    /** Optional free-form description */
+    /**
+     * @var string|null Описание контрагента
+     */
     public ?string $description = null;
 
-    /** Normalised tax identifier (10 or 12 digits) */
+    /**
+     * @var string|null ИНН (10 или 12 цифр)
+     */
     public ?string $inn = null;
 
-    /** Phone number in +7XXXXXXXXXX format */
+    /**
+     * @var string|null Номер телефона в формате +7XXXXXXXXXX
+     */
     public ?string $phone = null;
 
-    /** Contact e-mail */
+    /**
+     * @var string|null Email контрагента
+     */
     public ?string $email = null;
 
-    /** Colour marker chosen from the predefined palette */
+    /**
+     * @var string|null Цвет маркера из предопределенной палитры
+     */
     public ?string $color = null;
 
-    /** Author of the record */
+    /**
+     * @var int ID пользователя, создавшего запись
+     */
     public int $created_by;
 
-    /** Last user who updated the record */
+    /**
+     * @var int ID пользователя, последним обновившего запись
+     */
     public int $updated_by;
 
-    /** Creation timestamp (d.m.Y H:i formatted later) */
+    /**
+     * @var string Дата создания (форматируется позже как d.m.Y H:i)
+     */
     public string $created_at;
 
-    /** Last update timestamp */
+    /**
+     * @var string Дата последнего обновления
+     */
     public string $updated_at;
 
-    /** Login of the author */
+    /**
+     * @var string|null Логин пользователя, создавшего запись (из JOIN)
+     */
     public ?string $created_by_login = null;
 
-    /** Full name of the author */
+    /**
+     * @var string|null Полное имя пользователя, создавшего запись (из JOIN)
+     */
     public ?string $created_by_name = null;
 
-    /** Login of the last editor */
+    /**
+     * @var string|null Логин пользователя, последним обновившего запись (из JOIN)
+     */
     public ?string $updated_by_login = null;
 
-    /** Full name of the last editor */
+    /**
+     * @var string|null Полное имя пользователя, последним обновившего запись (из JOIN)
+     */
     public ?string $updated_by_name = null;
 
-    /** Number of attached documents */
+    /**
+     * @var int Количество прикрепленных документов
+     */
     public int $documents_count = 0;
 
     /**
-     * List of attached documents. Filled lazily when detailed information is requested.
-     *
-     * @var CounterpartyDocument[]|null
+     * @var CounterpartyDocument[]|null Список прикрепленных документов (заполняется лениво при запросе детальной информации)
      */
     public ?array $documents = null;
 }

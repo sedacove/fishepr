@@ -36,7 +36,11 @@ class SettingsService
     }
 
     /**
-     * Получить значение настройки по ключу
+     * Получает значение настройки по ключу
+     * 
+     * @param string $key Ключ настройки
+     * @return string Значение настройки
+     * @throws RuntimeException Если настройка не найдена
      */
     public function get(string $key): string
     {
@@ -48,7 +52,13 @@ class SettingsService
     }
 
     /**
-     * Обновить настройку
+     * Обновляет настройку
+     * 
+     * @param string $key Ключ настройки
+     * @param string $value Новое значение настройки
+     * @param int $userId ID пользователя, обновляющего настройку
+     * @return void
+     * @throws RuntimeException Если настройка не найдена
      */
     public function update(string $key, string $value, int $userId): void
     {

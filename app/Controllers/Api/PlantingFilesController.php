@@ -8,10 +8,27 @@ use App\Support\JsonResponse;
 use App\Support\Request;
 use RuntimeException;
 
+/**
+ * API контроллер для загрузки файлов посадок
+ * 
+ * Обрабатывает HTTP запросы для загрузки файлов к посадкам:
+ * - загрузка файлов для посадки (multipart/form-data)
+ * 
+ * Доступен только администраторам.
+ */
 class PlantingFilesController
 {
+    /**
+     * @var PlantingService Сервис для работы с посадками
+     */
     private PlantingService $service;
 
+    /**
+     * Конструктор контроллера
+     * 
+     * Проверяет авторизацию и права администратора.
+     * Инициализирует сервис для работы с посадками.
+     */
     public function __construct()
     {
         \requireAuth();
@@ -19,6 +36,16 @@ class PlantingFilesController
         $this->service = new PlantingService(\getDBConnection());
     }
 
+    /**
+     * Обрабатывает запрос на загрузку файлов для посадки
+     * 
+     * Принимает multipart/form-data с полями:
+     * - planting_id: ID посадки
+     * - files: массив файлов
+     * 
+     * @param Request $request Объект запроса
+     * @return void
+     */
     public function handle(Request $request): void
     {
         if ($request->getMethod() !== 'POST') {

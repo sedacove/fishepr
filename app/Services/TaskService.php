@@ -10,14 +10,48 @@ use PDO;
 use RuntimeException;
 use DomainException;
 
+/**
+ * Сервис для работы с задачами
+ * 
+ * Содержит бизнес-логику для работы с задачами:
+ * - валидация данных
+ * - проверка прав доступа
+ * - управление подзадачами и файлами
+ * - логирование действий
+ * - форматирование данных для отображения
+ */
 class TaskService
 {
+    /**
+     * @var TaskRepository Репозиторий для работы с задачами
+     */
     private TaskRepository $tasks;
+    
+    /**
+     * @var TaskItemRepository Репозиторий для работы с подзадачами
+     */
     private TaskItemRepository $items;
+    
+    /**
+     * @var TaskFileRepository Репозиторий для работы с файлами задач
+     */
     private TaskFileRepository $files;
+    
+    /**
+     * @var UserRepository Репозиторий для работы с пользователями
+     */
     private UserRepository $users;
+    
+    /**
+     * @var PDO Подключение к базе данных
+     */
     private PDO $pdo;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
@@ -27,6 +61,18 @@ class TaskService
         $this->users = new UserRepository($pdo);
     }
 
+    /**
+     * Получает список задач в зависимости от вкладки
+     * 
+     * - 'assigned': задачи, назначенные пользователем (только для админов)
+     * - другие: задачи, назначенные на пользователя
+     * 
+     * @param string $tab Вкладка ('assigned' или другие)
+     * @param int $userId ID текущего пользователя
+     * @param bool $isAdmin Является ли пользователь администратором
+     * @return array Массив задач
+     * @throws DomainException Если доступ запрещен
+     */
     public function listTasks(string $tab, int $userId, bool $isAdmin): array
     {
         if ($tab === 'assigned') {
@@ -39,6 +85,20 @@ class TaskService
         return $this->tasks->getTasksAssignedTo($userId);
     }
 
+    /**
+     * Получает полную информацию о задаче, включая подзадачи и файлы
+     * 
+     * Права доступа:
+     * - пользователь может просматривать задачи, назначенные на него
+     * - администратор может просматривать задачи, созданные им
+     * 
+     * @param int $taskId ID задачи
+     * @param int $userId ID текущего пользователя
+     * @param bool $isAdmin Является ли пользователь администратором
+     * @return array Массив с ключами 'task', 'items' (подзадачи), 'files' (файлы)
+     * @throws RuntimeException Если задача не найдена
+     * @throws DomainException Если доступ запрещен
+     */
     public function getTask(int $taskId, int $userId, bool $isAdmin): array
     {
         $task = $this->tasks->findById($taskId);
@@ -69,11 +129,30 @@ class TaskService
         ];
     }
 
+    /**
+     * Получает список активных пользователей
+     * 
+     * Используется для выпадающих списков при назначении задач.
+     * 
+     * @return array Массив пользователей (id, login, full_name)
+     */
     public function listUsers(): array
     {
         return $this->users->getActiveUsers();
     }
 
+    /**
+     * Создает новую задачу
+     * 
+     * Валидация:
+     * - название задачи обязательно
+     * - пользователь, на которого назначается задача, должен быть указан и существовать
+     * 
+     * @param array $payload Данные задачи (title, assigned_to, description, due_date, items, files)
+     * @param int $userId ID пользователя, создающего задачу
+     * @return int ID созданной задачи
+     * @throws DomainException Если данные некорректны
+     */
     public function createTask(array $payload, int $userId): int
     {
         $title = trim($payload['title'] ?? '');

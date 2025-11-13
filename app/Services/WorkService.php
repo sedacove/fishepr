@@ -16,23 +16,90 @@ use PDO;
 
 require_once __DIR__ . '/../../includes/settings.php';
 
+/**
+ * Сервис для работы со страницей "Работа"
+ * 
+ * Содержит бизнес-логику для агрегации данных по бассейнам:
+ * - получение списка активных бассейнов с их статусами
+ * - расчет статусов измерений (температура, кислород)
+ * - расчет статусов навесок и отборов
+ * - расчет статусов смертности
+ * - агрегация данных по сессиям
+ */
 class WorkService
 {
+    /**
+     * @var PoolRepository Репозиторий для работы с бассейнами
+     */
     private PoolRepository $pools;
+    
+    /**
+     * @var SessionRepository Репозиторий для работы с сессиями
+     */
     private SessionRepository $sessions;
+    
+    /**
+     * @var MeasurementRepository Репозиторий для работы с измерениями
+     */
     private MeasurementRepository $measurements;
+    
+    /**
+     * @var MortalityRepository Репозиторий для работы со смертностью
+     */
     private MortalityRepository $mortality;
+    
+    /**
+     * @var HarvestRepository Репозиторий для работы с отборами
+     */
     private HarvestRepository $harvests;
+    
+    /**
+     * @var WeighingRepository Репозиторий для работы с навесками
+     */
     private WeighingRepository $weighings;
 
+    /**
+     * @var array Настройки температуры (bad_below, acceptable_min, good_min, good_max, acceptable_max, bad_above)
+     */
     private array $temperatureSettings;
+    
+    /**
+     * @var array Настройки кислорода (bad_below, acceptable_min, good_min, good_max, acceptable_max, bad_above)
+     */
     private array $oxygenSettings;
+    
+    /**
+     * @var int Тайм-аут предупреждения для измерений (в минутах)
+     */
     private int $measurementWarningMinutes;
+    
+    /**
+     * @var int Тайм-аут предупреждения для навесок (в минутах)
+     */
     private int $weighingWarningMinutes;
+    
+    /**
+     * @var int Период расчета смертности (в часах)
+     */
     private int $mortalityHours;
+    
+    /**
+     * @var int Порог смертности для зеленого статуса
+     */
     private int $mortalityThresholdGreen;
+    
+    /**
+     * @var int Порог смертности для желтого статуса
+     */
     private int $mortalityThresholdYellow;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * Инициализирует репозитории и загружает настройки из системы.
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->pools = new PoolRepository($pdo);
@@ -68,6 +135,17 @@ class WorkService
         $this->mortalityThresholdYellow = \getSettingInt('mortality_threshold_yellow', 10);
     }
 
+    /**
+     * Получает список активных бассейнов с их статусами
+     * 
+     * Для каждого бассейна рассчитывает:
+     * - статус измерений (температура, кислород)
+     * - статус навесок и отборов
+     * - статус смертности
+     * - информацию об активной сессии
+     * 
+     * @return array Массив бассейнов с расчетными статусами
+     */
     public function getPools(): array
     {
         $pools = $this->pools->listActive();

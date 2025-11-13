@@ -8,13 +8,34 @@ require_once __DIR__ . '/../../includes/duty_helpers.php';
 use App\Services\DashboardLayoutService;
 use App\Services\DashboardWidgetRegistry;
 
+/**
+ * Контроллер главной страницы (дашборда)
+ * 
+ * Отвечает за отображение главной страницы с виджетами:
+ * - загрузка макета виджетов пользователя
+ * - подготовка данных для виджетов
+ * - рендеринг страницы дашборда
+ */
 class DashboardController extends Controller
 {
+    /**
+     * Конструктор контроллера
+     * 
+     * Проверяет авторизацию пользователя
+     */
     public function __construct()
     {
         requireAuth();
     }
 
+    /**
+     * Отображает главную страницу с виджетами
+     * 
+     * Загружает макет виджетов пользователя, доступные виджеты,
+     * настраивает диапазон дат для виджета дежурств и рендерит страницу.
+     * 
+     * @return string HTML содержимое страницы дашборда
+     */
     public function index(): string
     {
         $pdo = getDBConnection();

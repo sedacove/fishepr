@@ -10,17 +10,36 @@ use RuntimeException;
 
 require_once __DIR__ . '/../../includes/activity_log.php';
 
+/**
+ * Сервис для работы с бассейнами
+ * 
+ * Содержит бизнес-логику для работы с бассейнами:
+ * - валидация данных
+ * - управление порядком сортировки
+ * - логирование действий
+ * - форматирование данных для отображения
+ */
 class PoolService
 {
+    /**
+     * @var PoolRepository Репозиторий для работы с бассейнами
+     */
     private PoolRepository $pools;
 
+    /**
+     * Конструктор сервиса
+     * 
+     * @param PDO $pdo Подключение к базе данных
+     */
     public function __construct(PDO $pdo)
     {
         $this->pools = new PoolRepository($pdo);
     }
 
     /**
-     * @return array<int,array<string,mixed>>
+     * Получает список всех бассейнов
+     * 
+     * @return array<int,array<string,mixed>> Массив бассейнов с форматированными датами
      */
     public function list(): array
     {
@@ -34,6 +53,13 @@ class PoolService
         }, $items);
     }
 
+    /**
+     * Получает бассейн по ID
+     * 
+     * @param int $id ID бассейна
+     * @return array Данные бассейна
+     * @throws RuntimeException Если бассейн не найден
+     */
     public function get(int $id): array
     {
         $pool = $this->pools->find($id);
@@ -43,6 +69,19 @@ class PoolService
         return $pool->toArray();
     }
 
+    /**
+     * Создает новый бассейн
+     * 
+     * Валидация:
+     * - название бассейна обязательно
+     * 
+     * Автоматически назначает порядок сортировки (максимальный + 1).
+     * 
+     * @param array $payload Данные бассейна (name)
+     * @param int $userId ID пользователя, создающего бассейн
+     * @return int ID созданного бассейна
+     * @throws ValidationException Если название не указано
+     */
     public function create(array $payload, int $userId): int
     {
         $name = $this->validateName($payload['name'] ?? null);
@@ -57,6 +96,19 @@ class PoolService
         return $poolId;
     }
 
+    /**
+     * Обновляет данные бассейна
+     * 
+     * Валидация:
+     * - ID бассейна должен быть указан
+     * - название бассейна обязательно (если передано)
+     * 
+     * @param int $id ID бассейна
+     * @param array $payload Данные для обновления (name)
+     * @return void
+     * @throws ValidationException Если данные некорректны
+     * @throws RuntimeException Если бассейн не найден
+     */
     public function update(int $id, array $payload): void
     {
         $pool = $this->pools->find($id);
@@ -92,6 +144,13 @@ class PoolService
         \logActivity('update', 'pool', $id, "Обновлен бассейн: {$pool->name}", $changes);
     }
 
+    /**
+     * Удаляет бассейн
+     * 
+     * @param int $id ID бассейна для удаления
+     * @return void
+     * @throws RuntimeException Если бассейн не найден
+     */
     public function delete(int $id): void
     {
         $pool = $this->pools->find($id);
@@ -108,6 +167,15 @@ class PoolService
         ]);
     }
 
+    /**
+     * Изменяет порядок сортировки бассейнов
+     * 
+     * Обновляет порядок сортировки бассейнов в соответствии с порядком ID в массиве.
+     * Используется для drag-and-drop сортировки на странице управления бассейнами.
+     * 
+     * @param array $ids Массив ID бассейнов в новом порядке
+     * @return void
+     */
     public function reorder(array $ids): void
     {
         if (empty($ids)) {
