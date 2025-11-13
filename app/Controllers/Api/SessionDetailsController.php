@@ -22,6 +22,9 @@ class SessionDetailsController
     {
         try {
             $sessionId = (int)$request->getQuery('id', 0);
+            if ($sessionId <= 0) {
+                throw new ValidationException('id', 'ID сессии не указан', 400);
+            }
             $data = $this->service->getDetails($sessionId);
             JsonResponse::success($data);
         } catch (ValidationException $e) {
@@ -29,11 +32,27 @@ class SessionDetailsController
                 'success' => false,
                 'message' => $e->getMessage(),
                 'field' => $e->getField(),
-            ], $e->getCode() ?: 422);
+            ], (int)($e->getCode() ?: 422));
         } catch (RuntimeException $e) {
-            JsonResponse::error($e->getMessage(), $e->getCode() ?: 404);
+            $status = (int)($e->getCode() ?: 404);
+            JsonResponse::error($e->getMessage(), $status);
         } catch (\Throwable $e) {
-            JsonResponse::error('Внутренняя ошибка сервера', 500);
+            $status = (int)($e->getCode() ?: 500);
+            
+            // В режиме разработки показываем детали ошибки
+            $isDev = ($_SERVER['HTTP_HOST'] ?? '') === 'localhost' || strpos($_SERVER['HTTP_HOST'] ?? '', '127.0.0.1') !== false;
+            
+            if ($status >= 500) {
+                $message = $isDev 
+                    ? $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
+                    : 'Внутренняя ошибка сервера';
+            } else {
+                $message = $e->getMessage();
+            }
+            
+            error_log("Error in SessionDetailsController::handle(): " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine() . "\n" . $e->getTraceAsString());
+            
+            JsonResponse::error($message, $status);
         }
     }
 }

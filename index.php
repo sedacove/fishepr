@@ -41,6 +41,8 @@ $router->get('/sessions', 'SessionsController@index');
 $router->get('/sessions.php', 'SessionsController@index');
 $router->get('/users', 'UsersController@index');
 $router->get('/users.php', 'UsersController@index');
+$router->get('/settings', 'SettingsController@index');
+$router->get('/settings.php', 'SettingsController@index');
 
 try {
     $response = $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
@@ -56,12 +58,27 @@ try {
     echo $httpException->getMessage() ?: 'Ошибка';
 } catch (Throwable $exception) {
     http_response_code(500);
+    
+    // Логируем ошибку
+    error_log("Unhandled exception in index.php: " . $exception->getMessage() . " in " . $exception->getFile() . ":" . $exception->getLine() . "\n" . $exception->getTraceAsString());
+    
     if (function_exists('logMessage')) {
         logMessage('error', 'Unhandled exception on front controller', [
             'message' => $exception->getMessage(),
             'trace' => $exception->getTraceAsString(),
         ]);
     }
-    echo 'Произошла внутренняя ошибка сервера.';
+    
+    // В режиме разработки показываем детали ошибки
+    $isDev = ($_SERVER['HTTP_HOST'] ?? '') === 'localhost' || strpos($_SERVER['HTTP_HOST'] ?? '', '127.0.0.1') !== false;
+    
+    if ($isDev) {
+        echo '<h1>Внутренняя ошибка сервера</h1>';
+        echo '<pre>';
+        echo htmlspecialchars($exception->getMessage() . "\n\n" . $exception->getFile() . ':' . $exception->getLine() . "\n\n" . $exception->getTraceAsString());
+        echo '</pre>';
+    } else {
+        echo 'Произошла внутренняя ошибка сервера.';
+    }
 }
 

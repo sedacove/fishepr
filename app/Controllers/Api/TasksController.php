@@ -16,6 +16,7 @@ class TasksController
 
     public function __construct()
     {
+        // Авторизация проверяется в api/tasks.php
         $pdo = \getDBConnection();
         $this->service = new TaskService($pdo);
         $this->userId = \getCurrentUserId();

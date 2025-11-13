@@ -82,7 +82,22 @@ class WeighingsController
             $status = $e->getCode() ?: 404;
             JsonResponse::error($e->getMessage(), $status);
         } catch (\Throwable $e) {
-            JsonResponse::error('Внутренняя ошибка сервера', 500);
+            $status = $e->getCode() ?: 500;
+            
+            // В режиме разработки показываем детали ошибки
+            $isDev = ($_SERVER['HTTP_HOST'] ?? '') === 'localhost' || strpos($_SERVER['HTTP_HOST'] ?? '', '127.0.0.1') !== false;
+            
+            if ($status >= 500) {
+                $message = $isDev 
+                    ? $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
+                    : 'Внутренняя ошибка сервера';
+            } else {
+                $message = $e->getMessage();
+            }
+            
+            error_log("Error in WeighingsController::handle(): " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine() . "\n" . $e->getTraceAsString());
+            
+            JsonResponse::error($message, $status);
         }
     }
 

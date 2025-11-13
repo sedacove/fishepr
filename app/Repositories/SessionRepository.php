@@ -205,6 +205,39 @@ class SessionRepository extends Repository
 
         return $row ?: null;
     }
+
+    /**
+     * Найти сессию со всеми связанными данными для детальной страницы
+     * @return array|null
+     */
+    public function findWithRelations(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT s.*,
+                    p.name AS pool_name,
+                    p.id AS pool_id,
+                    pl.name AS planting_name,
+                    pl.fish_breed AS planting_fish_breed,
+                    pl.hatch_date AS hatch_date,
+                    pl.planting_date AS planting_planting_date,
+                    pl.fish_count AS planting_quantity,
+                    pl.biomass_weight AS planting_biomass_weight,
+                    pl.supplier AS supplier,
+                    pl.price AS planting_price,
+                    pl.delivery_cost AS delivery_cost,
+                    u.login AS created_by_login,
+                    u.full_name AS created_by_name
+             FROM sessions s
+             LEFT JOIN pools p ON p.id = s.pool_id
+             LEFT JOIN plantings pl ON pl.id = s.planting_id
+             LEFT JOIN users u ON u.id = s.created_by
+             WHERE s.id = ?'
+        );
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ?: null;
+    }
 }
 
 

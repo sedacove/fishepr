@@ -1,23 +1,32 @@
 <?php
 
-header('Content-Type: application/json');
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
-require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/activity_log.php';
-require_once __DIR__ . '/../includes/settings.php';
-require_once __DIR__ . '/../app/Support/Autoloader.php';
-
-requireAuth();
-
-$autoloader = new App\Support\Autoloader();
-$autoloader->addNamespace('App', __DIR__ . '/../app');
-$autoloader->register();
+require_once __DIR__ . '/_bootstrap.php';
 
 use App\Controllers\Api\MeterReadingsController;
 use App\Support\Request;
 
-$request = Request::fromGlobals();
-$controller = new MeterReadingsController();
-$controller->handle($request);
+try {
+    $request = Request::fromGlobals();
+    $controller = new MeterReadingsController();
+    $controller->handle($request);
+} catch (Throwable $e) {
+    http_response_code(500);
+    $errorMessage = 'Внутренняя ошибка сервера';
+    $errorDetails = $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine();
+    
+    error_log("Error in api/meter_readings.php: " . $errorDetails . "\n" . $e->getTraceAsString());
+    
+    // В режиме разработки показываем детали ошибки
+    $isDev = ($_SERVER['HTTP_HOST'] ?? '') === 'localhost' || strpos($_SERVER['HTTP_HOST'] ?? '', '127.0.0.1') !== false;
+    
+    echo json_encode([
+        'success' => false,
+        'message' => $isDev ? $errorDetails : $errorMessage,
+        'trace' => $isDev ? $e->getTraceAsString() : null
+    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+}
 

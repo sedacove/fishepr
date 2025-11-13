@@ -17,6 +17,7 @@ class MetersController
 
     public function __construct()
     {
+        // Авторизация проверяется в api/meters.php
         $pdo = \getDBConnection();
         $this->service = new MeterService($pdo);
         $this->userId = \getCurrentUserId();

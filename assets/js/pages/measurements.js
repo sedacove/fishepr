@@ -86,8 +86,8 @@
                             type="button"
                             role="tab"
                             ${hasSession ? '' : 'disabled'}
-                            title="${hasSession ? `${escapeHtml(pool.name)}: ${escapeHtml(pool.active_session.session_name)}` : 'Нет активной сессии'}">
-                        ${hasSession ? `${escapeHtml(pool.name)}: ${escapeHtml(pool.active_session.session_name)}` : '<i class="bi bi-x-circle text-muted"></i>'}
+                            title="${hasSession ? `${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}: ${escapeHtml(pool.active_session.session_name)}` : escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`) + ' (Нет активной сессии)'}">
+                        ${hasSession ? `${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}: ${escapeHtml(pool.active_session.session_name)}` : `${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)} <i class="bi bi-x-circle text-muted"></i>`}
                     </button>
                 </li>
             `;
@@ -100,7 +100,7 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                                 <h5 class="mb-0">
-                                    Замеры для бассейна "${escapeHtml(pool.name)}"
+                                    Замеры для бассейна "${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}"
                                     ${hasSession ? `<small class="text-muted">(Сессия: ${escapeHtml(pool.active_session.session_name)})</small>` : '<small class="text-muted">(Нет активной сессии)</small>'}
                                 </h5>
                                 <button type="button" class="btn btn-sm btn-primary" onclick="openAddModal(${pool.id})">
@@ -280,7 +280,7 @@
         select.empty().append('<option value="">Выберите бассейн</option>');
         poolsList.forEach(function(pool) {
             const selected = poolId && pool.id === poolId ? 'selected' : '';
-            select.append(`<option value="${pool.id}" ${selected}>${escapeHtml(pool.name)}</option>`);
+            select.append(`<option value="${pool.id}" ${selected}>${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}</option>`);
         });
 
         if (isAdmin) {
@@ -319,7 +319,7 @@
                     select.empty().append('<option value="">Выберите бассейн</option>');
                     poolsList.forEach(function(pool) {
                         const selected = pool.id === measurement.pool_id ? 'selected' : '';
-                        select.append(`<option value="${pool.id}" ${selected}>${escapeHtml(pool.name)}</option>`);
+                        select.append(`<option value="${pool.id}" ${selected}>${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}</option>`);
                     });
 
                     $('#measurementPool').val(measurement.pool_id || '');

@@ -36,6 +36,24 @@ class PoolRepository extends Repository
         return $row ? new Pool($row) : null;
     }
 
+    /**
+     * Найти активный бассейн по ID
+     * @return array|null
+     */
+    public function findActive(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT p.*, u.login AS created_by_login, u.full_name AS created_by_name
+             FROM pools p
+             LEFT JOIN users u ON u.id = p.created_by
+             WHERE p.id = ? AND p.is_active = 1'
+        );
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ?: null;
+    }
+
     public function create(string $name, int $sortOrder, int $userId): int
     {
         $stmt = $this->pdo->prepare(
@@ -141,6 +159,7 @@ class PoolRepository extends Repository
                     $processed[$poolId]['active_session'] = [
                         'id' => (int)$row['active_session_id'],
                         'name' => $row['active_session_name'],
+                        'session_name' => $row['active_session_name'], // Для совместимости с фронтендом
                         'start_date' => $row['active_session_start_date'],
                     ];
                 }

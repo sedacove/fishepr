@@ -17,6 +17,7 @@ class NewsController
 
     public function __construct()
     {
+        // Авторизация проверяется в api/news.php
         $pdo = \getDBConnection();
         $this->service = new NewsService($pdo);
         $this->userId = \getCurrentUserId();

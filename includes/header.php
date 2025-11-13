@@ -76,6 +76,13 @@ if (!isset($page_title)) {
         })();
     </script>
     
+    <!-- Определяем BASE_URL для JavaScript -->
+    <script>
+        if (typeof window.BASE_URL === 'undefined') {
+            window.BASE_URL = <?php echo json_encode(BASE_URL, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>;
+        }
+    </script>
+    
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -231,7 +238,7 @@ if (!isset($page_title)) {
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pages/settings.php">
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>settings">
                                     <i class="bi bi-sliders"></i> Настройки
                                 </a>
                             </li>
