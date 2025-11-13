@@ -130,7 +130,7 @@ if (!isset($page_title)) {
     <?php if (isLoggedIn()): ?>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="<?php echo BASE_URL; ?>index.php">
+            <a class="navbar-brand" href="<?php echo BASE_URL; ?>">
                 <img src="<?php echo BASE_URL; ?>assets/images/logo.png" alt="ERP Система" class="navbar-logo">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -139,7 +139,7 @@ if (!isset($page_title)) {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>index.php" title="Дашборд">
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>" title="Дашборд">
                             <i class="bi bi-speedometer2"></i>
                         </a>
                     </li>
