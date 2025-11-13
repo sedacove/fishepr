@@ -779,7 +779,7 @@ function renderMyTasks(tasks, container) {
         const progress = task.items_count > 0 ? Math.round((task.items_completed_count / task.items_count) * 100) : 0;
 
         html += `
-            <div class="dashboard-task-item" onclick="window.location.href='${baseUrl}pages/tasks.php'">
+            <div class="dashboard-task-item" onclick="window.location.href='${baseUrl}tasks'">
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" ${task.is_completed ? 'checked' : ''}
                            onclick="event.stopPropagation(); toggleTaskComplete(${task.id}, this.checked);">

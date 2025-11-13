@@ -172,25 +172,25 @@ if (!isset($page_title)) {
                         <a class="nav-link" href="<?php echo BASE_URL; ?>tasks">Задачи</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/duty_calendar.php">
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>duty-calendar">
                             Календарь
                         </a>
                     </li>
                     <?php if (isAdmin()): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/payroll.php">
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>payroll">
                             ФЗП
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/finances.php">
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>finances">
                             Финансы
                         </a>
                     </li>
                     <?php endif; ?>
                     <?php if (isAdmin()): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>pages/logs.php">Логи</a>
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>logs">Логи</a>
                     </li>
                     <?php endif; ?>
                 </ul>
