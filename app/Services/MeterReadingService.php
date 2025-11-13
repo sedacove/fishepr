@@ -84,7 +84,17 @@ class MeterReadingService
             throw new DomainException('Вы не можете редактировать это показание');
         }
 
-        $recordedAt = $isAdmin ? $this->resolveRecordedAt($payload['recorded_at'] ?? null, true, $reading['recorded_at']) : null;
+        // Для админа: если передана новая дата, обновляем её, иначе оставляем старую
+        $recordedAt = null;
+        if ($isAdmin) {
+            if (isset($payload['recorded_at']) && $payload['recorded_at'] !== null && $payload['recorded_at'] !== '') {
+                // Передана новая дата - обновляем
+                $recordedAt = $this->resolveRecordedAt($payload['recorded_at'], true);
+            } else {
+                // Дата не передана - оставляем старую
+                $recordedAt = $reading['recorded_at'];
+            }
+        }
 
         $this->readings->updateValue($id, $value, $recordedAt);
 
@@ -171,6 +181,53 @@ class MeterReadingService
             return max(0, (int)\getSettingInt('meter_reading_edit_timeout_minutes', 30));
         }
         return 30;
+    }
+
+    public function getWidgetData(int $meterId): array
+    {
+        $this->ensureMeterExists($meterId);
+        $meter = $this->meters->find($meterId);
+        $data = $this->readings->getLast30DaysWithConsumption($meterId);
+        
+        return [
+            'meter' => [
+                'id' => $meter['id'],
+                'name' => $meter['name'],
+            ],
+            'data' => $data,
+        ];
+    }
+
+    public function getAllMeters(): array
+    {
+        // Получаем все приборы
+        $allMeters = $this->meters->listPublic();
+        
+        // Фильтруем: оставляем только те, у которых есть показания за последние 14 дней
+        $metersWithData = [];
+        foreach ($allMeters as $meter) {
+            $meterId = (int)$meter['id'];
+            $readings = $this->readings->getLast30DaysWithConsumption($meterId);
+            
+            // Проверяем, есть ли данные за последние 14 дней
+            $hasRecentData = false;
+            $cutoffDate = new \DateTime();
+            $cutoffDate->modify('-14 days');
+            
+            foreach ($readings as $reading) {
+                $readingDate = new \DateTime($reading['date']);
+                if ($readingDate >= $cutoffDate) {
+                    $hasRecentData = true;
+                    break;
+                }
+            }
+            
+            if ($hasRecentData) {
+                $metersWithData[] = $meter;
+            }
+        }
+        
+        return $metersWithData;
     }
 
     private function ensureMeterExists(int $meterId): void

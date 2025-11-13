@@ -46,6 +46,11 @@
         },
         mode: 'count'
     };
+    const metersChartState = {
+        meters: [],
+        currentMeterIndex: 0,
+        data: []
+    };
     let tasksContainerEl = null;
     let latestNewsContainerEl = null;
     let latestNewsTitleEl = null;
@@ -179,6 +184,16 @@ function getWidgetPlaceholder(widgetKey) {
         `;
     }
 
+    if (widgetKey === 'meters_chart') {
+        return `
+            <div class="text-center py-3 text-muted">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+        `;
+    }
+
     return `
         <div class="text-center py-3">
             <div class="spinner-border spinner-border-sm text-primary" role="status">
@@ -223,6 +238,10 @@ function initializeWidgetContent(widgetKey) {
         }
         case 'oxygen_chart': {
             loadOxygenChart(body);
+            break;
+        }
+        case 'meters_chart': {
+            loadMetersChart(body);
             break;
         }
         default:
@@ -657,7 +676,12 @@ function renderDutyWeek(entries, container) {
         current.setDate(startDate.getDate() + i);
         const iso = current.toISOString().split('T')[0];
         const entry = map[iso] || null;
-        const dutyName = entry ? (entry.user_full_name || entry.user_login || '—') : '—';
+        let dutyName = entry ? (entry.user_full_name || entry.user_login || '—') : '—';
+        // Ограничиваем имя первыми двумя словами
+        if (dutyName && dutyName !== '—') {
+            const words = dutyName.trim().split(/\s+/);
+            dutyName = words.slice(0, 2).join(' ');
+        }
         const fasting = entry ? !!entry.is_fasting : false;
         const weekday = weekDayNames[current.getDay()];
         const dateNumber = current.getDate();
@@ -1475,6 +1499,223 @@ function formatTaskDate(dateString) {
         return `Просрочено на ${Math.abs(diffDays)} ${getDaysText(Math.abs(diffDays))}`;
     } else {
         return `Через ${diffDays} ${getDaysText(diffDays)}`;
+    }
+}
+
+function loadMetersChart(container) {
+    if (!container) return;
+    container.innerHTML = `
+        <div class="text-center py-3 text-muted">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+        </div>
+    `;
+
+    // Сначала загружаем список приборов
+    fetch(`${baseUrl}api/meter_readings.php?action=widget_meters`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+                metersChartState.meters = data.data;
+                metersChartState.currentMeterIndex = 0;
+                loadMeterData(container);
+            } else {
+                container.innerHTML = '<p class="text-muted mb-0">Нет доступных приборов учета</p>';
+            }
+        })
+        .catch(() => {
+            container.innerHTML = '<p class="text-danger mb-0">Ошибка при загрузке приборов</p>';
+        });
+}
+
+function loadMeterData(container) {
+    if (!container) return;
+    const meters = metersChartState.meters;
+    const currentIndex = metersChartState.currentMeterIndex;
+    
+    if (meters.length === 0 || currentIndex < 0 || currentIndex >= meters.length) {
+        container.innerHTML = '<p class="text-muted mb-0">Нет доступных приборов учета</p>';
+        return;
+    }
+
+    const currentMeter = meters[currentIndex];
+    
+    container.innerHTML = `
+        <div class="text-center py-3 text-muted">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+        </div>
+    `;
+
+    fetch(`${baseUrl}api/meter_readings.php?action=widget_data&meter_id=${currentMeter.id}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                metersChartState.data = Array.isArray(data.data.data) ? data.data.data : [];
+                renderMetersChart(container);
+            } else {
+                container.innerHTML = '<p class="text-danger mb-0">Не удалось загрузить данные</p>';
+            }
+        })
+        .catch(() => {
+            container.innerHTML = '<p class="text-danger mb-0">Ошибка при загрузке данных</p>';
+        });
+}
+
+function renderMetersChart(container) {
+    if (!container) return;
+    if (dashboardCharts.meters_chart) {
+        dashboardCharts.meters_chart.destroy();
+        dashboardCharts.meters_chart = null;
+    }
+
+    const meters = metersChartState.meters;
+    const currentIndex = metersChartState.currentMeterIndex;
+    const data = Array.isArray(metersChartState.data) ? metersChartState.data : [];
+    
+    if (meters.length === 0) {
+        container.innerHTML = '<p class="text-muted mb-0">Нет доступных приборов учета</p>';
+        return;
+    }
+
+    const currentMeter = meters[currentIndex];
+    const canGoPrev = currentIndex > 0;
+    const canGoNext = currentIndex < meters.length - 1;
+
+    // Фильтруем данные, оставляя только те, где есть расход
+    const chartData = data.filter(item => item.consumption !== null && item.consumption !== undefined);
+    const labels = chartData.map(item => item.date_label);
+    const values = chartData.map(item => {
+        const consumption = typeof item.consumption === 'number' ? item.consumption : 0;
+        return Math.max(0, consumption);
+    });
+
+    if (labels.length === 0) {
+        container.innerHTML = `
+            <div class="position-relative">
+                <div class="d-flex justify-content-end mb-2">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary" ${!canGoPrev ? 'disabled' : ''} data-action="prev-meter" title="Предыдущий прибор">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" disabled style="min-width: 120px; pointer-events: none;">
+                            <small>${escapeHtml(currentMeter.name || `Прибор ${currentMeter.id}`)}</small>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" ${!canGoNext ? 'disabled' : ''} data-action="next-meter" title="Следующий прибор">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <p class="text-muted mb-0">Недостаточно данных для построения графика</p>
+            </div>
+        `;
+        
+        attachMeterNavigationHandlers(container);
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="position-relative">
+            <div class="d-flex justify-content-end mb-2">
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-secondary" ${!canGoPrev ? 'disabled' : ''} data-action="prev-meter" title="Предыдущий прибор">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" disabled style="min-width: 120px; pointer-events: none;">
+                        <small>${escapeHtml(currentMeter.name || `Прибор ${currentMeter.id}`)}</small>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" ${!canGoNext ? 'disabled' : ''} data-action="next-meter" title="Следующий прибор">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="position-relative" style="height: 220px;">
+                <canvas id="metersChartCanvas"></canvas>
+            </div>
+        </div>
+    `;
+
+    attachMeterNavigationHandlers(container);
+
+    const canvas = container.querySelector('#metersChartCanvas');
+    if (!canvas) {
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+
+    dashboardCharts.meters_chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Расход',
+                data: values,
+                backgroundColor: '#ffc107',
+                borderColor: '#ffc107',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return formatNumericValue(value, {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 2
+                            });
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context && context.parsed && typeof context.parsed.y !== 'undefined'
+                                ? context.parsed.y
+                                : 0;
+                            return ` Расход: ${formatNumericValue(value, {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 2
+                            })}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function attachMeterNavigationHandlers(container) {
+    const prevBtn = container.querySelector('[data-action="prev-meter"]');
+    const nextBtn = container.querySelector('[data-action="next-meter"]');
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function() {
+            if (metersChartState.currentMeterIndex > 0) {
+                metersChartState.currentMeterIndex--;
+                loadMeterData(container);
+            }
+        });
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function() {
+            if (metersChartState.currentMeterIndex < metersChartState.meters.length - 1) {
+                metersChartState.currentMeterIndex++;
+                loadMeterData(container);
+            }
+        });
     }
 }
 

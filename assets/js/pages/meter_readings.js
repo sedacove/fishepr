@@ -259,9 +259,8 @@
         const recordedAtInput = $('#readingRecordedAt');
         if (recordedAtInput.length) {
             const recordedAtValue = recordedAtInput.val();
-            if (recordedAtValue) {
-                payload.recorded_at = recordedAtValue;
-            }
+            // Всегда передаем recorded_at, даже если пустое, чтобы сервер мог обработать
+            payload.recorded_at = recordedAtValue || null;
         }
 
         const action = readingId ? 'update' : 'create';

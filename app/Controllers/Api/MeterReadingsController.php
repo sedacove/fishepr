@@ -48,6 +48,12 @@ class MeterReadingsController
                     $this->requirePost($request);
                     $this->handleDelete($request);
                     break;
+                case 'widget_data':
+                    $this->handleWidgetData($request);
+                    break;
+                case 'widget_meters':
+                    $this->handleWidgetMeters($request);
+                    break;
                 default:
                     throw new Exception('Неизвестное действие');
             }
@@ -101,6 +107,22 @@ class MeterReadingsController
         }
         $this->service->deleteReading($id, $this->userId, $this->isAdmin);
         JsonResponse::success([], 'Показание удалено');
+    }
+
+    private function handleWidgetData(Request $request): void
+    {
+        $meterId = (int)$request->getQuery('meter_id', 0);
+        if ($meterId <= 0) {
+            throw new DomainException('ID прибора не указан');
+        }
+        $data = $this->service->getWidgetData($meterId);
+        JsonResponse::success($data);
+    }
+
+    private function handleWidgetMeters(Request $request): void
+    {
+        $meters = $this->service->getAllMeters();
+        JsonResponse::success($meters);
     }
 
     private function requirePost(Request $request): void
