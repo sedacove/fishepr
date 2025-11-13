@@ -38,6 +38,7 @@ $saveFunction = $saveFunction ?? 'saveMeasurement';
                     <div class="mb-3" id="<?php echo htmlspecialchars($datetimeFieldId); ?>" style="display: none;">
                         <label for="<?php echo htmlspecialchars($datetimeInputId); ?>" class="form-label">Дата и время замера <span class="text-danger">*</span></label>
                         <input type="datetime-local" class="form-control" id="<?php echo htmlspecialchars($datetimeInputId); ?>" name="measured_at">
+                        <div class="form-hint">Если оставить поле пустым, будет использовано текущее время.</div>
                     </div>
                     
                     <div class="row">

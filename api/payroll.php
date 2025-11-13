@@ -4,15 +4,21 @@
  * Доступен только администраторам
  */
 
-header('Content-Type: application/json');
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
-require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/activity_log.php';
+require_once __DIR__ . '/_bootstrap.php';
 
-// Требуем авторизацию и права администратора
-requireAuth();
-requireAdmin();
+// Проверка прав администратора
+if (!isAdmin()) {
+    http_response_code(403);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Доступ запрещен. Требуются права администратора.'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';

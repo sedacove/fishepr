@@ -39,6 +39,7 @@ $saveFunction = $saveFunction ?? 'saveHarvest';
                     <div class="mb-3" id="<?php echo htmlspecialchars($datetimeFieldId); ?>" style="display: none;">
                         <label for="<?php echo htmlspecialchars($datetimeInputId); ?>" class="form-label">Дата и время записи <span class="text-danger">*</span></label>
                         <input type="datetime-local" class="form-control" id="<?php echo htmlspecialchars($datetimeInputId); ?>" name="recorded_at">
+                        <div class="form-hint">Если оставить поле пустым, будет использовано текущее время.</div>
                     </div>
                     
                     <div class="row">
@@ -58,7 +59,7 @@ $saveFunction = $saveFunction ?? 'saveHarvest';
                         <select class="form-select" id="<?php echo htmlspecialchars($counterpartySelectId); ?>" name="counterparty_id">
                             <option value="">Не указан</option>
                         </select>
-                        <small class="text-muted">Выберите контрагента, если отбор связан с поставкой или покупателем.</small>
+                        <div class="form-hint">Выберите контрагента, если отбор связан с поставкой или покупателем.</div>
                     </div>
                 </form>
             </div>

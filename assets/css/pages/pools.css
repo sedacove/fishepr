@@ -1,0 +1,30 @@
+.pool-item {
+    transition: background-color 0.2s;
+}
+
+.pool-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .pool-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+    background-color: #f0f0f0;
+}
+
+[data-theme="dark"] .sortable-ghost {
+    background-color: #404040;
+}
+
+.sortable-chosen {
+    cursor: grabbing !important;
+}
+
+.sortable-drag {
+    opacity: 0.8;
+}
+
+

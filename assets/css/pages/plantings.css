@@ -1,0 +1,33 @@
+.plantings-dropzone {
+    min-height: 150px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.plantings-dropzone:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+[data-theme="dark"] .plantings-dropzone {
+    border-color: #404040 !important;
+}
+
+[data-theme="dark"] .plantings-dropzone:hover {
+    background-color: rgba(102, 126, 234, 0.1);
+}
+
+.plantings-file-item {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+[data-theme="dark"] .plantings-file-item {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+

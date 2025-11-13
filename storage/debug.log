@@ -1,0 +1,1357 @@
+[2025-11-12 15:42:38] [unknown:0] === REQUEST START ===
+[2025-11-12 15:42:38] [unknown:0] REQUEST_URI: /fisherp/
+[2025-11-12 15:42:38] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 15:42:38] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 15:42:38] [unknown:0] QUERY_STRING: 
+[2025-11-12 15:42:38] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 17:42:38] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 17:42:38] [unknown:0] Dispatching route...
+[2025-11-12 17:42:38] [requireAuth] Checking auth...
+[2025-11-12 17:42:38] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:38] [requireAuth] REQUEST_URI: /fisherp/
+[2025-11-12 17:42:38] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:38] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:38] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:38] [unknown:0] Response type: string
+[2025-11-12 17:42:38] [unknown:0] === REQUEST END ===
+[2025-11-12 17:42:38] [requireAuth] Checking auth...
+[2025-11-12 17:42:38] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:38] [requireAuth] REQUEST_URI: /fisherp/api/duty.php?action=range&start=2025-11-11&end=2025-11-17
+[2025-11-12 17:42:38] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:38] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:38] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:38] [requireAuth] Checking auth...
+[2025-11-12 17:42:38] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:38] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=latest_temperatures
+[2025-11-12 17:42:38] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:38] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:38] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:38] [requireAuth] Checking auth...
+[2025-11-12 17:42:38] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:38] [requireAuth] REQUEST_URI: /fisherp/api/tasks.php?action=list&tab=my
+[2025-11-12 17:42:38] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:38] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:38] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:38] [requireAuth] Checking auth...
+[2025-11-12 17:42:38] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:38] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=latest_oxygen
+[2025-11-12 17:42:38] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:38] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:38] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:38] [requireAuth] Checking auth...
+[2025-11-12 17:42:38] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:38] [requireAuth] REQUEST_URI: /fisherp/api/mortality.php?action=totals_last14_by_pool
+[2025-11-12 17:42:38] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:38] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:38] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:38] [requireAuth] Checking auth...
+[2025-11-12 17:42:38] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:38] [requireAuth] REQUEST_URI: /fisherp/api/news.php?action=latest
+[2025-11-12 17:42:38] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:38] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:38] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:38] [requireAuth] Checking auth...
+[2025-11-12 17:42:38] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:38] [requireAuth] REQUEST_URI: /fisherp/api/mortality.php?action=totals_last30
+[2025-11-12 17:42:38] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:38] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:38] [requireAuth] User is logged in, continuing...
+[2025-11-12 15:42:40] [unknown:0] === REQUEST START ===
+[2025-11-12 15:42:40] [unknown:0] REQUEST_URI: /fisherp/
+[2025-11-12 15:42:40] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 15:42:40] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 15:42:40] [unknown:0] QUERY_STRING: 
+[2025-11-12 15:42:40] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 17:42:40] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 17:42:40] [unknown:0] Dispatching route...
+[2025-11-12 17:42:40] [requireAuth] Checking auth...
+[2025-11-12 17:42:40] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:40] [requireAuth] REQUEST_URI: /fisherp/
+[2025-11-12 17:42:40] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:40] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:40] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:40] [unknown:0] Response type: string
+[2025-11-12 17:42:40] [unknown:0] === REQUEST END ===
+[2025-11-12 17:42:40] [requireAuth] Checking auth...
+[2025-11-12 17:42:40] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:40] [requireAuth] REQUEST_URI: /fisherp/api/tasks.php?action=list&tab=my
+[2025-11-12 17:42:40] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:40] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:40] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:40] [requireAuth] Checking auth...
+[2025-11-12 17:42:40] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:40] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=latest_oxygen
+[2025-11-12 17:42:40] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:40] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:40] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:40] [requireAuth] Checking auth...
+[2025-11-12 17:42:40] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:40] [requireAuth] REQUEST_URI: /fisherp/api/duty.php?action=range&start=2025-11-11&end=2025-11-17
+[2025-11-12 17:42:40] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:40] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:40] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:40] [requireAuth] Checking auth...
+[2025-11-12 17:42:40] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:40] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=latest_temperatures
+[2025-11-12 17:42:40] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:40] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:40] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:40] [requireAuth] Checking auth...
+[2025-11-12 17:42:40] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:40] [requireAuth] REQUEST_URI: /fisherp/api/news.php?action=latest
+[2025-11-12 17:42:40] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:40] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:40] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:40] [requireAuth] Checking auth...
+[2025-11-12 17:42:40] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:40] [requireAuth] REQUEST_URI: /fisherp/api/mortality.php?action=totals_last14_by_pool
+[2025-11-12 17:42:40] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:40] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:40] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:40] [requireAuth] Checking auth...
+[2025-11-12 17:42:40] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:40] [requireAuth] REQUEST_URI: /fisherp/api/mortality.php?action=totals_last30
+[2025-11-12 17:42:40] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:40] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:40] [requireAuth] User is logged in, continuing...
+[2025-11-12 15:42:41] [unknown:0] === REQUEST START ===
+[2025-11-12 15:42:41] [unknown:0] REQUEST_URI: /fisherp/meter-readings
+[2025-11-12 15:42:41] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 15:42:41] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 15:42:41] [unknown:0] QUERY_STRING: 
+[2025-11-12 15:42:41] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 17:42:41] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 17:42:41] [unknown:0] Dispatching route...
+[2025-11-12 17:42:41] [requireAuth] Checking auth...
+[2025-11-12 17:42:41] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:41] [requireAuth] REQUEST_URI: /fisherp/meter-readings
+[2025-11-12 17:42:41] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:41] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:41] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:41] [unknown:0] Response type: string
+[2025-11-12 17:42:41] [unknown:0] === REQUEST END ===
+[2025-11-12 17:42:41] [requireAuth] Checking auth...
+[2025-11-12 17:42:41] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:41] [requireAuth] REQUEST_URI: /fisherp/api/meters.php?action=list
+[2025-11-12 17:42:41] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:41] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:41] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:41] [requireAuth] Checking auth...
+[2025-11-12 17:42:41] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:41] [requireAuth] REQUEST_URI: /fisherp/api/meter_readings.php?action=list&meter_id=2
+[2025-11-12 17:42:41] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:41] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:41] [requireAuth] User is logged in, continuing...
+[2025-11-12 15:42:41] [unknown:0] === REQUEST START ===
+[2025-11-12 15:42:41] [unknown:0] REQUEST_URI: /fisherp/tasks/
+[2025-11-12 15:42:41] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 15:42:41] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 15:42:41] [unknown:0] QUERY_STRING: 
+[2025-11-12 15:42:41] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 17:42:41] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 17:42:41] [unknown:0] Dispatching route...
+[2025-11-12 17:42:41] [requireAuth] Checking auth...
+[2025-11-12 17:42:41] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:41] [requireAuth] REQUEST_URI: /fisherp/tasks/
+[2025-11-12 17:42:41] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:41] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:41] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:41] [unknown:0] Response type: string
+[2025-11-12 17:42:41] [unknown:0] === REQUEST END ===
+[2025-11-12 17:42:42] [requireAuth] Checking auth...
+[2025-11-12 17:42:42] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:42] [requireAuth] REQUEST_URI: /fisherp/api/tasks.php?action=get_users
+[2025-11-12 17:42:42] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:42] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:42] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:42] [requireAuth] Checking auth...
+[2025-11-12 17:42:42] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:42] [requireAuth] REQUEST_URI: /fisherp/api/tasks.php?action=list&tab=my
+[2025-11-12 17:42:42] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:42] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:42] [requireAuth] User is logged in, continuing...
+[2025-11-12 15:42:43] [unknown:0] === REQUEST START ===
+[2025-11-12 15:42:43] [unknown:0] REQUEST_URI: /fisherp/measurements
+[2025-11-12 15:42:43] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 15:42:43] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 15:42:43] [unknown:0] QUERY_STRING: 
+[2025-11-12 15:42:43] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 17:42:43] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 17:42:43] [unknown:0] Dispatching route...
+[2025-11-12 17:42:43] [requireAuth] Checking auth...
+[2025-11-12 17:42:43] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:43] [requireAuth] REQUEST_URI: /fisherp/measurements
+[2025-11-12 17:42:43] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:43] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:43] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:43] [unknown:0] Response type: string
+[2025-11-12 17:42:43] [unknown:0] === REQUEST END ===
+[2025-11-12 17:42:43] [requireAuth] Checking auth...
+[2025-11-12 17:42:43] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:43] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=get_pools
+[2025-11-12 17:42:43] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:43] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:43] [requireAuth] User is logged in, continuing...
+[2025-11-12 15:42:45] [unknown:0] === REQUEST START ===
+[2025-11-12 15:42:45] [unknown:0] REQUEST_URI: /fisherp/harvests
+[2025-11-12 15:42:45] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 15:42:45] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 15:42:45] [unknown:0] QUERY_STRING: 
+[2025-11-12 15:42:45] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 17:42:45] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 17:42:45] [unknown:0] Dispatching route...
+[2025-11-12 17:42:45] [requireAuth] Checking auth...
+[2025-11-12 17:42:45] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:45] [requireAuth] REQUEST_URI: /fisherp/harvests
+[2025-11-12 17:42:45] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:45] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:45] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:45] [unknown:0] Response type: string
+[2025-11-12 17:42:45] [unknown:0] === REQUEST END ===
+[2025-11-12 17:42:45] [requireAuth] Checking auth...
+[2025-11-12 17:42:45] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:45] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 17:42:45] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:45] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:45] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:45] [requireAuth] Checking auth...
+[2025-11-12 17:42:45] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:45] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 17:42:45] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:45] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:45] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:45] [requireAuth] Checking auth...
+[2025-11-12 17:42:45] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:45] [requireAuth] REQUEST_URI: /fisherp/api/harvests.php?action=get_pools
+[2025-11-12 17:42:45] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:45] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:45] [requireAuth] User is logged in, continuing...
+[2025-11-12 15:42:46] [unknown:0] === REQUEST START ===
+[2025-11-12 15:42:46] [unknown:0] REQUEST_URI: /fisherp/mortality
+[2025-11-12 15:42:46] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 15:42:46] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 15:42:46] [unknown:0] QUERY_STRING: 
+[2025-11-12 15:42:46] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 17:42:46] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 17:42:46] [unknown:0] Dispatching route...
+[2025-11-12 17:42:46] [requireAuth] Checking auth...
+[2025-11-12 17:42:46] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:46] [requireAuth] REQUEST_URI: /fisherp/mortality
+[2025-11-12 17:42:46] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:46] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:46] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:46] [unknown:0] Response type: string
+[2025-11-12 17:42:46] [unknown:0] === REQUEST END ===
+[2025-11-12 17:42:46] [requireAuth] Checking auth...
+[2025-11-12 17:42:46] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:46] [requireAuth] REQUEST_URI: /fisherp/api/mortality.php?action=get_pools
+[2025-11-12 17:42:46] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:46] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:46] [requireAuth] User is logged in, continuing...
+[2025-11-12 15:42:47] [unknown:0] === REQUEST START ===
+[2025-11-12 15:42:47] [unknown:0] REQUEST_URI: /fisherp/weighings
+[2025-11-12 15:42:47] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 15:42:47] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 15:42:47] [unknown:0] QUERY_STRING: 
+[2025-11-12 15:42:47] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 17:42:47] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 17:42:47] [unknown:0] Dispatching route...
+[2025-11-12 17:42:47] [requireAuth] Checking auth...
+[2025-11-12 17:42:47] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:47] [requireAuth] REQUEST_URI: /fisherp/weighings
+[2025-11-12 17:42:47] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:47] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:47] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:47] [unknown:0] Response type: string
+[2025-11-12 17:42:47] [unknown:0] === REQUEST END ===
+[2025-11-12 17:42:47] [requireAuth] Checking auth...
+[2025-11-12 17:42:47] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:47] [requireAuth] REQUEST_URI: /fisherp/api/weighings.php?action=get_pools
+[2025-11-12 17:42:47] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:47] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:47] [requireAuth] User is logged in, continuing...
+[2025-11-12 15:42:48] [unknown:0] === REQUEST START ===
+[2025-11-12 15:42:48] [unknown:0] REQUEST_URI: /fisherp/weighings
+[2025-11-12 15:42:48] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 15:42:48] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 15:42:48] [unknown:0] QUERY_STRING: 
+[2025-11-12 15:42:48] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 17:42:48] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 17:42:48] [unknown:0] Dispatching route...
+[2025-11-12 17:42:48] [requireAuth] Checking auth...
+[2025-11-12 17:42:48] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:48] [requireAuth] REQUEST_URI: /fisherp/weighings
+[2025-11-12 17:42:48] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:48] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:48] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:48] [unknown:0] Response type: string
+[2025-11-12 17:42:48] [unknown:0] === REQUEST END ===
+[2025-11-12 17:42:48] [requireAuth] Checking auth...
+[2025-11-12 17:42:48] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:48] [requireAuth] REQUEST_URI: /fisherp/api/weighings.php?action=get_pools
+[2025-11-12 17:42:48] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:48] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:48] [requireAuth] User is logged in, continuing...
+[2025-11-12 15:42:51] [unknown:0] === REQUEST START ===
+[2025-11-12 15:42:51] [unknown:0] REQUEST_URI: /fisherp/pools
+[2025-11-12 15:42:51] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 15:42:51] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 15:42:51] [unknown:0] QUERY_STRING: 
+[2025-11-12 15:42:51] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 17:42:51] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 17:42:51] [unknown:0] Dispatching route...
+[2025-11-12 17:42:51] [requireAuth] Checking auth...
+[2025-11-12 17:42:51] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:51] [requireAuth] REQUEST_URI: /fisherp/pools
+[2025-11-12 17:42:51] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:51] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:51] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:51] [requireAuth] Checking auth...
+[2025-11-12 17:42:51] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:51] [requireAuth] REQUEST_URI: /fisherp/pools
+[2025-11-12 17:42:51] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:51] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:51] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:51] [unknown:0] Response type: string
+[2025-11-12 17:42:51] [unknown:0] === REQUEST END ===
+[2025-11-12 17:42:51] [requireAuth] Checking auth...
+[2025-11-12 17:42:51] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:51] [requireAuth] REQUEST_URI: /fisherp/api/pools.php?action=list
+[2025-11-12 17:42:51] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:51] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:51] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:51] [requireAuth] Checking auth...
+[2025-11-12 17:42:51] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:51] [requireAuth] REQUEST_URI: /fisherp/api/pools.php?action=list
+[2025-11-12 17:42:51] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:51] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:51] [requireAuth] User is logged in, continuing...
+[2025-11-12 15:42:52] [unknown:0] === REQUEST START ===
+[2025-11-12 15:42:52] [unknown:0] REQUEST_URI: /fisherp/users
+[2025-11-12 15:42:52] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 15:42:52] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 15:42:52] [unknown:0] QUERY_STRING: 
+[2025-11-12 15:42:52] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 17:42:52] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 17:42:52] [unknown:0] Dispatching route...
+[2025-11-12 17:42:52] [requireAuth] Checking auth...
+[2025-11-12 17:42:52] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:52] [requireAuth] REQUEST_URI: /fisherp/users
+[2025-11-12 17:42:52] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:52] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:52] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:52] [requireAuth] Checking auth...
+[2025-11-12 17:42:52] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:52] [requireAuth] REQUEST_URI: /fisherp/users
+[2025-11-12 17:42:52] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:52] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:52] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:52] [unknown:0] Response type: string
+[2025-11-12 17:42:52] [unknown:0] === REQUEST END ===
+[2025-11-12 17:42:52] [requireAuth] Checking auth...
+[2025-11-12 17:42:52] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:52] [requireAuth] REQUEST_URI: /fisherp/api/users.php?action=list
+[2025-11-12 17:42:52] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:52] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:52] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:52] [requireAuth] Checking auth...
+[2025-11-12 17:42:52] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:52] [requireAuth] REQUEST_URI: /fisherp/api/users.php?action=list
+[2025-11-12 17:42:52] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:52] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:52] [requireAuth] User is logged in, continuing...
+[2025-11-12 15:42:53] [unknown:0] === REQUEST START ===
+[2025-11-12 15:42:53] [unknown:0] REQUEST_URI: /fisherp/measurements
+[2025-11-12 15:42:53] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 15:42:53] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 15:42:53] [unknown:0] QUERY_STRING: 
+[2025-11-12 15:42:53] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 17:42:53] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 17:42:53] [unknown:0] Dispatching route...
+[2025-11-12 17:42:53] [requireAuth] Checking auth...
+[2025-11-12 17:42:53] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:53] [requireAuth] REQUEST_URI: /fisherp/measurements
+[2025-11-12 17:42:53] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:53] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:53] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:53] [unknown:0] Response type: string
+[2025-11-12 17:42:53] [unknown:0] === REQUEST END ===
+[2025-11-12 17:42:53] [requireAuth] Checking auth...
+[2025-11-12 17:42:53] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:53] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=get_pools
+[2025-11-12 17:42:53] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:53] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:53] [requireAuth] User is logged in, continuing...
+[2025-11-12 15:42:59] [unknown:0] === REQUEST START ===
+[2025-11-12 15:42:59] [unknown:0] REQUEST_URI: /fisherp/harvests
+[2025-11-12 15:42:59] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 15:42:59] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 15:42:59] [unknown:0] QUERY_STRING: 
+[2025-11-12 15:42:59] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 17:42:59] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 17:42:59] [unknown:0] Dispatching route...
+[2025-11-12 17:42:59] [requireAuth] Checking auth...
+[2025-11-12 17:42:59] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:42:59] [requireAuth] REQUEST_URI: /fisherp/harvests
+[2025-11-12 17:42:59] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:42:59] [requireAuth] Redirect count: 1
+[2025-11-12 17:42:59] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:42:59] [unknown:0] Response type: string
+[2025-11-12 17:42:59] [unknown:0] === REQUEST END ===
+[2025-11-12 17:43:00] [requireAuth] Checking auth...
+[2025-11-12 17:43:00] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:43:00] [requireAuth] REQUEST_URI: /fisherp/api/harvests.php?action=get_pools
+[2025-11-12 17:43:00] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:43:00] [requireAuth] Redirect count: 1
+[2025-11-12 17:43:00] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:43:00] [requireAuth] Checking auth...
+[2025-11-12 17:43:00] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:43:00] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 17:43:00] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:43:00] [requireAuth] Redirect count: 1
+[2025-11-12 17:43:00] [requireAuth] User is logged in, continuing...
+[2025-11-12 17:43:00] [requireAuth] Checking auth...
+[2025-11-12 17:43:00] [requireAuth] isLoggedIn: YES
+[2025-11-12 17:43:00] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 17:43:00] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 17:43:00] [requireAuth] Redirect count: 1
+[2025-11-12 17:43:00] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:27:19] [unknown:0] === REQUEST START ===
+[2025-11-12 16:27:19] [unknown:0] REQUEST_URI: /fisherp/index.php
+[2025-11-12 16:27:19] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:27:19] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:27:19] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:27:19] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:27:19] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:27:19] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:27:19 - Input path: /fisherp/index.php
+[Router::stripBasePath] 2025-11-12 18:27:19 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:27:19 - Path starts with basePath, stripped to: /index.php
+[Router::stripBasePath] 2025-11-12 18:27:19 - Final path: /index.php
+[Router::dispatch] 2025-11-12 18:27:19 - URI: /fisherp/index.php
+[Router::dispatch] 2025-11-12 18:27:19 - Original path: /fisherp/index.php
+[Router::dispatch] 2025-11-12 18:27:19 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:27:19 - Path after stripBasePath: /index.php
+[Router::dispatch] 2025-11-12 18:27:19 - Normalized path: /index.php
+[Router::dispatch] 2025-11-12 18:27:19 - Route key: GET /index.php
+[Router::dispatch] 2025-11-12 18:27:19 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:27:19] [requireAuth] Checking auth...
+[2025-11-12 18:27:19] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:19] [requireAuth] REQUEST_URI: /fisherp/index.php
+[2025-11-12 18:27:19] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:19] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:19] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:19] [unknown:0] Response type: string
+[2025-11-12 18:27:19] [unknown:0] === REQUEST END ===
+[2025-11-12 18:27:19] [requireAuth] Checking auth...
+[2025-11-12 18:27:19] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:19] [requireAuth] REQUEST_URI: /fisherp/api/tasks.php?action=list&tab=my
+[2025-11-12 18:27:19] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:19] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:19] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:19] [requireAuth] Checking auth...
+[2025-11-12 18:27:19] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:19] [requireAuth] REQUEST_URI: /fisherp/api/duty.php?action=range&start=2025-11-11&end=2025-11-17
+[2025-11-12 18:27:19] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:19] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:19] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:19] [requireAuth] Checking auth...
+[2025-11-12 18:27:19] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:19] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=latest_temperatures
+[2025-11-12 18:27:19] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:19] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:19] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:19] [requireAuth] Checking auth...
+[2025-11-12 18:27:19] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:19] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=latest_oxygen
+[2025-11-12 18:27:19] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:19] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:19] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:19] [requireAuth] Checking auth...
+[2025-11-12 18:27:19] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:19] [requireAuth] REQUEST_URI: /fisherp/api/mortality.php?action=totals_last14_by_pool
+[2025-11-12 18:27:19] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:19] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:19] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:19] [requireAuth] Checking auth...
+[2025-11-12 18:27:19] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:19] [requireAuth] REQUEST_URI: /fisherp/api/news.php?action=latest
+[2025-11-12 18:27:19] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:19] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:19] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:19] [requireAuth] Checking auth...
+[2025-11-12 18:27:19] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:19] [requireAuth] REQUEST_URI: /fisherp/api/mortality.php?action=totals_last30
+[2025-11-12 18:27:19] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:19] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:19] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:27:20] [unknown:0] === REQUEST START ===
+[2025-11-12 16:27:20] [unknown:0] REQUEST_URI: /fisherp/work
+[2025-11-12 16:27:20] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:27:20] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:27:20] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:27:20] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:27:20] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:27:20] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:27:20 - Input path: /fisherp/work
+[Router::stripBasePath] 2025-11-12 18:27:20 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:27:20 - Path starts with basePath, stripped to: /work
+[Router::stripBasePath] 2025-11-12 18:27:20 - Final path: /work
+[Router::dispatch] 2025-11-12 18:27:20 - URI: /fisherp/work
+[Router::dispatch] 2025-11-12 18:27:20 - Original path: /fisherp/work
+[Router::dispatch] 2025-11-12 18:27:20 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:27:20 - Path after stripBasePath: /work
+[Router::dispatch] 2025-11-12 18:27:20 - Normalized path: /work
+[Router::dispatch] 2025-11-12 18:27:20 - Route key: GET /work
+[Router::dispatch] 2025-11-12 18:27:20 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:27:20] [requireAuth] Checking auth...
+[2025-11-12 18:27:20] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:20] [requireAuth] REQUEST_URI: /fisherp/work
+[2025-11-12 18:27:20] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:20] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:20] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:20] [unknown:0] Response type: string
+[2025-11-12 18:27:20] [unknown:0] === REQUEST END ===
+[2025-11-12 18:27:20] [requireAuth] Checking auth...
+[2025-11-12 18:27:20] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:20] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:27:20] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:20] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:20] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:20] [requireAuth] Checking auth...
+[2025-11-12 18:27:20] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:20] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:27:20] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:20] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:20] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:20] [requireAuth] Checking auth...
+[2025-11-12 18:27:20] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:20] [requireAuth] REQUEST_URI: /fisherp/api/work.php
+[2025-11-12 18:27:20] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:20] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:20] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:20] [requireAuth] Checking auth...
+[2025-11-12 18:27:20] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:20] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=get_pools
+[2025-11-12 18:27:20] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:20] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:20] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:20] [requireAuth] Checking auth...
+[2025-11-12 18:27:20] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:20] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:27:20] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:20] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:20] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:20] [requireAuth] Checking auth...
+[2025-11-12 18:27:20] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:20] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:27:20] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:20] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:20] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:27:21] [unknown:0] === REQUEST START ===
+[2025-11-12 16:27:21] [unknown:0] REQUEST_URI: /fisherp/work
+[2025-11-12 16:27:21] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:27:21] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:27:21] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:27:21] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:27:21] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:27:21] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:27:21 - Input path: /fisherp/work
+[Router::stripBasePath] 2025-11-12 18:27:21 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:27:21 - Path starts with basePath, stripped to: /work
+[Router::stripBasePath] 2025-11-12 18:27:21 - Final path: /work
+[Router::dispatch] 2025-11-12 18:27:21 - URI: /fisherp/work
+[Router::dispatch] 2025-11-12 18:27:21 - Original path: /fisherp/work
+[Router::dispatch] 2025-11-12 18:27:21 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:27:21 - Path after stripBasePath: /work
+[Router::dispatch] 2025-11-12 18:27:21 - Normalized path: /work
+[Router::dispatch] 2025-11-12 18:27:21 - Route key: GET /work
+[Router::dispatch] 2025-11-12 18:27:21 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:27:21] [requireAuth] Checking auth...
+[2025-11-12 18:27:21] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:21] [requireAuth] REQUEST_URI: /fisherp/work
+[2025-11-12 18:27:21] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:21] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:21] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:21] [unknown:0] Response type: string
+[2025-11-12 18:27:21] [unknown:0] === REQUEST END ===
+[2025-11-12 18:27:21] [requireAuth] Checking auth...
+[2025-11-12 18:27:21] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:21] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:27:21] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:21] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:21] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:21] [requireAuth] Checking auth...
+[2025-11-12 18:27:21] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:21] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:27:21] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:21] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:21] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:21] [requireAuth] Checking auth...
+[2025-11-12 18:27:21] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:21] [requireAuth] REQUEST_URI: /fisherp/api/work.php
+[2025-11-12 18:27:21] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:21] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:21] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:21] [requireAuth] Checking auth...
+[2025-11-12 18:27:21] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:21] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=get_pools
+[2025-11-12 18:27:21] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:21] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:21] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:21] [requireAuth] Checking auth...
+[2025-11-12 18:27:21] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:21] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:27:21] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:21] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:21] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:21] [requireAuth] Checking auth...
+[2025-11-12 18:27:21] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:21] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:27:21] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:21] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:21] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:27:22] [unknown:0] === REQUEST START ===
+[2025-11-12 16:27:22] [unknown:0] REQUEST_URI: /fisherp/work
+[2025-11-12 16:27:22] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:27:22] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:27:22] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:27:22] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:27:22] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:27:22] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:27:22 - Input path: /fisherp/work
+[Router::stripBasePath] 2025-11-12 18:27:22 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:27:22 - Path starts with basePath, stripped to: /work
+[Router::stripBasePath] 2025-11-12 18:27:22 - Final path: /work
+[Router::dispatch] 2025-11-12 18:27:22 - URI: /fisherp/work
+[Router::dispatch] 2025-11-12 18:27:22 - Original path: /fisherp/work
+[Router::dispatch] 2025-11-12 18:27:22 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:27:22 - Path after stripBasePath: /work
+[Router::dispatch] 2025-11-12 18:27:22 - Normalized path: /work
+[Router::dispatch] 2025-11-12 18:27:22 - Route key: GET /work
+[Router::dispatch] 2025-11-12 18:27:22 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:27:22] [requireAuth] Checking auth...
+[2025-11-12 18:27:22] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:22] [requireAuth] REQUEST_URI: /fisherp/work
+[2025-11-12 18:27:22] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:22] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:22] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:22] [unknown:0] Response type: string
+[2025-11-12 18:27:22] [unknown:0] === REQUEST END ===
+[2025-11-12 18:27:23] [requireAuth] Checking auth...
+[2025-11-12 18:27:23] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:23] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:27:23] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:23] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:23] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:23] [requireAuth] Checking auth...
+[2025-11-12 18:27:23] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:23] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:27:23] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:23] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:23] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:23] [requireAuth] Checking auth...
+[2025-11-12 18:27:23] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:23] [requireAuth] REQUEST_URI: /fisherp/api/work.php
+[2025-11-12 18:27:23] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:23] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:23] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:23] [requireAuth] Checking auth...
+[2025-11-12 18:27:23] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:23] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=get_pools
+[2025-11-12 18:27:23] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:23] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:23] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:23] [requireAuth] Checking auth...
+[2025-11-12 18:27:23] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:23] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:27:23] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:23] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:23] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:23] [requireAuth] Checking auth...
+[2025-11-12 18:27:23] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:23] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:27:23] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:23] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:23] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:27:26] [unknown:0] === REQUEST START ===
+[2025-11-12 16:27:26] [unknown:0] REQUEST_URI: /fisherp/measurements
+[2025-11-12 16:27:26] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:27:26] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:27:26] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:27:26] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:27:26] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:27:26] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:27:26 - Input path: /fisherp/measurements
+[Router::stripBasePath] 2025-11-12 18:27:26 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:27:26 - Path starts with basePath, stripped to: /measurements
+[Router::stripBasePath] 2025-11-12 18:27:26 - Final path: /measurements
+[Router::dispatch] 2025-11-12 18:27:26 - URI: /fisherp/measurements
+[Router::dispatch] 2025-11-12 18:27:26 - Original path: /fisherp/measurements
+[Router::dispatch] 2025-11-12 18:27:26 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:27:26 - Path after stripBasePath: /measurements
+[Router::dispatch] 2025-11-12 18:27:26 - Normalized path: /measurements
+[Router::dispatch] 2025-11-12 18:27:26 - Route key: GET /measurements
+[Router::dispatch] 2025-11-12 18:27:26 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:27:26] [requireAuth] Checking auth...
+[2025-11-12 18:27:26] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:26] [requireAuth] REQUEST_URI: /fisherp/measurements
+[2025-11-12 18:27:26] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:26] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:26] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:26] [unknown:0] Response type: string
+[2025-11-12 18:27:26] [unknown:0] === REQUEST END ===
+[2025-11-12 18:27:26] [requireAuth] Checking auth...
+[2025-11-12 18:27:26] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:26] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=get_pools
+[2025-11-12 18:27:26] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:26] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:26] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:27:28] [unknown:0] === REQUEST START ===
+[2025-11-12 16:27:28] [unknown:0] REQUEST_URI: /fisherp/harvests
+[2025-11-12 16:27:28] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:27:28] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:27:28] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:27:28] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:27:28] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:27:28] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:27:28 - Input path: /fisherp/harvests
+[Router::stripBasePath] 2025-11-12 18:27:28 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:27:28 - Path starts with basePath, stripped to: /harvests
+[Router::stripBasePath] 2025-11-12 18:27:28 - Final path: /harvests
+[Router::dispatch] 2025-11-12 18:27:28 - URI: /fisherp/harvests
+[Router::dispatch] 2025-11-12 18:27:28 - Original path: /fisherp/harvests
+[Router::dispatch] 2025-11-12 18:27:28 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:27:28 - Path after stripBasePath: /harvests
+[Router::dispatch] 2025-11-12 18:27:28 - Normalized path: /harvests
+[Router::dispatch] 2025-11-12 18:27:28 - Route key: GET /harvests
+[Router::dispatch] 2025-11-12 18:27:28 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:27:28] [requireAuth] Checking auth...
+[2025-11-12 18:27:28] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:28] [requireAuth] REQUEST_URI: /fisherp/harvests
+[2025-11-12 18:27:28] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:28] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:28] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:28] [unknown:0] Response type: string
+[2025-11-12 18:27:28] [unknown:0] === REQUEST END ===
+[2025-11-12 18:27:28] [requireAuth] Checking auth...
+[2025-11-12 18:27:28] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:28] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:27:28] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:28] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:28] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:28] [requireAuth] Checking auth...
+[2025-11-12 18:27:28] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:28] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:27:28] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:28] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:28] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:28] [requireAuth] Checking auth...
+[2025-11-12 18:27:28] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:28] [requireAuth] REQUEST_URI: /fisherp/api/harvests.php?action=get_pools
+[2025-11-12 18:27:28] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:28] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:28] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:27:29] [unknown:0] === REQUEST START ===
+[2025-11-12 16:27:29] [unknown:0] REQUEST_URI: /fisherp/mortality
+[2025-11-12 16:27:29] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:27:29] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:27:29] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:27:29] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:27:29] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:27:29] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:27:29 - Input path: /fisherp/mortality
+[Router::stripBasePath] 2025-11-12 18:27:29 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:27:29 - Path starts with basePath, stripped to: /mortality
+[Router::stripBasePath] 2025-11-12 18:27:29 - Final path: /mortality
+[Router::dispatch] 2025-11-12 18:27:29 - URI: /fisherp/mortality
+[Router::dispatch] 2025-11-12 18:27:29 - Original path: /fisherp/mortality
+[Router::dispatch] 2025-11-12 18:27:29 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:27:29 - Path after stripBasePath: /mortality
+[Router::dispatch] 2025-11-12 18:27:29 - Normalized path: /mortality
+[Router::dispatch] 2025-11-12 18:27:29 - Route key: GET /mortality
+[Router::dispatch] 2025-11-12 18:27:29 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:27:29] [requireAuth] Checking auth...
+[2025-11-12 18:27:29] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:29] [requireAuth] REQUEST_URI: /fisherp/mortality
+[2025-11-12 18:27:29] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:29] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:29] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:29] [unknown:0] Response type: string
+[2025-11-12 18:27:29] [unknown:0] === REQUEST END ===
+[2025-11-12 18:27:29] [requireAuth] Checking auth...
+[2025-11-12 18:27:29] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:29] [requireAuth] REQUEST_URI: /fisherp/api/mortality.php?action=get_pools
+[2025-11-12 18:27:29] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:29] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:29] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:27:30] [unknown:0] === REQUEST START ===
+[2025-11-12 16:27:30] [unknown:0] REQUEST_URI: /fisherp/weighings
+[2025-11-12 16:27:30] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:27:30] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:27:30] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:27:30] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:27:30] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:27:30] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:27:30 - Input path: /fisherp/weighings
+[Router::stripBasePath] 2025-11-12 18:27:30 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:27:30 - Path starts with basePath, stripped to: /weighings
+[Router::stripBasePath] 2025-11-12 18:27:30 - Final path: /weighings
+[Router::dispatch] 2025-11-12 18:27:30 - URI: /fisherp/weighings
+[Router::dispatch] 2025-11-12 18:27:30 - Original path: /fisherp/weighings
+[Router::dispatch] 2025-11-12 18:27:30 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:27:30 - Path after stripBasePath: /weighings
+[Router::dispatch] 2025-11-12 18:27:30 - Normalized path: /weighings
+[Router::dispatch] 2025-11-12 18:27:30 - Route key: GET /weighings
+[Router::dispatch] 2025-11-12 18:27:30 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:27:30] [requireAuth] Checking auth...
+[2025-11-12 18:27:30] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:30] [requireAuth] REQUEST_URI: /fisherp/weighings
+[2025-11-12 18:27:30] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:30] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:30] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:30] [unknown:0] Response type: string
+[2025-11-12 18:27:30] [unknown:0] === REQUEST END ===
+[2025-11-12 18:27:30] [requireAuth] Checking auth...
+[2025-11-12 18:27:30] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:30] [requireAuth] REQUEST_URI: /fisherp/api/weighings.php?action=get_pools
+[2025-11-12 18:27:30] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:30] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:30] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:27:31] [unknown:0] === REQUEST START ===
+[2025-11-12 16:27:31] [unknown:0] REQUEST_URI: /fisherp/work
+[2025-11-12 16:27:31] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:27:31] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:27:31] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:27:31] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:27:31] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:27:31] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:27:31 - Input path: /fisherp/work
+[Router::stripBasePath] 2025-11-12 18:27:31 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:27:31 - Path starts with basePath, stripped to: /work
+[Router::stripBasePath] 2025-11-12 18:27:31 - Final path: /work
+[Router::dispatch] 2025-11-12 18:27:31 - URI: /fisherp/work
+[Router::dispatch] 2025-11-12 18:27:31 - Original path: /fisherp/work
+[Router::dispatch] 2025-11-12 18:27:31 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:27:31 - Path after stripBasePath: /work
+[Router::dispatch] 2025-11-12 18:27:31 - Normalized path: /work
+[Router::dispatch] 2025-11-12 18:27:31 - Route key: GET /work
+[Router::dispatch] 2025-11-12 18:27:31 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:27:31] [requireAuth] Checking auth...
+[2025-11-12 18:27:31] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:31] [requireAuth] REQUEST_URI: /fisherp/work
+[2025-11-12 18:27:31] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:31] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:31] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:31] [unknown:0] Response type: string
+[2025-11-12 18:27:31] [unknown:0] === REQUEST END ===
+[2025-11-12 18:27:31] [requireAuth] Checking auth...
+[2025-11-12 18:27:31] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:31] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:27:31] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:31] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:31] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:31] [requireAuth] Checking auth...
+[2025-11-12 18:27:31] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:31] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:27:31] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:31] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:31] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:31] [requireAuth] Checking auth...
+[2025-11-12 18:27:31] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:31] [requireAuth] REQUEST_URI: /fisherp/api/work.php
+[2025-11-12 18:27:31] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:31] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:31] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:32] [requireAuth] Checking auth...
+[2025-11-12 18:27:32] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:32] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=get_pools
+[2025-11-12 18:27:32] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:32] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:32] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:32] [requireAuth] Checking auth...
+[2025-11-12 18:27:32] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:32] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:27:32] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:32] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:32] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:32] [requireAuth] Checking auth...
+[2025-11-12 18:27:32] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:32] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:27:32] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:32] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:32] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:27:33] [unknown:0] === REQUEST START ===
+[2025-11-12 16:27:33] [unknown:0] REQUEST_URI: /fisherp/index.php
+[2025-11-12 16:27:33] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:27:33] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:27:33] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:27:33] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:27:33] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:27:33] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:27:33 - Input path: /fisherp/index.php
+[Router::stripBasePath] 2025-11-12 18:27:33 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:27:33 - Path starts with basePath, stripped to: /index.php
+[Router::stripBasePath] 2025-11-12 18:27:33 - Final path: /index.php
+[Router::dispatch] 2025-11-12 18:27:33 - URI: /fisherp/index.php
+[Router::dispatch] 2025-11-12 18:27:33 - Original path: /fisherp/index.php
+[Router::dispatch] 2025-11-12 18:27:33 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:27:33 - Path after stripBasePath: /index.php
+[Router::dispatch] 2025-11-12 18:27:33 - Normalized path: /index.php
+[Router::dispatch] 2025-11-12 18:27:33 - Route key: GET /index.php
+[Router::dispatch] 2025-11-12 18:27:33 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:27:33] [requireAuth] Checking auth...
+[2025-11-12 18:27:33] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:33] [requireAuth] REQUEST_URI: /fisherp/index.php
+[2025-11-12 18:27:33] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:33] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:33] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:33] [unknown:0] Response type: string
+[2025-11-12 18:27:33] [unknown:0] === REQUEST END ===
+[2025-11-12 18:27:33] [requireAuth] Checking auth...
+[2025-11-12 18:27:33] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:33] [requireAuth] REQUEST_URI: /fisherp/api/duty.php?action=range&start=2025-11-11&end=2025-11-17
+[2025-11-12 18:27:33] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:33] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:33] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:33] [requireAuth] Checking auth...
+[2025-11-12 18:27:33] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:33] [requireAuth] REQUEST_URI: /fisherp/api/tasks.php?action=list&tab=my
+[2025-11-12 18:27:33] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:33] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:33] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:33] [requireAuth] Checking auth...
+[2025-11-12 18:27:33] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:33] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=latest_temperatures
+[2025-11-12 18:27:33] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:33] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:33] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:33] [requireAuth] Checking auth...
+[2025-11-12 18:27:33] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:33] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=latest_oxygen
+[2025-11-12 18:27:33] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:33] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:33] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:33] [requireAuth] Checking auth...
+[2025-11-12 18:27:33] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:33] [requireAuth] REQUEST_URI: /fisherp/api/mortality.php?action=totals_last14_by_pool
+[2025-11-12 18:27:33] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:33] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:33] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:33] [requireAuth] Checking auth...
+[2025-11-12 18:27:33] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:33] [requireAuth] REQUEST_URI: /fisherp/api/news.php?action=latest
+[2025-11-12 18:27:33] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:33] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:33] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:33] [requireAuth] Checking auth...
+[2025-11-12 18:27:33] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:33] [requireAuth] REQUEST_URI: /fisherp/api/mortality.php?action=totals_last30
+[2025-11-12 18:27:33] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:33] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:33] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:27:34] [unknown:0] === REQUEST START ===
+[2025-11-12 16:27:34] [unknown:0] REQUEST_URI: /fisherp/work
+[2025-11-12 16:27:34] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:27:34] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:27:34] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:27:34] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:27:34] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:27:34] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:27:34 - Input path: /fisherp/work
+[Router::stripBasePath] 2025-11-12 18:27:34 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:27:34 - Path starts with basePath, stripped to: /work
+[Router::stripBasePath] 2025-11-12 18:27:34 - Final path: /work
+[Router::dispatch] 2025-11-12 18:27:34 - URI: /fisherp/work
+[Router::dispatch] 2025-11-12 18:27:34 - Original path: /fisherp/work
+[Router::dispatch] 2025-11-12 18:27:34 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:27:34 - Path after stripBasePath: /work
+[Router::dispatch] 2025-11-12 18:27:34 - Normalized path: /work
+[Router::dispatch] 2025-11-12 18:27:34 - Route key: GET /work
+[Router::dispatch] 2025-11-12 18:27:34 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:27:34] [requireAuth] Checking auth...
+[2025-11-12 18:27:34] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:34] [requireAuth] REQUEST_URI: /fisherp/work
+[2025-11-12 18:27:34] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:34] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:34] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:34] [unknown:0] Response type: string
+[2025-11-12 18:27:34] [unknown:0] === REQUEST END ===
+[2025-11-12 18:27:34] [requireAuth] Checking auth...
+[2025-11-12 18:27:34] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:34] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:27:34] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:34] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:34] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:34] [requireAuth] Checking auth...
+[2025-11-12 18:27:34] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:34] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:27:34] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:34] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:34] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:34] [requireAuth] Checking auth...
+[2025-11-12 18:27:34] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:34] [requireAuth] REQUEST_URI: /fisherp/api/work.php
+[2025-11-12 18:27:34] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:34] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:34] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:34] [requireAuth] Checking auth...
+[2025-11-12 18:27:34] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:34] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=get_pools
+[2025-11-12 18:27:34] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:34] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:34] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:34] [requireAuth] Checking auth...
+[2025-11-12 18:27:34] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:34] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:27:34] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:34] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:34] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:34] [requireAuth] Checking auth...
+[2025-11-12 18:27:34] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:34] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:27:34] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:34] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:34] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:27:59] [unknown:0] === REQUEST START ===
+[2025-11-12 16:27:59] [unknown:0] REQUEST_URI: /fisherp/work
+[2025-11-12 16:27:59] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:27:59] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:27:59] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:27:59] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:27:59] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:27:59] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:27:59 - Input path: /fisherp/work
+[Router::stripBasePath] 2025-11-12 18:27:59 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:27:59 - Path starts with basePath, stripped to: /work
+[Router::stripBasePath] 2025-11-12 18:27:59 - Final path: /work
+[Router::dispatch] 2025-11-12 18:27:59 - URI: /fisherp/work
+[Router::dispatch] 2025-11-12 18:27:59 - Original path: /fisherp/work
+[Router::dispatch] 2025-11-12 18:27:59 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:27:59 - Path after stripBasePath: /work
+[Router::dispatch] 2025-11-12 18:27:59 - Normalized path: /work
+[Router::dispatch] 2025-11-12 18:27:59 - Route key: GET /work
+[Router::dispatch] 2025-11-12 18:27:59 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:27:59] [requireAuth] Checking auth...
+[2025-11-12 18:27:59] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:59] [requireAuth] REQUEST_URI: /fisherp/work
+[2025-11-12 18:27:59] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:59] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:59] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:59] [unknown:0] Response type: string
+[2025-11-12 18:27:59] [unknown:0] === REQUEST END ===
+[2025-11-12 18:27:59] [requireAuth] Checking auth...
+[2025-11-12 18:27:59] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:59] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:27:59] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:59] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:59] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:59] [requireAuth] Checking auth...
+[2025-11-12 18:27:59] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:59] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:27:59] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:59] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:59] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:27:59] [requireAuth] Checking auth...
+[2025-11-12 18:27:59] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:27:59] [requireAuth] REQUEST_URI: /fisherp/api/work.php
+[2025-11-12 18:27:59] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:27:59] [requireAuth] Redirect count: 1
+[2025-11-12 18:27:59] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:28:00] [requireAuth] Checking auth...
+[2025-11-12 18:28:00] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:28:00] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=get_pools
+[2025-11-12 18:28:00] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:28:00] [requireAuth] Redirect count: 1
+[2025-11-12 18:28:00] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:28:00] [requireAuth] Checking auth...
+[2025-11-12 18:28:00] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:28:00] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:28:00] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:28:00] [requireAuth] Redirect count: 1
+[2025-11-12 18:28:00] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:28:00] [requireAuth] Checking auth...
+[2025-11-12 18:28:00] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:28:00] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:28:00] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:28:00] [requireAuth] Redirect count: 1
+[2025-11-12 18:28:00] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:28:11] [requireAuth] Checking auth...
+[2025-11-12 18:28:11] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:28:11] [requireAuth] REQUEST_URI: /fisherp/api/work.php
+[2025-11-12 18:28:11] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:28:11] [requireAuth] Redirect count: 1
+[2025-11-12 18:28:11] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:31:33] [unknown:0] === REQUEST START ===
+[2025-11-12 16:31:33] [unknown:0] REQUEST_URI: /fisherp/work
+[2025-11-12 16:31:33] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:31:33] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:31:33] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:31:33] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:31:33] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:31:33] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:31:33 - Input path: /fisherp/work
+[Router::stripBasePath] 2025-11-12 18:31:33 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:31:33 - Path starts with basePath, stripped to: /work
+[Router::stripBasePath] 2025-11-12 18:31:33 - Final path: /work
+[Router::dispatch] 2025-11-12 18:31:33 - URI: /fisherp/work
+[Router::dispatch] 2025-11-12 18:31:33 - Original path: /fisherp/work
+[Router::dispatch] 2025-11-12 18:31:33 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:31:33 - Path after stripBasePath: /work
+[Router::dispatch] 2025-11-12 18:31:33 - Normalized path: /work
+[Router::dispatch] 2025-11-12 18:31:33 - Route key: GET /work
+[Router::dispatch] 2025-11-12 18:31:33 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:31:33] [requireAuth] Checking auth...
+[2025-11-12 18:31:33] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:33] [requireAuth] REQUEST_URI: /fisherp/work
+[2025-11-12 18:31:33] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:33] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:33] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:33] [unknown:0] Response type: string
+[2025-11-12 18:31:33] [unknown:0] === REQUEST END ===
+[2025-11-12 18:31:34] [requireAuth] Checking auth...
+[2025-11-12 18:31:34] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:34] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:31:34] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:34] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:34] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:34] [requireAuth] Checking auth...
+[2025-11-12 18:31:34] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:34] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:31:34] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:34] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:34] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:34] [requireAuth] Checking auth...
+[2025-11-12 18:31:34] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:34] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=get_pools
+[2025-11-12 18:31:34] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:34] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:34] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:34] [requireAuth] Checking auth...
+[2025-11-12 18:31:34] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:34] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:31:34] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:34] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:34] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:31:36] [unknown:0] === REQUEST START ===
+[2025-11-12 16:31:36] [unknown:0] REQUEST_URI: /fisherp/work
+[2025-11-12 16:31:36] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:31:36] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:31:36] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:31:36] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:31:36] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:31:36] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:31:36 - Input path: /fisherp/work
+[Router::stripBasePath] 2025-11-12 18:31:36 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:31:36 - Path starts with basePath, stripped to: /work
+[Router::stripBasePath] 2025-11-12 18:31:36 - Final path: /work
+[Router::dispatch] 2025-11-12 18:31:36 - URI: /fisherp/work
+[Router::dispatch] 2025-11-12 18:31:36 - Original path: /fisherp/work
+[Router::dispatch] 2025-11-12 18:31:36 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:31:36 - Path after stripBasePath: /work
+[Router::dispatch] 2025-11-12 18:31:36 - Normalized path: /work
+[Router::dispatch] 2025-11-12 18:31:36 - Route key: GET /work
+[Router::dispatch] 2025-11-12 18:31:36 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:31:36] [requireAuth] Checking auth...
+[2025-11-12 18:31:36] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:36] [requireAuth] REQUEST_URI: /fisherp/work
+[2025-11-12 18:31:36] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:36] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:36] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:36] [unknown:0] Response type: string
+[2025-11-12 18:31:36] [unknown:0] === REQUEST END ===
+[2025-11-12 18:31:36] [requireAuth] Checking auth...
+[2025-11-12 18:31:36] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:36] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:31:36] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:36] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:36] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:36] [requireAuth] Checking auth...
+[2025-11-12 18:31:36] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:36] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:31:36] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:36] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:36] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:36] [requireAuth] Checking auth...
+[2025-11-12 18:31:36] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:36] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=get_pools
+[2025-11-12 18:31:36] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:36] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:36] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:36] [requireAuth] Checking auth...
+[2025-11-12 18:31:36] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:36] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:31:36] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:36] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:36] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:31:42] [unknown:0] === REQUEST START ===
+[2025-11-12 16:31:42] [unknown:0] REQUEST_URI: /fisherp/work
+[2025-11-12 16:31:42] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:31:42] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:31:42] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:31:42] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:31:42] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:31:42] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:31:42 - Input path: /fisherp/work
+[Router::stripBasePath] 2025-11-12 18:31:42 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:31:42 - Path starts with basePath, stripped to: /work
+[Router::stripBasePath] 2025-11-12 18:31:42 - Final path: /work
+[Router::dispatch] 2025-11-12 18:31:42 - URI: /fisherp/work
+[Router::dispatch] 2025-11-12 18:31:42 - Original path: /fisherp/work
+[Router::dispatch] 2025-11-12 18:31:42 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:31:42 - Path after stripBasePath: /work
+[Router::dispatch] 2025-11-12 18:31:42 - Normalized path: /work
+[Router::dispatch] 2025-11-12 18:31:42 - Route key: GET /work
+[Router::dispatch] 2025-11-12 18:31:42 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:31:42] [requireAuth] Checking auth...
+[2025-11-12 18:31:42] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:42] [requireAuth] REQUEST_URI: /fisherp/work
+[2025-11-12 18:31:42] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:42] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:42] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:42] [unknown:0] Response type: string
+[2025-11-12 18:31:42] [unknown:0] === REQUEST END ===
+[2025-11-12 18:31:43] [requireAuth] Checking auth...
+[2025-11-12 18:31:43] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:43] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:31:43] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:43] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:43] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:43] [requireAuth] Checking auth...
+[2025-11-12 18:31:43] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:43] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:31:43] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:43] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:43] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:43] [requireAuth] Checking auth...
+[2025-11-12 18:31:43] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:43] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=get_pools
+[2025-11-12 18:31:43] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:43] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:43] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:43] [requireAuth] Checking auth...
+[2025-11-12 18:31:43] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:43] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:31:43] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:43] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:43] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:31:45] [unknown:0] === REQUEST START ===
+[2025-11-12 16:31:45] [unknown:0] REQUEST_URI: /fisherp/index.php
+[2025-11-12 16:31:45] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:31:45] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:31:45] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:31:45] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:31:45] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:31:45] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:31:45 - Input path: /fisherp/index.php
+[Router::stripBasePath] 2025-11-12 18:31:45 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:31:45 - Path starts with basePath, stripped to: /index.php
+[Router::stripBasePath] 2025-11-12 18:31:45 - Final path: /index.php
+[Router::dispatch] 2025-11-12 18:31:45 - URI: /fisherp/index.php
+[Router::dispatch] 2025-11-12 18:31:45 - Original path: /fisherp/index.php
+[Router::dispatch] 2025-11-12 18:31:45 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:31:45 - Path after stripBasePath: /index.php
+[Router::dispatch] 2025-11-12 18:31:45 - Normalized path: /index.php
+[Router::dispatch] 2025-11-12 18:31:45 - Route key: GET /index.php
+[Router::dispatch] 2025-11-12 18:31:45 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:31:45] [requireAuth] Checking auth...
+[2025-11-12 18:31:45] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:45] [requireAuth] REQUEST_URI: /fisherp/index.php
+[2025-11-12 18:31:45] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:45] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:45] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:45] [unknown:0] Response type: string
+[2025-11-12 18:31:45] [unknown:0] === REQUEST END ===
+[2025-11-12 18:31:45] [requireAuth] Checking auth...
+[2025-11-12 18:31:45] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:45] [requireAuth] REQUEST_URI: /fisherp/api/duty.php?action=range&start=2025-11-11&end=2025-11-17
+[2025-11-12 18:31:45] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:45] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:45] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:45] [requireAuth] Checking auth...
+[2025-11-12 18:31:45] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:45] [requireAuth] REQUEST_URI: /fisherp/api/tasks.php?action=list&tab=my
+[2025-11-12 18:31:45] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:45] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:45] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:45] [requireAuth] Checking auth...
+[2025-11-12 18:31:45] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:45] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=latest_temperatures
+[2025-11-12 18:31:45] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:45] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:45] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:45] [requireAuth] Checking auth...
+[2025-11-12 18:31:45] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:45] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=latest_oxygen
+[2025-11-12 18:31:45] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:45] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:45] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:45] [requireAuth] Checking auth...
+[2025-11-12 18:31:45] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:45] [requireAuth] REQUEST_URI: /fisherp/api/mortality.php?action=totals_last14_by_pool
+[2025-11-12 18:31:45] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:45] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:45] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:45] [requireAuth] Checking auth...
+[2025-11-12 18:31:45] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:45] [requireAuth] REQUEST_URI: /fisherp/api/news.php?action=latest
+[2025-11-12 18:31:45] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:45] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:45] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:45] [requireAuth] Checking auth...
+[2025-11-12 18:31:45] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:45] [requireAuth] REQUEST_URI: /fisherp/api/mortality.php?action=totals_last30
+[2025-11-12 18:31:45] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:45] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:45] [requireAuth] User is logged in, continuing...
+[2025-11-12 16:31:51] [unknown:0] === REQUEST START ===
+[2025-11-12 16:31:51] [unknown:0] REQUEST_URI: /fisherp/work
+[2025-11-12 16:31:51] [unknown:0] SCRIPT_NAME: /fisherp/index.php
+[2025-11-12 16:31:51] [unknown:0] REQUEST_METHOD: GET
+[2025-11-12 16:31:51] [unknown:0] QUERY_STRING: 
+[2025-11-12 16:31:51] [unknown:0] SESSION: NOT_STARTED
+[2025-11-12 18:31:51] [unknown:0] BasePath set to: /fisherp
+[2025-11-12 18:31:51] [unknown:0] Dispatching route...
+[Router::stripBasePath] 2025-11-12 18:31:51 - Input path: /fisherp/work
+[Router::stripBasePath] 2025-11-12 18:31:51 - BasePath: /fisherp
+[Router::stripBasePath] 2025-11-12 18:31:51 - Path starts with basePath, stripped to: /work
+[Router::stripBasePath] 2025-11-12 18:31:51 - Final path: /work
+[Router::dispatch] 2025-11-12 18:31:51 - URI: /fisherp/work
+[Router::dispatch] 2025-11-12 18:31:51 - Original path: /fisherp/work
+[Router::dispatch] 2025-11-12 18:31:51 - BasePath: /fisherp
+[Router::dispatch] 2025-11-12 18:31:51 - Path after stripBasePath: /work
+[Router::dispatch] 2025-11-12 18:31:51 - Normalized path: /work
+[Router::dispatch] 2025-11-12 18:31:51 - Route key: GET /work
+[Router::dispatch] 2025-11-12 18:31:51 - Available routes: GET /, GET /index.php, GET /work, GET /work.php, GET /tasks, GET /tasks.php, GET /meter-readings, GET /meter_readings.php, GET /session-details, GET /session_details.php, GET /measurements, GET /measurements.php, GET /mortality, GET /mortality.php, GET /counterparties, GET /counterparties.php, GET /harvests, GET /harvests.php, GET /weighings, GET /weighings.php, GET /news, GET /news.php, GET /meters, GET /meters.php, GET /pools, GET /pools.php, GET /plantings, GET /plantings.php, GET /sessions, GET /sessions.php, GET /users, GET /users.php
+[2025-11-12 18:31:51] [requireAuth] Checking auth...
+[2025-11-12 18:31:51] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:51] [requireAuth] REQUEST_URI: /fisherp/work
+[2025-11-12 18:31:51] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:51] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:51] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:51] [unknown:0] Response type: string
+[2025-11-12 18:31:51] [unknown:0] === REQUEST END ===
+[2025-11-12 18:31:51] [requireAuth] Checking auth...
+[2025-11-12 18:31:51] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:51] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:31:51] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:51] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:51] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:51] [requireAuth] Checking auth...
+[2025-11-12 18:31:51] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:51] [requireAuth] REQUEST_URI: /fisherp/api/settings.php?action=get&key=measurement_warning_timeout_minutes
+[2025-11-12 18:31:51] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:51] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:51] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:52] [requireAuth] Checking auth...
+[2025-11-12 18:31:52] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:52] [requireAuth] REQUEST_URI: /fisherp/api/measurements.php?action=get_pools
+[2025-11-12 18:31:52] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:52] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:52] [requireAuth] User is logged in, continuing...
+[2025-11-12 18:31:52] [requireAuth] Checking auth...
+[2025-11-12 18:31:52] [requireAuth] isLoggedIn: YES
+[2025-11-12 18:31:52] [requireAuth] REQUEST_URI: /fisherp/api/counterparties.php?action=list
+[2025-11-12 18:31:52] [requireAuth] BASE_URL: http://localhost/fisherp/
+[2025-11-12 18:31:52] [requireAuth] Redirect count: 1
+[2025-11-12 18:31:52] [requireAuth] User is logged in, continuing...

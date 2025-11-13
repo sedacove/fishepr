@@ -62,7 +62,7 @@ function requireAuth() {
 function requireAdmin() {
     requireAuth();
     if (!isAdmin()) {
-        header('Location: ' . BASE_URL . 'index.php');
+        header('Location: ' . BASE_URL);
         exit;
     }
 }

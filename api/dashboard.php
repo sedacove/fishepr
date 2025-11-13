@@ -3,62 +3,33 @@
  * API для настройки главного экрана (виджеты)
  */
 
-header('Content-Type: application/json');
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
-require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/dashboard_layout.php';
+require_once __DIR__ . '/_bootstrap.php';
 
-requireAuth();
-
-$method = $_SERVER['REQUEST_METHOD'];
-$action = $_GET['action'] ?? 'layout';
+use App\Controllers\Api\DashboardController;
+use App\Support\Request;
 
 try {
-    $pdo = getDBConnection();
-    $userId = getCurrentUserId();
-
-    switch ($action) {
-        case 'layout':
-            $layout = getUserDashboardLayout($pdo, $userId);
-            $available = getAvailableWidgetsForUser($layout);
-
-            echo json_encode([
-                'success' => true,
-                'data' => [
-                    'layout' => $layout,
-                    'widgets' => $available,
-                ],
-            ]);
-            break;
-
-        case 'save_layout':
-            if ($method !== 'POST') {
-                throw new Exception('Метод не поддерживается');
-            }
-
-            $data = json_decode(file_get_contents('php://input'), true);
-            if (!is_array($data) || !isset($data['layout'])) {
-                throw new Exception('Некорректные данные макета');
-            }
-
-            $newLayout = normalizeDashboardLayout($data['layout']);
-            saveUserDashboardLayout($pdo, $userId, $newLayout);
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'Макет сохранён',
-            ]);
-            break;
-
-        default:
-            throw new Exception('Неизвестное действие');
-    }
+    $request = Request::fromGlobals();
+    $controller = new DashboardController();
+    $controller->handle($request);
 } catch (Throwable $e) {
-    http_response_code(400);
+    http_response_code(500);
+    $errorMessage = 'Внутренняя ошибка сервера';
+    $errorDetails = $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine();
+    
+    error_log("Error in api/dashboard.php: " . $errorDetails . "\n" . $e->getTraceAsString());
+    
+    // В режиме разработки показываем детали ошибки
+    $isDev = ($_SERVER['HTTP_HOST'] ?? '') === 'localhost' || strpos($_SERVER['HTTP_HOST'] ?? '', '127.0.0.1') !== false;
+    
     echo json_encode([
         'success' => false,
-        'message' => $e->getMessage(),
-    ]);
+        'message' => $isDev ? $errorDetails : $errorMessage,
+        'trace' => $isDev ? $e->getTraceAsString() : null
+    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 }
 
