@@ -9,6 +9,24 @@
     const dashboardState = window.dashboardConfig || {};
     const dashboardWidgetsMap = dashboardState.widgets || {};
     const dutyRange = dashboardState.dutyRange || {};
+    function parseDateString(dateStr) {
+        if (typeof dateStr !== 'string') {
+            return new Date();
+        }
+        const parts = dateStr.split('-').map(Number);
+        if (parts.length !== 3 || parts.some(Number.isNaN)) {
+            return new Date(dateStr);
+        }
+        const [year, month, day] = parts;
+        return new Date(year, month - 1, day);
+    }
+
+    function formatDateKey(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
     const baseUrl = dashboardState.baseUrl || '';
     const DASHBOARD_COLUMNS = 2;
 
@@ -629,7 +647,22 @@ function getShortestColumnIndexClient(columns) {
     return minIndex;
 }
 
-function loadDutyWeek(container) {
+    function buildApiDateKey(date) {
+        return new Date(date).toISOString().split('T')[0];
+    }
+
+    function fetchDutyByDate(apiDate) {
+        const params = new URLSearchParams({
+            action: 'get',
+            date: apiDate
+        });
+        return fetch(`${baseUrl}api/duty.php?${params.toString()}`)
+            .then(response => response.json())
+            .then(data => (data && data.success) ? data.data : null)
+            .catch(() => null);
+    }
+
+    function loadDutyWeek(container) {
     if (!container) return;
     container.innerHTML = `
         <div class="text-center py-3">
@@ -639,24 +672,36 @@ function loadDutyWeek(container) {
         </div>
     `;
 
-    const params = new URLSearchParams({
-        action: 'range',
-        start: dutyRange.start || '',
-        end: dutyRange.end || ''
-    });
+        const startDate = dutyRange.start ? parseDateString(dutyRange.start) : new Date();
+        const days = [];
+        for (let i = 0; i < 7; i++) {
+            const displayDate = new Date(startDate);
+            displayDate.setDate(startDate.getDate() + i);
+            days.push({
+                displayKey: formatDateKey(displayDate),
+                apiKey: buildApiDateKey(displayDate)
+            });
+        }
 
-    fetch(`${baseUrl}api/duty.php?${params.toString()}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                renderDutyWeek(data.data || [], container);
-            } else {
-                container.innerHTML = '<p class="text-danger mb-0"><i class="bi bi-exclamation-triangle"></i> Не удалось загрузить расписание</p>';
-            }
-        })
-        .catch(() => {
-            container.innerHTML = '<p class="text-danger mb-0"><i class="bi bi-exclamation-triangle"></i> Ошибка при загрузке расписания</p>';
-        });
+        Promise.all(days.map(day => fetchDutyByDate(day.apiKey)))
+            .then(results => {
+                const entries = results.map((duty, index) => {
+                    const day = days[index];
+                    if (!duty) {
+                        return { date: day.displayKey, user_full_name: null, user_login: null, is_fasting: false };
+                    }
+                    return {
+                        date: day.displayKey,
+                        user_full_name: duty.user_full_name,
+                        user_login: duty.user_login,
+                        is_fasting: !!duty.is_fasting
+                    };
+                });
+                renderDutyWeek(entries, container);
+            })
+            .catch(() => {
+                container.innerHTML = '<p class="text-danger mb-0"><i class="bi bi-exclamation-triangle"></i> Ошибка при загрузке расписания</p>';
+            });
 }
 
 function renderDutyWeek(entries, container) {
@@ -666,7 +711,7 @@ function renderDutyWeek(entries, container) {
         map[entry.date] = entry;
     });
 
-    const startDate = dutyRange.start ? new Date(dutyRange.start) : new Date();
+    const startDate = dutyRange.start ? parseDateString(dutyRange.start) : new Date();
     const todayIso = new Date().toISOString().split('T')[0];
     const weekDayNames = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 
@@ -674,7 +719,7 @@ function renderDutyWeek(entries, container) {
     for (let i = 0; i < 7; i++) {
         const current = new Date(startDate);
         current.setDate(startDate.getDate() + i);
-        const iso = current.toISOString().split('T')[0];
+        const iso = formatDateKey(current);
         const entry = map[iso] || null;
         let dutyName = entry ? (entry.user_full_name || entry.user_login || '—') : '—';
         // Ограничиваем имя первыми двумя словами
