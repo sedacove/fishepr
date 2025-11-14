@@ -574,33 +574,33 @@ function refreshWidgetContentByKey(widgetKey) {
         case 'news':
             latestNewsContainerEl = body;
             latestNewsTitleEl = document.getElementById('widget-title-news');
-            loadLatestNews(latestNewsContainerEl, latestNewsTitleEl);
+            loadLatestNews(latestNewsContainerEl, latestNewsTitleEl, { silent: true });
             break;
         case 'duty_week':
             dutyWeekContainerEl = body;
-            loadDutyWeek(dutyWeekContainerEl);
+            loadDutyWeek(dutyWeekContainerEl, { silent: true });
             break;
         case 'my_tasks':
             tasksContainerEl = body;
-            loadMyTasks(tasksContainerEl);
+            loadMyTasks(tasksContainerEl, { silent: true });
             break;
         case 'mortality_chart':
-            loadMortalityChart(body);
+            loadMortalityChart(body, { silent: true });
             break;
         case 'mortality_by_pool_chart':
-            loadMortalityByPoolChart(body);
+            loadMortalityByPoolChart(body, { silent: true });
             break;
         case 'temperature_chart':
-            loadTemperatureChart(body);
+            loadTemperatureChart(body, { silent: true });
             break;
         case 'oxygen_chart':
-            loadOxygenChart(body);
+            loadOxygenChart(body, { silent: true });
             break;
         case 'meters_chart':
-            loadMetersChart(body);
+            loadMetersChart(body, { silent: true });
             break;
         case 'shift_tasks':
-            loadShiftTasksWidget(body);
+            loadShiftTasksWidget(body, { silent: true });
             break;
         default:
             break;
@@ -729,15 +729,17 @@ function getShortestColumnIndexClient(columns) {
             .catch(() => null);
     }
 
-    function loadDutyWeek(container) {
-    if (!container) return;
-    container.innerHTML = `
-        <div class="text-center py-3">
-            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                <span class="visually-hidden">Загрузка...</span>
-            </div>
-        </div>
-    `;
+    function loadDutyWeek(container, options = {}) {
+        if (!container) return;
+        if (!options.silent) {
+            container.innerHTML = `
+                <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
+                </div>
+            `;
+        }
 
         const startDate = dutyRange.start ? parseDateString(dutyRange.start) : new Date();
         const days = [];
@@ -814,15 +816,18 @@ function renderDutyWeek(entries, container) {
     container.innerHTML = html;
 }
 
-function loadShiftTasksWidget(container) {
+function loadShiftTasksWidget(container, options = {}) {
     shiftTasksWidgetState.container = container;
-    container.innerHTML = `
-        <div class="text-center py-3 text-muted">
-            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                <span class="visually-hidden">Загрузка...</span>
+    if (!container) return;
+    if (!options.silent) {
+        container.innerHTML = `
+            <div class="text-center py-3 text-muted">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
             </div>
-        </div>
-    `;
+        `;
+    }
 
     fetch(`${baseUrl}api/shift_tasks.php?action=list`)
         .then(response => response.json())
@@ -926,15 +931,17 @@ function onShiftTaskWidgetToggle(event) {
         });
 }
 
-function loadLatestNews(container, titleElement) {
+function loadLatestNews(container, titleElement, options = {}) {
     if (!container) return;
-    container.innerHTML = `
-        <div class="text-center py-3">
-            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                <span class="visually-hidden">Загрузка...</span>
+    if (!options.silent) {
+        container.innerHTML = `
+            <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
             </div>
-        </div>
-    `;
+        `;
+    }
 
     fetch(`${baseUrl}api/news.php?action=latest`)
         .then(response => response.json())
@@ -983,15 +990,17 @@ function loadLatestNews(container, titleElement) {
         });
 }
 
-function loadMyTasks(container) {
+function loadMyTasks(container, options = {}) {
     if (!container) return;
-    container.innerHTML = `
-        <div class="text-center py-3">
-            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                <span class="visually-hidden">Загрузка...</span>
+    if (!options.silent) {
+        container.innerHTML = `
+            <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
             </div>
-        </div>
-    `;
+        `;
+    }
 
     fetch(`${baseUrl}api/tasks.php?action=list&tab=my`)
         .then(response => response.json())
@@ -1078,15 +1087,17 @@ function toggleTaskComplete(taskId, isCompleted) {
       });
 }
 
-function loadMortalityChart(container) {
+function loadMortalityChart(container, options = {}) {
     if (!container) return;
-    container.innerHTML = `
-        <div class="text-center py-3">
-            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                <span class="visually-hidden">Загрузка...</span>
+    if (!options.silent) {
+        container.innerHTML = `
+            <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
             </div>
-        </div>
-    `;
+        `;
+    }
 
     fetch(`${baseUrl}api/mortality.php?action=totals_last30`)
         .then(response => response.json())
@@ -1118,15 +1129,17 @@ function loadMortalityChart(container) {
         });
 }
 
-function loadMortalityByPoolChart(container) {
+function loadMortalityByPoolChart(container, options = {}) {
     if (!container) return;
-    container.innerHTML = `
-        <div class="text-center py-3">
-            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                <span class="visually-hidden">Загрузка...</span>
+    if (!options.silent) {
+        container.innerHTML = `
+            <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
             </div>
-        </div>
-    `;
+        `;
+    }
 
     fetch(`${baseUrl}api/mortality.php?action=totals_last14_by_pool`)
         .then(response => response.json())
@@ -1502,37 +1515,39 @@ function updateMortalityByPoolWidgetTitle(totalValue, modeConfig) {
     titleEl.textContent = `${baseTitle} (всего: ${formattedTotal} ${modeConfig.unit})`;
 }
 
-function loadTemperatureChart(container) {
+function loadTemperatureChart(container, options = {}) {
     loadMeasurementChart(container, 'latest_temperatures', 'temperature_chart', {
         datasetLabel: 'Температура, °C',
         defaultColor: '#0d6efd',
         unit: '°C',
-    });
+    }, options);
 }
 
-function loadOxygenChart(container) {
+function loadOxygenChart(container, options = {}) {
     loadMeasurementChart(container, 'latest_oxygen', 'oxygen_chart', {
         datasetLabel: 'Кислород, мг/л',
         defaultColor: '#198754',
         unit: 'мг/л',
-    });
+    }, options);
 }
 
-function loadMeasurementChart(container, endpoint, chartKey, options) {
+function loadMeasurementChart(container, endpoint, chartKey, chartOptions, options = {}) {
     if (!container) return;
-    container.innerHTML = `
-        <div class="text-center py-3">
-            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                <span class="visually-hidden">Загрузка...</span>
+    if (!options.silent) {
+        container.innerHTML = `
+            <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
             </div>
-        </div>
-    `;
+        `;
+    }
 
     fetch(`${baseUrl}api/measurements.php?action=${endpoint}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                renderMeasurementChart(container, data.data || [], chartKey, options);
+                renderMeasurementChart(container, data.data || [], chartKey, chartOptions);
             } else {
                 container.innerHTML = '<p class="text-danger mb-0">Не удалось загрузить данные замеров</p>';
             }
@@ -1726,15 +1741,17 @@ function formatTaskDate(dateString) {
     }
 }
 
-function loadMetersChart(container) {
+function loadMetersChart(container, options = {}) {
     if (!container) return;
-    container.innerHTML = `
-        <div class="text-center py-3 text-muted">
-            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                <span class="visually-hidden">Загрузка...</span>
+    if (!options.silent) {
+        container.innerHTML = `
+            <div class="text-center py-3 text-muted">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
             </div>
-        </div>
-    `;
+        `;
+    }
 
     // Сначала загружаем список приборов
     fetch(`${baseUrl}api/meter_readings.php?action=widget_meters`)
@@ -1743,7 +1760,7 @@ function loadMetersChart(container) {
             if (data.success && Array.isArray(data.data) && data.data.length > 0) {
                 metersChartState.meters = data.data;
                 metersChartState.currentMeterIndex = 0;
-                loadMeterData(container);
+                loadMeterData(container, options);
             } else {
                 container.innerHTML = '<p class="text-muted mb-0">Нет доступных приборов учета</p>';
             }
@@ -1753,7 +1770,7 @@ function loadMetersChart(container) {
         });
 }
 
-function loadMeterData(container) {
+function loadMeterData(container, options = {}) {
     if (!container) return;
     const meters = metersChartState.meters;
     const currentIndex = metersChartState.currentMeterIndex;
@@ -1765,13 +1782,15 @@ function loadMeterData(container) {
 
     const currentMeter = meters[currentIndex];
     
-    container.innerHTML = `
-        <div class="text-center py-3 text-muted">
-            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                <span class="visually-hidden">Загрузка...</span>
+    if (!options.silent) {
+        container.innerHTML = `
+            <div class="text-center py-3 text-muted">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
             </div>
-        </div>
-    `;
+        `;
+    }
 
     fetch(`${baseUrl}api/meter_readings.php?action=widget_data&meter_id=${currentMeter.id}`)
         .then(response => response.json())
