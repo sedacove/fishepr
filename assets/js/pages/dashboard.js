@@ -69,6 +69,11 @@
         currentMeterIndex: 0,
         data: []
     };
+    const shiftTasksWidgetState = {
+        container: null,
+        tasks: [],
+        isAdmin: false,
+    };
     let tasksContainerEl = null;
     let latestNewsContainerEl = null;
     let latestNewsTitleEl = null;
@@ -260,6 +265,10 @@ function initializeWidgetContent(widgetKey) {
         }
         case 'meters_chart': {
             loadMetersChart(body);
+            break;
+        }
+        case 'shift_tasks': {
+            loadShiftTasksWidget(body);
             break;
         }
         default:
@@ -745,6 +754,107 @@ function renderDutyWeek(entries, container) {
     }
     html += '</div>';
     container.innerHTML = html;
+}
+
+function loadShiftTasksWidget(container) {
+    shiftTasksWidgetState.container = container;
+    container.innerHTML = `
+        <div class="text-center py-3 text-muted">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+        </div>
+    `;
+
+    fetch(`${baseUrl}api/shift_tasks.php?action=list`)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                throw new Error(data.message || 'Не удалось загрузить задания смены');
+            }
+            const payload = data.data || {};
+            shiftTasksWidgetState.tasks = payload.tasks || [];
+            shiftTasksWidgetState.isAdmin = !!payload.is_admin;
+            renderShiftTasksWidget();
+        })
+        .catch(error => {
+            container.innerHTML = `<p class="text-danger mb-0"><i class="bi bi-exclamation-triangle"></i> ${escapeHtml(error.message)}</p>`;
+        });
+}
+
+function renderShiftTasksWidget() {
+    const container = shiftTasksWidgetState.container;
+    if (!container) return;
+
+    const tasks = shiftTasksWidgetState.tasks.slice(0, 5);
+    if (!tasks.length) {
+        container.innerHTML = '<p class="text-muted mb-0">Нет заданий для текущей смены</p>';
+        return;
+    }
+
+    const items = tasks.map(task => {
+        const isCompleted = task.status === 'completed';
+        const checkbox = `
+            <div class="form-check shift-widget-check me-2">
+                <input class="form-check-input" type="checkbox" data-shift-task="${task.id}" ${isCompleted ? 'checked' : ''}>
+            </div>
+        `;
+        const title = `<div class="fw-semibold">${escapeHtml(task.title || '')}</div>`;
+        const desc = task.description ? `<div class="small text-muted">${escapeHtml(task.description)}</div>` : '';
+        const statusClass = isCompleted ? 'text-success' : (task.is_overdue ? 'text-danger' : 'text-muted');
+        const statusLabel = escapeHtml(task.time_diff_label || '');
+
+        return `
+            <li class="list-group-item d-flex align-items-start">
+                ${checkbox}
+                <div class="flex-grow-1">
+                    ${title}
+                    ${desc}
+                    <div class="small ${statusClass}">${statusLabel}</div>
+                </div>
+            </li>
+        `;
+    }).join('');
+
+    container.innerHTML = `<ul class="list-group list-group-flush shift-widget-list">${items}</ul>`;
+    container.querySelectorAll('input[data-shift-task]').forEach(input => {
+        input.addEventListener('change', onShiftTaskWidgetToggle);
+    });
+}
+
+function onShiftTaskWidgetToggle(event) {
+    const checkbox = event.target;
+    const taskId = Number(checkbox.dataset.shiftTask);
+    const completed = checkbox.checked;
+
+    const message = completed ? 'Отметить задание как выполненное?' : 'Вернуть задание в работу?';
+    if (!confirm(message)) {
+        checkbox.checked = !completed;
+        return;
+    }
+
+    fetch(`${baseUrl}api/shift_tasks.php?action=toggle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task_id: taskId, completed }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                throw new Error(data.message || 'Не удалось обновить задание');
+            }
+            const payload = data.data || {};
+            const updatedTask = payload.task;
+            const idx = shiftTasksWidgetState.tasks.findIndex(task => task.id === taskId);
+            if (idx >= 0 && updatedTask) {
+                shiftTasksWidgetState.tasks[idx] = updatedTask;
+            }
+            renderShiftTasksWidget();
+        })
+        .catch(error => {
+            alert(error.message);
+            checkbox.checked = !completed;
+        });
 }
 
 function loadLatestNews(container, titleElement) {

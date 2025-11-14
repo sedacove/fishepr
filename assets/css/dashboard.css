@@ -183,6 +183,28 @@
     font-size: 0.8rem;
 }
 
+[data-theme="dark"] .shift-widget-list .list-group-item {
+    background-color: transparent;
+    color: inherit;
+}
+
+.shift-widget-list .list-group-item {
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+.shift-widget-list .list-group-item:last-child {
+    border-bottom: none;
+}
+
+.shift-widget-check .form-check-input {
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.25rem;
+}
+
 [data-theme="dark"] .add-widget-card {
     border-color: rgba(255, 255, 255, 0.3);
 }

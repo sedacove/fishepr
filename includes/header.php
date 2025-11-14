@@ -236,6 +236,11 @@ if (!isset($page_title)) {
                                     <i class="bi bi-newspaper"></i> Новости
                                 </a>
                             </li>
+                            <li>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>shift-tasks">
+                                    <i class="bi bi-check2-square"></i> Задания смены
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item" href="<?php echo BASE_URL; ?>settings">

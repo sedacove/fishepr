@@ -1,0 +1,157 @@
+#shiftTasksAlerts .alert {
+    margin-bottom: 0.5rem;
+}
+
+#shiftTemplatesTable tbody tr td {
+    vertical-align: middle;
+}
+
+#shiftTemplatesTable .btn-outline-secondary,
+#shiftTemplatesTable .btn-outline-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    padding: 0;
+}
+
+#shiftTemplatesTable .btn-outline-secondary {
+    color: #0d6efd;
+    border-color: rgba(13, 110, 253, 0.4);
+}
+
+#shiftTemplatesTable .btn-outline-secondary:hover {
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+#shiftTemplatesTable .btn-outline-danger {
+    color: #dc3545;
+    border-color: rgba(220, 53, 69, 0.4);
+}
+
+#shiftTemplatesTable .btn-outline-danger:hover {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.shift-template-badge {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 999px;
+}
+
+.shift-tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.shift-task-item {
+    border: 1px solid rgba(13, 110, 253, 0.3);
+    border-radius: 0.75rem;
+    padding: 0.75rem 0.9rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    background-color: #0b1120;
+    color: #f8fbff;
+    box-shadow: inset 0 0 0 1px rgba(13, 110, 253, 0.2), 0 8px 20px rgba(15, 23, 42, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.shift-task-item:hover {
+    transform: translateY(-1px);
+    box-shadow: inset 0 0 0 1px rgba(13, 110, 253, 0.35), 0 12px 24px rgba(15, 23, 42, 0.55);
+}
+
+.shift-task-item.completed {
+    opacity: 0.65;
+}
+
+.shift-task-content {
+    flex: 1;
+}
+
+.shift-task-title {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    color: #ffffff;
+}
+
+.shift-task-meta {
+    font-size: 0.85rem;
+}
+
+.shift-task-time {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.shift-task-time.overdue {
+    color: #dc3545;
+}
+
+.shift-task-time.upcoming {
+    color: #198754;
+}
+
+.shift-task-checkbox .form-check-input {
+    width: 1.3rem;
+    height: 1.3rem;
+    margin-top: 0.3rem;
+    border-color: rgba(13, 110, 253, 0.6);
+    background-color: transparent;
+}
+
+.shift-task-checkbox .form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.shift-task-status-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.shift-task-status-label.overdue {
+    color: #dc3545;
+}
+
+.shift-task-status-label.pending {
+    color: #ffc107;
+}
+
+.shift-task-status-label.completed {
+    color: #198754;
+}
+
+.frequency-dependent {
+    display: none;
+}
+
+.frequency-dependent.active {
+    display: block;
+}
+
+@media (max-width: 767px) {
+    .shift-task-item {
+        flex-direction: column;
+    }
+
+    .shift-task-checkbox .form-check-input {
+        width: 1rem;
+        height: 1rem;
+    }
+}
+
+
