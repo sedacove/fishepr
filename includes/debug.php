@@ -94,7 +94,7 @@ if (!class_exists('DebugPDO')) {
             }
         }
 
-        public function query(string $statement, ?int $mode = null, ...$fetch_mode_args)
+        public function query(string $statement, ?int $mode = null, ...$fetch_mode_args): PDOStatement|false
         {
             if (!DebugProfiler::isEnabled()) {
                 return $this->runParentQuery($statement, $mode, $fetch_mode_args);
@@ -108,7 +108,7 @@ if (!class_exists('DebugPDO')) {
             }
         }
 
-        private function runParentQuery(string $statement, ?int $mode, array $fetchArgs)
+        private function runParentQuery(string $statement, ?int $mode, array $fetchArgs): PDOStatement|false
         {
             if ($mode === null) {
                 return parent::query($statement);
