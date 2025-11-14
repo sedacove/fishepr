@@ -14,6 +14,8 @@
  */
 
 require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../includes/debug.php';
+require_once __DIR__ . '/../includes/settings.php';
 require_once __DIR__ . '/Support/Autoloader.php';
 require_once __DIR__ . '/Support/Router.php';
 require_once __DIR__ . '/Support/View.php';
@@ -29,6 +31,10 @@ $autoloader->register();
 
 // Настройка базового пути для представлений
 View::setBasePath(__DIR__ . '/Views');
+
+$debugModeEnabled = (bool)getSettingInt('debug_mode', 0);
+DebugProfiler::enable($debugModeEnabled);
+View::share('debugModeEnabled', $debugModeEnabled);
 
 // Создание и возврат маршрутизатора
 $router = new Router();

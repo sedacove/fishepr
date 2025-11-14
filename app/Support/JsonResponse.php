@@ -51,6 +51,7 @@ class JsonResponse
         if ($data !== null) {
             $payload['data'] = $data;
         }
+        self::maybeAttachDebug($payload);
         self::send($payload, $status);
     }
 
@@ -78,6 +79,21 @@ class JsonResponse
         if (!empty($data)) {
             $payload['data'] = $data;
         }
+        self::maybeAttachDebug($payload);
         self::send($payload, $status);
+    }
+
+    private static function maybeAttachDebug(array &$payload): void
+    {
+        if (!class_exists(\DebugProfiler::class)) {
+            return;
+        }
+        if (!\DebugProfiler::isEnabled()) {
+            return;
+        }
+        if (!function_exists('isAdmin') || !\isAdmin()) {
+            return;
+        }
+        $payload['_debug'] = \DebugProfiler::getSummary();
     }
 }

@@ -191,6 +191,128 @@ body.login-page {
     vertical-align: middle;
 }
 
+[data-theme="dark"] .debug-panel-content {
+    background-color: #1f2937;
+    color: #f8fafc;
+    border-color: rgba(148, 163, 184, 0.4);
+}
+
+[data-theme="dark"] .debug-dot {
+    background-color: #eab308;
+    box-shadow: 0 6px 18px rgba(234, 179, 8, 0.4);
+}
+
+[data-theme="dark"] .debug-panel-overlay {
+    background-color: rgba(15, 23, 42, 0.65);
+}
+
+.debug-dot {
+    position: fixed;
+    bottom: 18px;
+    right: 18px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: #0d6efd;
+    box-shadow: 0 10px 24px rgba(13, 110, 253, 0.5);
+    cursor: pointer;
+    z-index: 1050;
+    border: 2px solid #fff;
+}
+
+.debug-panel-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.35);
+    display: none;
+    align-items: flex-end;
+    justify-content: flex-end;
+    z-index: 1050;
+    padding: 1.5rem;
+}
+
+.debug-panel-overlay.show {
+    display: flex;
+}
+
+.debug-panel-content {
+    width: 360px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.35);
+    padding: 1.25rem;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.debug-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.debug-panel-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: inherit;
+}
+
+.debug-summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem 0;
+}
+
+.debug-summary-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.45);
+}
+
+.debug-summary-list li:last-child {
+    border-bottom: none;
+}
+
+.debug-summary-list span {
+    color: #64748b;
+}
+
+.debug-summary-list strong {
+    font-weight: 600;
+    color: inherit;
+}
+
+.debug-queries-list {
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    font-size: 0.8rem;
+    background-color: rgba(15, 23, 42, 0.02);
+}
+
+.debug-queries-list code {
+    display: block;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin-bottom: 0.35rem;
+}
+
+.debug-query-item + .debug-query-item {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.35);
+}
+
 [data-theme="dark"] .form-control {
     background-color: #2d2d2d;
     border-color: #404040;

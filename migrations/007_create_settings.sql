@@ -18,5 +18,6 @@ CREATE TABLE IF NOT EXISTS `settings` (
 
 -- Вставляем начальные настройки
 INSERT INTO `settings` (`key`, `value`, `description`) VALUES
-('measurement_edit_timeout_minutes', '30', 'Время в минутах, в течение которого пользователь может редактировать свой замер после создания')
+('measurement_edit_timeout_minutes', '30', 'Время в минутах, в течение которого пользователь может редактировать свой замер после создания'),
+('debug_mode', '0', 'Флаг включения режима отладки (1 = включен)')
 ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);

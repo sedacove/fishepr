@@ -227,14 +227,20 @@ function renderGenericSettings(settings, container, options = {}) {
     }
 
     settings.forEach(function(setting) {
-        if (setting.key === 'show_section_descriptions') {
+        if (setting.key === 'show_section_descriptions' || setting.key === 'debug_mode') {
             const isChecked = setting.value === '1' || setting.value === 'true';
+            const labelText = setting.key === 'debug_mode'
+                ? (setting.description || 'Режим отладки')
+                : (setting.description || setting.key);
+            const helpText = setting.key === 'debug_mode'
+                ? 'При включении собирается отладочная статистика и становится доступна в футере для администраторов.'
+                : setting.key;
             container.append(`
                 <div class="mb-3 pb-3 border-bottom">
                     <div class="row align-items-center g-3">
                         <div class="col-lg-6">
-                            <label class="form-label fw-bold mb-1">${escapeHtml(setting.description || setting.key)}</label>
-                            <small class="text-muted d-block">${escapeHtml(setting.key)}</small>
+                            <label class="form-label fw-bold mb-1">${escapeHtml(labelText)}</label>
+                            <small class="text-muted d-block">${escapeHtml(helpText)}</small>
                         </div>
                         <div class="col-lg-3">
                             <div class="form-check form-switch">

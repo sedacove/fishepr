@@ -7,10 +7,14 @@
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../includes/debug.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/settings.php';
 require_once __DIR__ . '/../includes/activity_log.php';
 require_once __DIR__ . '/../app/Support/Autoloader.php';
+
+$debugModeEnabled = (bool) getSettingInt('debug_mode', 0);
+DebugProfiler::enable($debugModeEnabled);
 
 // Проверка авторизации для API (возвращаем JSON вместо редиректа)
 if (!isLoggedIn()) {

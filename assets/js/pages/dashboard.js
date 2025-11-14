@@ -571,41 +571,45 @@ function refreshWidgetContentByKey(widgetKey) {
     }
 
     switch (widgetKey) {
-        case 'news':
+        case 'news': {
             latestNewsContainerEl = body;
             latestNewsTitleEl = document.getElementById('widget-title-news');
-            loadLatestNews(latestNewsContainerEl, latestNewsTitleEl, { silent: true });
+            loadLatestNews(latestNewsContainerEl, latestNewsTitleEl, { silent: true, widgetKey });
             break;
-        case 'duty_week':
+        }
+        case 'duty_week': {
             dutyWeekContainerEl = body;
-            loadDutyWeek(dutyWeekContainerEl, { silent: true });
+            loadDutyWeek(dutyWeekContainerEl, { silent: true, widgetKey });
             break;
-        case 'my_tasks':
+        }
+        case 'my_tasks': {
             tasksContainerEl = body;
-            loadMyTasks(tasksContainerEl, { silent: true });
+            loadMyTasks(tasksContainerEl, { silent: true, widgetKey });
             break;
+        }
         case 'mortality_chart':
-            loadMortalityChart(body, { silent: true });
+            loadMortalityChart(body, { silent: true, widgetKey });
             break;
         case 'mortality_by_pool_chart':
-            loadMortalityByPoolChart(body, { silent: true });
+            loadMortalityByPoolChart(body, { silent: true, widgetKey });
             break;
         case 'temperature_chart':
-            loadTemperatureChart(body, { silent: true });
+            loadTemperatureChart(body, { silent: true, widgetKey });
             break;
         case 'oxygen_chart':
-            loadOxygenChart(body, { silent: true });
+            loadOxygenChart(body, { silent: true, widgetKey });
             break;
         case 'meters_chart':
-            loadMetersChart(body, { silent: true });
+            loadMetersChart(body, { silent: true, widgetKey });
             break;
         case 'shift_tasks':
-            loadShiftTasksWidget(body, { silent: true });
+            loadShiftTasksWidget(body, { silent: true, widgetKey });
             break;
         default:
             break;
     }
 }
+
 
 function showDashboardAlert(type, message) {
     const container = document.getElementById('alert-container');
