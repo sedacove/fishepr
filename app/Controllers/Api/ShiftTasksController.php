@@ -46,6 +46,10 @@ class ShiftTasksController extends Controller
                     $this->ensureAdmin();
                     $this->handleDeleteTemplate($request);
                     return;
+                case 'reorder_templates':
+                    $this->ensureAdmin();
+                    $this->handleReorderTemplates($request);
+                    return;
                 default:
                     JsonResponse::error('Неизвестное действие', 400);
             }
@@ -135,6 +139,17 @@ class ShiftTasksController extends Controller
 
         $this->service->deleteTemplate($templateId);
         JsonResponse::success(['deleted' => true]);
+    }
+
+    private function handleReorderTemplates(Request $request): void
+    {
+        if (!$request->isMethod('POST')) {
+            throw new DomainException('Метод не поддерживается');
+        }
+        $payload = $request->getJsonBody();
+        $order = $payload['order'] ?? [];
+        $this->service->reorderTemplates($order);
+        JsonResponse::success(['sorted' => true]);
     }
 
     private function ensureAdmin(): void

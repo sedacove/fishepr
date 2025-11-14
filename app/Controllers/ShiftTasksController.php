@@ -20,6 +20,7 @@ class ShiftTasksController extends Controller
         return $this->view('shift_tasks.index', [
             'pageTitle' => 'Задания смены',
             'extra_styles' => ['assets/css/pages/shift_tasks.css'],
+            'extra_head_scripts' => ['https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js'],
             'extra_body_scripts' => ['assets/js/pages/shift_tasks.js'],
         ]);
     }

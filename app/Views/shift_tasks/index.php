@@ -23,36 +23,22 @@ View::extends('layouts.app');
     <div class="row g-4">
         <div class="col-lg-6">
             <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white">
+                <div class="card-header">
                     <h5 class="mb-0">Шаблоны заданий</h5>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table align-middle" id="shiftTemplatesTable">
-                            <thead>
-                                <tr>
-                                    <th>Название</th>
-                                    <th>Повторение</th>
-                                    <th>Время</th>
-                                    <th class="text-end">Действия</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">
-                                        <div class="spinner-border spinner-border-sm text-primary me-2"></div>
-                                        Загрузка шаблонов...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div id="shiftTemplatesList" class="list-group shift-templates-list">
+                        <div class="text-center text-muted py-4">
+                            <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                            Загрузка шаблонов...
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2">
+                <div class="card-header d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2">
                     <div>
                         <h5 class="mb-0">Чек-лист текущей смены</h5>
                         <small class="text-muted" id="shiftTasksDateLabel"></small>

@@ -101,6 +101,7 @@ class ShiftTaskService
         if ($id === null) {
             $data['created_by'] = $userId;
             $data['updated_by'] = $userId;
+            $data['sort_order'] = $this->templates->getNextSortOrder();
             return $this->templates->create($data);
         }
 
@@ -129,6 +130,15 @@ class ShiftTaskService
     public function findTemplate(int $id): ?array
     {
         return $this->templates->find($id);
+    }
+
+    public function reorderTemplates(array $orderedIds): void
+    {
+        $orderedIds = array_values(array_filter(array_map('intval', $orderedIds), fn($id) => $id > 0));
+        if (empty($orderedIds)) {
+            throw new DomainException('Нет данных для сортировки');
+        }
+        $this->templates->updateSortOrder($orderedIds);
     }
 
     private function validateTemplatePayload(array $payload): array

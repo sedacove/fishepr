@@ -37,7 +37,7 @@ class ShiftTaskTemplateRepository extends Repository
             $params[] = $isActive ? 1 : 0;
         }
 
-        $sql .= ' ORDER BY t.is_active DESC, t.title ASC';
+        $sql .= ' ORDER BY t.is_active DESC, t.sort_order ASC, t.id ASC';
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
@@ -56,13 +56,14 @@ class ShiftTaskTemplateRepository extends Repository
     {
         $stmt = $this->pdo->prepare('
             INSERT INTO shift_task_templates
-            (title, description, frequency, start_date, week_day, day_of_month, due_time, is_active, created_by, updated_by)
-            VALUES (:title, :description, :frequency, :start_date, :week_day, :day_of_month, :due_time, :is_active, :created_by, :updated_by)
+            (title, description, sort_order, frequency, start_date, week_day, day_of_month, due_time, is_active, created_by, updated_by)
+            VALUES (:title, :description, :sort_order, :frequency, :start_date, :week_day, :day_of_month, :due_time, :is_active, :created_by, :updated_by)
         ');
 
         $stmt->execute([
             ':title' => $data['title'],
             ':description' => $data['description'] ?? null,
+            ':sort_order' => $data['sort_order'] ?? 0,
             ':frequency' => $data['frequency'],
             ':start_date' => $data['start_date'],
             ':week_day' => $data['week_day'],
@@ -111,6 +112,32 @@ class ShiftTaskTemplateRepository extends Repository
     {
         $stmt = $this->pdo->prepare('DELETE FROM shift_task_templates WHERE id = ?');
         $stmt->execute([$id]);
+    }
+
+    public function getNextSortOrder(): int
+    {
+        $stmt = $this->pdo->query('SELECT COALESCE(MAX(sort_order), 0) + 1 AS next_order FROM shift_task_templates');
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int)($row['next_order'] ?? 1);
+    }
+
+    public function updateSortOrder(array $orderedIds): void
+    {
+        if (empty($orderedIds)) {
+            return;
+        }
+        $this->pdo->beginTransaction();
+        try {
+            $order = 1;
+            $stmt = $this->pdo->prepare('UPDATE shift_task_templates SET sort_order = ? WHERE id = ?');
+            foreach ($orderedIds as $id) {
+                $stmt->execute([$order++, $id]);
+            }
+            $this->pdo->commit();
+        } catch (\Throwable $exception) {
+            $this->pdo->rollBack();
+            throw $exception;
+        }
     }
 
     /**

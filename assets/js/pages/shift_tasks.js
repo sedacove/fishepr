@@ -1,9 +1,9 @@
 (function () {
     'use strict';
 
-    const templatesTable = document.getElementById('shiftTemplatesTable');
+    const templatesList = document.getElementById('shiftTemplatesList');
     const checklistContainer = document.getElementById('shiftTasksChecklist');
-    if (!templatesTable && !checklistContainer) {
+    if (!templatesList && !checklistContainer) {
         return;
     }
 
@@ -66,41 +66,74 @@
     }
 
     function renderTemplates() {
-        if (!templatesTable) return;
-        const tbody = templatesTable.querySelector('tbody');
+        if (!templatesList) return;
         if (!state.templates.length) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="4" class="text-center text-muted py-4">
-                        Шаблоны не настроены
-                    </td>
-                </tr>
+            templatesList.innerHTML = `
+                <div class="text-center text-muted py-4">
+                    Шаблоны не настроены
+                </div>
             `;
             return;
         }
 
-        tbody.innerHTML = state.templates.map(template => `
-            <tr data-template-id="${template.id}">
-                <td>
-                    <div class="fw-semibold">${escapeHtml(template.title)}</div>
-                    <div class="text-muted small">${escapeHtml(template.description || '')}</div>
-                </td>
-                <td>
-                    <span class="badge text-bg-light shift-template-badge">${formatFrequency(template)}</span>
-                </td>
-                <td>${template.due_time?.slice(0, 5) || '—'}</td>
-                <td class="text-end">
-                    <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-secondary" data-action="edit-template">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-outline-danger" data-action="delete-template">
-                            <i class="bi bi-trash"></i>
-                        </button>
+        templatesList.innerHTML = state.templates.map(template => `
+            <div class="list-group-item shift-template-item d-flex justify-content-between align-items-center" data-template-id="${template.id}">
+                <div class="d-flex align-items-start gap-3">
+                    <button class="btn btn-link p-0 shift-template-handle" type="button" title="Переместить">
+                        <i class="bi bi-grip-vertical"></i>
+                    </button>
+                    <div>
+                        <div class="fw-semibold">${escapeHtml(template.title)}</div>
+                        <div class="text-muted small mb-1">${escapeHtml(template.description || '')}</div>
+                        <div class="d-flex flex-wrap gap-2 small text-muted">
+                            <span><i class="bi bi-arrow-repeat me-1"></i>${formatFrequency(template)}</span>
+                            <span><i class="bi bi-clock me-1"></i>${template.due_time?.slice(0, 5) || '—'}</span>
+                            ${template.is_active ? '<span class="badge bg-success-subtle text-success-emphasis">Активно</span>' : '<span class="badge bg-secondary-subtle text-secondary-emphasis">Отключено</span>'}
+                        </div>
                     </div>
-                </td>
-            </tr>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-primary" data-action="edit-template" title="Редактировать">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" data-action="delete-template" title="Удалить">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
         `).join('');
+        initTemplatesSortable();
+    }
+    function initTemplatesSortable() {
+        if (!templatesList) return;
+        if (window.shiftTemplatesSortable) {
+            window.shiftTemplatesSortable.destroy();
+        }
+
+        window.shiftTemplatesSortable = new Sortable(templatesList, {
+            animation: 150,
+            handle: '.shift-template-handle',
+            ghostClass: 'shift-template-ghost',
+            onEnd: saveTemplatesOrder,
+        });
+    }
+
+    function saveTemplatesOrder() {
+        const rows = Array.from(templatesList.querySelectorAll('.shift-template-item'));
+        const order = rows.map(row => Number(row.dataset.templateId));
+
+        fetchJson(`${apiBase}?action=reorder_templates`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order }),
+        })
+            .then(response => {
+                if (!response.success) {
+                    throw new Error(response.message || 'Не удалось сохранить порядок');
+                }
+                showAlert('success', 'Порядок сохранен');
+            })
+            .catch(error => showAlert('danger', error.message));
     }
 
     function escapeHtml(text) {
@@ -255,7 +288,7 @@
             return;
         }
         const action = target.dataset.action;
-        const row = target.closest('tr');
+        const row = target.closest('.shift-template-item');
         const templateId = Number(row?.dataset.templateId);
         const template = state.templates.find(item => item.id == templateId);
 
@@ -332,7 +365,7 @@
     }
 
     // Event listeners
-    templatesTable?.addEventListener('click', handleTemplateAction);
+    templatesList?.addEventListener('click', handleTemplateAction);
     checklistContainer?.addEventListener('click', handleChecklistClick);
     templateForm?.addEventListener('submit', handleTemplateSubmission);
     deleteConfirmBtn?.addEventListener('click', handleDeleteTemplate);

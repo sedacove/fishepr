@@ -193,6 +193,7 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     padding-left: 0.25rem;
     padding-right: 0.25rem;
+    font-size: 0.85rem;
 }
 
 .shift-widget-list .list-group-item:last-child {

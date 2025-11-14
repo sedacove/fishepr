@@ -80,6 +80,8 @@
     let dutyWeekContainerEl = null;
     let toggleEditBtn = null;
     let isEditMode = false;
+    const AUTO_REFRESH_INTERVAL = 60000;
+    let autoRefreshTimer = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     toggleEditBtn = document.getElementById('toggleEditBtn');
@@ -88,6 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     renderDashboard();
     initAddWidgetModal();
+    initAutoRefresh();
 });
 
 function renderDashboard() {
@@ -549,6 +552,61 @@ function toggleEditMode() {
     renderDashboard();
 }
 
+function initAutoRefresh() {
+    if (autoRefreshTimer) {
+        clearInterval(autoRefreshTimer);
+    }
+    autoRefreshTimer = setInterval(refreshActiveWidgets, AUTO_REFRESH_INTERVAL);
+}
+
+function refreshActiveWidgets() {
+    const widgetKeys = flattenLayoutColumns();
+    widgetKeys.forEach(refreshWidgetContentByKey);
+}
+
+function refreshWidgetContentByKey(widgetKey) {
+    const body = document.getElementById(`widget-body-${widgetKey}`);
+    if (!body) {
+        return;
+    }
+
+    switch (widgetKey) {
+        case 'news':
+            latestNewsContainerEl = body;
+            latestNewsTitleEl = document.getElementById('widget-title-news');
+            loadLatestNews(latestNewsContainerEl, latestNewsTitleEl);
+            break;
+        case 'duty_week':
+            dutyWeekContainerEl = body;
+            loadDutyWeek(dutyWeekContainerEl);
+            break;
+        case 'my_tasks':
+            tasksContainerEl = body;
+            loadMyTasks(tasksContainerEl);
+            break;
+        case 'mortality_chart':
+            loadMortalityChart(body);
+            break;
+        case 'mortality_by_pool_chart':
+            loadMortalityByPoolChart(body);
+            break;
+        case 'temperature_chart':
+            loadTemperatureChart(body);
+            break;
+        case 'oxygen_chart':
+            loadOxygenChart(body);
+            break;
+        case 'meters_chart':
+            loadMetersChart(body);
+            break;
+        case 'shift_tasks':
+            loadShiftTasksWidget(body);
+            break;
+        default:
+            break;
+    }
+}
+
 function showDashboardAlert(type, message) {
     const container = document.getElementById('alert-container');
     if (!container) return;
@@ -786,7 +844,16 @@ function renderShiftTasksWidget() {
     const container = shiftTasksWidgetState.container;
     if (!container) return;
 
-    const tasks = shiftTasksWidgetState.tasks.slice(0, 5);
+    const tasks = [...shiftTasksWidgetState.tasks];
+    tasks.sort((a, b) => {
+        if (a.status === 'completed' && b.status !== 'completed') {
+            return 1;
+        }
+        if (a.status !== 'completed' && b.status === 'completed') {
+            return -1;
+        }
+        return (a.sort_order || 0) - (b.sort_order || 0);
+    });
     if (!tasks.length) {
         container.innerHTML = '<p class="text-muted mb-0">Нет заданий для текущей смены</p>';
         return;
@@ -805,12 +872,14 @@ function renderShiftTasksWidget() {
         const statusLabel = escapeHtml(task.time_diff_label || '');
 
         return `
-            <li class="list-group-item d-flex align-items-start">
+            <li class="list-group-item d-flex align-items-center gap-2">
                 ${checkbox}
-                <div class="flex-grow-1">
-                    ${title}
-                    ${desc}
-                    <div class="small ${statusClass}">${statusLabel}</div>
+                <div class="flex-grow-1 d-flex justify-content-between align-items-center gap-2">
+                    <div class="text-truncate">
+                        ${title}
+                        ${desc ? `<span class="text-muted small ms-1">${desc}</span>` : ''}
+                    </div>
+                    <div class="small ${statusClass} text-nowrap">${statusLabel}</div>
                 </div>
             </li>
         `;
