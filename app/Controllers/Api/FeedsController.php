@@ -31,6 +31,9 @@ class FeedsController
                 case 'list':
                     JsonResponse::success($this->service->list());
                     return;
+                case 'chart_data':
+                    JsonResponse::success($this->service->chartData());
+                    return;
                 case 'get':
                     $id = (int)$request->getQuery('id', 0);
                     JsonResponse::success($this->service->get($id));

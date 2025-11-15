@@ -146,6 +146,11 @@ class SessionSummary extends Model
      * @var array|null Расчет нормы кормления
      */
     public ?array $feeding_plan = null;
+
+    /**
+     * @var float|null Коэффициент фактического внесения корма (кг на 100 кг биомассы)
+     */
+    public ?float $feed_ratio = null;
 }
 
 

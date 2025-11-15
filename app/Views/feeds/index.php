@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\FeedTableParser;
 use App\Support\View;
 
 View::extends('layouts.app');
@@ -7,6 +8,7 @@ View::extends('layouts.app');
 $config = $feedsConfig ?? [
     'baseUrl' => BASE_URL,
 ];
+$templateYaml = $feedTableTemplate ?? FeedTableParser::getTemplate();
 
 require_once __DIR__ . '/../../../includes/section_descriptions.php';
 ?>
@@ -53,6 +55,26 @@ require_once __DIR__ . '/../../../includes/section_descriptions.php';
             </div>
         </div>
     </div>
+
+    <div class="card mt-4" id="feedsChartsWrapper">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div>
+                    <h2 class="h4 mb-1">Графики температур и веса</h2>
+                    <p class="text-muted mb-0 small">По данным из YAML-таблиц каждого корма (значение – кг корма на 100 кг биомассы в сутки).</p>
+                </div>
+                <div class="text-muted small" id="feedsChartsLegend"></div>
+            </div>
+            <div id="feedsChartsContainer" class="feed-charts-grid">
+                <div class="text-center text-muted py-4 w-100">
+                    <div class="spinner-border spinner-border-sm me-2" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
+                    Загружаем данные графиков...
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="feedModal" tabindex="-1" aria-hidden="true">
@@ -87,27 +109,52 @@ require_once __DIR__ . '/../../../includes/section_descriptions.php';
                         <textarea class="form-control" id="feedDescription" name="description" rows="3"></textarea>
                     </div>
 
-                    <div class="alert alert-light border mb-3">
-                        <strong>Как задавать формулы кормления:</strong>
-                        <ul class="mb-0 mt-2 small">
-                            <li>Используйте переменную <code>T</code> для температуры воды (°C) и <code>W</code> для среднего веса рыбы (в граммах).</li>
-                            <li>Допустимы операции <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code> и круглые скобки. Десятичные дроби задавайте через точку.</li>
-                            <li>Формула должна возвращать норму кормления (кг на 1 кг биомассы). Пример: <code>((0.08 + (T - 6) * 0.06) * (2.5 * W ^ -0.3)) / 100</code></li>
-                        </ul>
+                    <div class="alert alert-light border mb-4">
+                        <strong class="d-block mb-2">Таблица коэффициентов кормления</strong>
+                        <p class="mb-2 small text-muted">
+                            Заполните YAML-таблицу, где указаны диапазоны веса (в граммах), допустимые температуры и значения коэффициентов.
+                            Значение показывает, сколько килограммов корма требуется на 100 кг биомассы в сутки.
+                        </p>
+                        <div class="feed-template-preview">
+                            <textarea class="form-control feed-template-textarea font-monospace" id="feedTemplateExample" rows="14" readonly><?php echo htmlspecialchars($templateYaml, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></textarea>
+                            <div class="text-end mt-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-copy-template="#feedTemplateExample">
+                                    Скопировать шаблон
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="row g-3">
+                    <div class="row g-4">
                         <div class="col-md-4">
-                            <label for="feedFormulaEconom" class="form-label">Формула «Эконом»</label>
-                            <textarea class="form-control" id="feedFormulaEconom" name="formula_econom" rows="3"></textarea>
+                            <div class="form-label d-flex justify-content-between align-items-center">
+                                <span>Таблица «Эконом»</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-feed-template="#feedFormulaEconom">
+                                    Вставить шаблон
+                                </button>
+                            </div>
+                            <textarea class="form-control feed-table-textarea font-monospace" id="feedFormulaEconom" name="formula_econom" rows="16"></textarea>
+                            <div class="form-text">Можно настроить под конкретный корм.</div>
                         </div>
                         <div class="col-md-4">
-                            <label for="feedFormulaNormal" class="form-label">Формула «Норма»</label>
-                            <textarea class="form-control" id="feedFormulaNormal" name="formula_normal" rows="3"></textarea>
+                            <div class="form-label d-flex justify-content-between align-items-center">
+                                <span>Таблица «Норма»</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-feed-template="#feedFormulaNormal">
+                                    Вставить шаблон
+                                </button>
+                            </div>
+                            <textarea class="form-control feed-table-textarea font-monospace" id="feedFormulaNormal" name="formula_normal" rows="16"></textarea>
+                            <div class="form-text">Если значения совпадают с эконом, можно оставить поле пустым.</div>
                         </div>
                         <div class="col-md-4">
-                            <label for="feedFormulaGrowth" class="form-label">Формула «Рост»</label>
-                            <textarea class="form-control" id="feedFormulaGrowth" name="formula_growth" rows="3"></textarea>
+                            <div class="form-label d-flex justify-content-between align-items-center">
+                                <span>Таблица «Рост»</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-feed-template="#feedFormulaGrowth">
+                                    Вставить шаблон
+                                </button>
+                            </div>
+                            <textarea class="form-control feed-table-textarea font-monospace" id="feedFormulaGrowth" name="formula_growth" rows="16"></textarea>
+                            <div class="form-text">Можно использовать собственные диапазоны и температуры.</div>
                         </div>
                     </div>
 
@@ -140,6 +187,9 @@ require_once __DIR__ . '/../../../includes/section_descriptions.php';
 </div>
 
 <script>
-    window.feedsConfig = <?php echo json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+    window.feedsConfig = <?php echo json_encode(
+        array_merge($config, ['tableTemplate' => $templateYaml]),
+        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+    ); ?>;
 </script>
 

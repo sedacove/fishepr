@@ -7,7 +7,7 @@ use App\Models\Feed\FeedNormImage;
 use App\Repositories\FeedNormImageRepository;
 use App\Repositories\FeedRepository;
 use App\Support\Exceptions\ValidationException;
-use App\Support\FeedingFormula;
+use App\Support\FeedTableParser;
 use DomainException;
 use InvalidArgumentException;
 use PDO;
@@ -207,6 +207,140 @@ class FeedService
         return $this->feeds->options();
     }
 
+    /**
+     * Возвращает подготовленные данные для построения графиков кормов
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public function chartData(): array
+    {
+        $items = $this->feeds->listAll();
+        if (empty($items)) {
+            return [];
+        }
+
+        $feeds = [];
+        foreach ($items as $row) {
+            $feedCharts = $this->buildFeedChartPayload($row);
+            if (empty($feedCharts['strategies'])) {
+                continue;
+            }
+            $feeds[] = $feedCharts;
+        }
+
+        return $feeds;
+    }
+
+    /**
+     * @param array<string,mixed> $row
+     */
+    private function buildFeedChartPayload(array $row): array
+    {
+        $strategies = [];
+        foreach (['econom', 'normal', 'growth'] as $strategy) {
+            $field = 'formula_' . $strategy;
+            $yaml = $row[$field] ?? null;
+            if (!$yaml) {
+                continue;
+            }
+
+            try {
+                $table = FeedTableParser::parse($yaml);
+            } catch (InvalidArgumentException $e) {
+                error_log(sprintf('Feed chart parse error for feed #%s (%s): %s', $row['id'] ?? '?', $strategy, $e->getMessage()));
+                continue;
+            }
+
+            $strategyPayload = $this->buildStrategyChart($table, $strategy);
+            if ($strategyPayload === null) {
+                continue;
+            }
+
+            $strategies[] = $strategyPayload;
+        }
+
+        return [
+            'id' => (int)($row['id'] ?? 0),
+            'name' => $row['name'] ?? 'Корм',
+            'granule' => $row['granule'] ?? null,
+            'manufacturer' => $row['manufacturer'] ?? null,
+            'strategies' => $strategies,
+        ];
+    }
+
+    /**
+     * @param array<string,mixed> $table
+     */
+    private function buildStrategyChart(array $table, string $strategy): ?array
+    {
+        $temperatures = array_map('floatval', $table['temperatures'] ?? []);
+        $weightRanges = $table['weight_ranges'] ?? [];
+        if (empty($temperatures) || empty($weightRanges)) {
+            return null;
+        }
+
+        $datasets = [];
+        foreach ($weightRanges as $range) {
+            $label = $range['label'] ?? null;
+            if (!$label) {
+                continue;
+            }
+
+            $dataPoints = [];
+            foreach ($temperatures as $temperature) {
+                $tempKey = (string)$temperature;
+                $value = $table['values'][$tempKey][$label] ?? null;
+                $dataPoints[] = $value !== null ? (float)$value : null;
+            }
+
+            if ($this->allValuesNull($dataPoints)) {
+                continue;
+            }
+
+            $datasets[] = [
+                'label' => $label,
+                'min' => isset($range['min']) ? (float)$range['min'] : null,
+                'max' => isset($range['max']) ? (float)$range['max'] : null,
+                'data' => $dataPoints,
+            ];
+        }
+
+        if (empty($datasets)) {
+            return null;
+        }
+
+        return [
+            'key' => $strategy,
+            'label' => $this->getStrategyLabel($strategy),
+            'unit' => $table['unit'] ?? null,
+            'temperatures' => $temperatures,
+            'datasets' => $datasets,
+        ];
+    }
+
+    /**
+     * @param array<int,float|null> $values
+     */
+    private function allValuesNull(array $values): bool
+    {
+        foreach ($values as $value) {
+            if ($value !== null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function getStrategyLabel(string $strategy): string
+    {
+        return match ($strategy) {
+            'econom' => 'Эконом',
+            'growth' => 'Рост',
+            default => 'Норма',
+        };
+    }
+
     private function validatePayload(array $payload): array
     {
         $name = trim((string)($payload['name'] ?? ''));
@@ -222,31 +356,26 @@ class FeedService
             'name' => $name,
             'granule' => $granule !== '' ? $granule : null,
             'description' => $description !== '' ? $description : null,
-            'formula_econom' => $this->validateFormula($payload['formula_econom'] ?? null, 'formula_econom'),
-            'formula_normal' => $this->validateFormula($payload['formula_normal'] ?? null, 'formula_normal'),
-            'formula_growth' => $this->validateFormula($payload['formula_growth'] ?? null, 'formula_growth'),
+            'formula_econom' => $this->validateFeedTable($payload['formula_econom'] ?? null, 'formula_econom'),
+            'formula_normal' => $this->validateFeedTable($payload['formula_normal'] ?? null, 'formula_normal'),
+            'formula_growth' => $this->validateFeedTable($payload['formula_growth'] ?? null, 'formula_growth'),
             'manufacturer' => $manufacturer !== '' ? $manufacturer : null,
         ];
     }
 
-    private function normalizeText(?string $value): ?string
+    private function validateFeedTable(?string $value, string $field): ?string
     {
         if ($value === null) {
             return null;
         }
-        $text = trim($value);
-        return $text === '' ? null : $text;
-    }
 
-    private function validateFormula(?string $value, string $field): ?string
-    {
-        $normalized = FeedingFormula::normalize($value);
-        if ($normalized === null) {
+        $normalized = trim($value);
+        if ($normalized === '') {
             return null;
         }
 
         try {
-            FeedingFormula::validate($normalized);
+            FeedTableParser::parse($normalized);
         } catch (InvalidArgumentException $e) {
             throw new ValidationException($field, $e->getMessage());
         }

@@ -12,7 +12,7 @@ use App\Repositories\PoolRepository;
 use App\Repositories\SessionRepository;
 use App\Repositories\WeighingRepository;
 use App\Support\Exceptions\ValidationException;
-use App\Support\FeedingFormula;
+use App\Support\FeedTableParser;
 use DateTime;
 use PDO;
 
@@ -69,6 +69,11 @@ class WorkService
      * @var array<int,array> Кеш загруженных кормов
      */
     private array $feedCache = [];
+
+    /**
+     * @var array<string,array|null> Кеш разобранных таблиц кормления (feedId|strategy)
+     */
+    private array $feedTableCache = [];
 
     /**
      * @var array Настройки температуры (bad_below, acceptable_min, good_min, good_max, acceptable_max, bad_above)
@@ -195,12 +200,10 @@ class WorkService
             'planting_name' => $sessionRow['planting_name'] ?? null,
             'planting_fish_breed' => $sessionRow['planting_fish_breed'] ?? null,
             'feed_id' => isset($sessionRow['feed_id']) ? (int)$sessionRow['feed_id'] : null,
+            'feed_name' => $sessionRow['feed_name'] ?? null,
             'feeding_strategy' => $sessionRow['feeding_strategy'] ?? null,
+            'daily_feedings' => isset($sessionRow['daily_feedings']) ? (int)$sessionRow['daily_feedings'] : null,
         ]);
-
-        if (isset($sessionRow['feed_name'])) {
-            $session->feed_name = $sessionRow['feed_name'];
-        }
 
         $startDate = $session->start_date ?? $sessionRow['created_at'] ?? null;
         if (!$startDate) {
@@ -343,17 +346,18 @@ class WorkService
      * Рассчитывает рекомендованный объём кормления для текущей сессии
      *
      * Алгоритм:
-     * 1. Проверяем, что у сессии задан корм и стратегия кормления.
+     * 1. Проверяем, что у сессии задан корм, стратегия и количество кормлений в день.
      * 2. Собираем исходные данные: последнюю температуру воды, средний вес рыбы и текущую биомассу.
-     * 3. Получаем формулу из карточки корма и подставляем значения (T — температура, W — вес в граммах).
-     * 4. Формула возвращает норму кормления в кг на 1 кг биомассы. Домножаем на фактическую биомассу
-     *    и сохраняем результат вместе с исходными параметрами.
-     * 5. Во всех шагах предусмотрены проверки и безопасная обработка ошибок, чтобы карточка сессии
-     *    оставалась стабильной даже при некорректных данных.
+     * 3. Читаем YAML-таблицу из карточки корма, определяем подходящий диапазон веса и температуры.
+     * 4. Таблица хранит норму в «кг корма на 100 кг биомассы в сутки». Приводим к фактической биомассе
+     *    и делим на количество кормлений, получая норму на одно кормление.
+     * 5. Все шаги защищены проверками и логированием, чтобы карточка сессии оставалась стабильной
+     *    даже при некорректных данных или неполных таблицах.
      */
     private function applyFeedingPlan(SessionSummary $session, array $sessionRow): void
     {
         $session->feeding_plan = null;
+        $session->feed_ratio = null;
 
         $feedId = $session->feed_id;
         $strategy = $session->feeding_strategy ?: $sessionRow['feeding_strategy'] ?? null;
@@ -361,7 +365,7 @@ class WorkService
             return;
         }
 
-        $dailyFeedings = (int)($sessionRow['daily_feedings'] ?? 0);
+        $dailyFeedings = (int)($sessionRow['daily_feedings'] ?? $session->daily_feedings ?? 0);
         if ($dailyFeedings <= 0) {
             return;
         }
@@ -380,37 +384,36 @@ class WorkService
         }
         $session->feed_name = $feed['name'] ?? $session->feed_name;
 
-        $formulaField = 'formula_' . $strategy;
-        $formula = $feed[$formulaField] ?? null;
-        if (!$formula) {
+        $table = $this->getFeedTable($feed, $strategy);
+        if (!$table) {
             return;
         }
 
         $avgWeightGrams = $avgWeightKg * 1000;
-        try {
-            $ratio = FeedingFormula::evaluate($formula, (float)$temperature, (float)$avgWeightGrams);
-        } catch (\InvalidArgumentException $e) {
-            error_log('Feeding formula evaluation failed for feed #' . $feedId . ': ' . $e->getMessage());
+        $match = FeedTableParser::resolveRate($table, (float)$temperature, (float)$avgWeightGrams);
+        if (!$match) {
             return;
         }
 
-        $ratio = max(0, (float)$ratio);
-        $recommended = max(0, $ratio * (float)$biomassKg);
-
-        $perFeeding = max(0, $recommended / $dailyFeedings);
+        $ratioPer100Kg = max(0, (float)$match['value']);
+        $recommendedPerDay = max(0, ($ratioPer100Kg / 100) * (float)$biomassKg);
+        $perFeeding = max(0, $recommendedPerDay / $dailyFeedings);
+        $session->feed_ratio = $ratioPer100Kg;
 
         $session->feeding_plan = [
             'feed_name' => $session->feed_name,
             'strategy' => $strategy,
             'strategy_label' => $this->getStrategyLabel($strategy),
-            'ratio_per_kg' => $ratio,
-            'recommended_total' => $recommended,
+            'unit' => $table['unit'] ?? null,
+            'ratio_per_100kg' => $ratioPer100Kg,
+            'temperature_slot' => $match['temperature'],
+            'weight_label' => $match['weight_label'],
+            'daily_amount' => $recommendedPerDay,
             'per_feeding' => $perFeeding,
             'temperature' => (float)$temperature,
             'avg_weight_kg' => $avgWeightKg,
             'avg_weight_g' => $avgWeightGrams,
             'biomass_kg' => (float)$biomassKg,
-            'formula' => $formula,
         ];
     }
 
@@ -421,6 +424,47 @@ class WorkService
         }
 
         return $this->feedCache[$feedId];
+    }
+
+    private function getFeedTable(array $feed, string $strategy): ?array
+    {
+        $field = $this->resolveFeedTableField($strategy);
+        if (!$field) {
+            return null;
+        }
+
+        $feedId = (int)($feed['id'] ?? 0);
+        $cacheKey = $feedId . '|' . $strategy;
+
+        if (array_key_exists($cacheKey, $this->feedTableCache)) {
+            return $this->feedTableCache[$cacheKey];
+        }
+
+        $rawYaml = $feed[$field] ?? null;
+        if (!$rawYaml) {
+            $this->feedTableCache[$cacheKey] = null;
+            return null;
+        }
+
+        try {
+            $table = FeedTableParser::parse($rawYaml);
+        } catch (\Throwable $e) {
+            error_log('Feed table parse error for feed #' . $feedId . ': ' . $e->getMessage());
+            $table = null;
+        }
+
+        $this->feedTableCache[$cacheKey] = $table;
+        return $table;
+    }
+
+    private function resolveFeedTableField(string $strategy): ?string
+    {
+        return match ($strategy) {
+            'econom' => 'formula_econom',
+            'growth' => 'formula_growth',
+            'normal' => 'formula_normal',
+            default => null,
+        };
     }
 
     private function getStrategyLabel(string $strategy): string

@@ -9,11 +9,14 @@
     const config = window.feedsConfig || {};
     const baseUrl = config.baseUrl || '';
     const apiBase = new URL('.', baseUrl || window.location.href).toString();
+    const tableTemplate = (config.tableTemplate || '').trim();
 
     let currentFeedId = null;
     let feedsTableBody = null;
     let feedModalInstance = null;
     let normUploadInput = null;
+    const feedChartsRegistry = {};
+    const feedChartStates = {};
 
     document.addEventListener('DOMContentLoaded', initPage);
 
@@ -23,8 +26,67 @@
         if (normUploadInput) {
             normUploadInput.addEventListener('change', handleNormUpload);
         }
+        document.querySelectorAll('[data-feed-template]').forEach(btn => {
+            btn.addEventListener('click', handleInsertTemplate);
+        });
+        document.querySelectorAll('[data-copy-template]').forEach(btn => {
+            btn.addEventListener('click', handleCopyTemplate);
+        });
         feedModalInstance = bootstrap.Modal.getOrCreateInstance(document.getElementById('feedModal'));
         loadFeeds();
+    }
+
+    function handleInsertTemplate(event) {
+        event.preventDefault();
+        if (!tableTemplate) {
+            showAlert('warning', 'Шаблон ещё не загружен');
+            return;
+        }
+        const targetSelector = event.currentTarget.getAttribute('data-feed-template');
+        const textarea = targetSelector ? document.querySelector(targetSelector) : null;
+        if (!textarea) {
+            return;
+        }
+        textarea.value = tableTemplate;
+        textarea.dispatchEvent(new Event('input'));
+        textarea.focus();
+    }
+
+    function handleCopyTemplate(event) {
+        event.preventDefault();
+        const sourceSelector = event.currentTarget.getAttribute('data-copy-template');
+        const source = sourceSelector ? document.querySelector(sourceSelector) : null;
+        const text = source ? (source.value || source.textContent || '') : tableTemplate;
+        if (!text) {
+            showAlert('warning', 'Нет данных для копирования');
+            return;
+        }
+
+        const copyPromise = navigator.clipboard && navigator.clipboard.writeText
+            ? navigator.clipboard.writeText(text)
+            : fallbackCopy(text);
+
+        Promise.resolve(copyPromise)
+            .then(() => showAlert('success', 'Шаблон скопирован в буфер обмена'))
+            .catch(() => showAlert('danger', 'Не удалось скопировать шаблон'));
+    }
+
+    function fallbackCopy(text) {
+        return new Promise((resolve, reject) => {
+            try {
+                const temp = document.createElement('textarea');
+                temp.style.position = 'fixed';
+                temp.style.opacity = '0';
+                temp.value = text;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
 
     function apiUrl(path) {
@@ -52,11 +114,302 @@
                     throw new Error(data.message || 'Не удалось загрузить корма');
                 }
                 renderFeedsTable(data.data || []);
+                loadFeedCharts();
             })
             .catch(error => {
                 console.error('loadFeeds error:', error);
                 showAlert('danger', error.message || 'Ошибка при загрузке кормов');
             });
+    }
+
+    function loadFeedCharts() {
+        const container = document.getElementById('feedsChartsContainer');
+        const legend = document.getElementById('feedsChartsLegend');
+        if (!container) {
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="text-center text-muted py-4 w-100">
+                <div class="spinner-border spinner-border-sm me-2" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+                Обновляем графики...
+            </div>
+        `;
+        if (legend) {
+            legend.textContent = '';
+        }
+        destroyFeedCharts();
+
+        fetch(apiUrl('api/feeds.php?action=chart_data'))
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    throw new Error(data.message || 'Не удалось получить данные графиков');
+                }
+                renderFeedCharts(data.data || []);
+            })
+            .catch(error => {
+                console.error('loadFeedCharts error:', error);
+                showAlert('danger', error.message || 'Ошибка при загрузке графиков кормов');
+                container.innerHTML = `
+                    <div class="alert alert-warning w-100 mb-0">
+                        Не удалось загрузить графики кормов. Попробуйте обновить страницу.
+                    </div>
+                `;
+            });
+    }
+
+    function renderFeedCharts(feeds) {
+        const container = document.getElementById('feedsChartsContainer');
+        const legend = document.getElementById('feedsChartsLegend');
+        if (!container) {
+            return;
+        }
+
+        container.innerHTML = '';
+        if (!feeds.length) {
+            container.innerHTML = `
+                <div class="text-center text-muted py-4 w-100">
+                    Корма с заполненными YAML-таблицами не найдены.
+                </div>
+            `;
+            if (legend) {
+                legend.textContent = '';
+            }
+            return;
+        }
+
+        if (legend) {
+            legend.textContent = `Всего кормов на графиках: ${feeds.length}`;
+        }
+
+        feeds.forEach(feed => {
+            const strategies = Array.isArray(feed.strategies) ? feed.strategies : [];
+            if (!strategies.length) {
+                return;
+            }
+
+            const card = document.createElement('div');
+            card.className = 'feed-chart-card';
+
+            const title = document.createElement('div');
+            title.className = 'feed-chart-header';
+            title.innerHTML = `
+                <div class="feed-chart-title">${escapeHtml(feed.name || 'Корм')}</div>
+                <div class="feed-chart-meta">
+                    ${feed.manufacturer ? `Производитель: ${escapeHtml(feed.manufacturer)}` : 'Производитель не указан'}
+                    ${feed.granule ? ` · Гранула: ${escapeHtml(feed.granule)}` : ''}
+                </div>
+            `;
+            card.appendChild(title);
+
+            const chartState = {
+                feedId: feed.id,
+                strategies,
+                currentKey: strategies[0].key,
+                buttons: {},
+                unitElement: null,
+            };
+
+            const tabsWrapper = document.createElement('div');
+            tabsWrapper.className = 'feed-chart-tabs';
+
+            const tabsGroup = document.createElement('div');
+            tabsGroup.className = 'btn-group btn-group-sm';
+
+            strategies.forEach((strategy, index) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-outline-secondary feed-chart-tab-btn';
+                if (index === 0) {
+                    btn.classList.add('active');
+                }
+                btn.dataset.feedId = feed.id;
+                btn.dataset.strategyKey = strategy.key;
+                btn.textContent = strategy.label || `Стратегия ${index + 1}`;
+                btn.addEventListener('click', handleStrategyTabClick);
+                chartState.buttons[strategy.key] = btn;
+                tabsGroup.appendChild(btn);
+            });
+
+            tabsWrapper.appendChild(tabsGroup);
+
+            const unitBadge = document.createElement('span');
+            unitBadge.className = 'feed-chart-unit-badge text-muted small';
+            unitBadge.textContent = strategies[0].unit || 'Кг корма / 100 кг биомассы';
+            chartState.unitElement = unitBadge;
+            tabsWrapper.appendChild(unitBadge);
+
+            card.appendChild(tabsWrapper);
+
+            const canvasWrapper = document.createElement('div');
+            canvasWrapper.className = 'feed-chart-canvas-wrapper';
+            const canvas = document.createElement('canvas');
+            canvas.id = `feedChart-${feed.id}`;
+            canvas.className = 'feed-chart-canvas';
+            canvasWrapper.appendChild(canvas);
+            card.appendChild(canvasWrapper);
+
+            feedChartStates[feed.id] = {
+                ...chartState,
+                canvasId: canvas.id,
+            };
+
+            container.appendChild(card);
+
+            setTimeout(() => renderFeedChart(feed.id, strategies[0]), 0);
+        });
+    }
+
+    function handleStrategyTabClick(event) {
+        event.preventDefault();
+        const button = event.currentTarget;
+        const feedId = Number(button.dataset.feedId);
+        const strategyKey = button.dataset.strategyKey;
+        if (!feedId || !strategyKey) {
+            return;
+        }
+
+        const state = feedChartStates[feedId];
+        if (!state || state.currentKey === strategyKey) {
+            return;
+        }
+
+        const strategy = state.strategies.find(item => item.key === strategyKey);
+        if (!strategy) {
+            return;
+        }
+
+        state.currentKey = strategyKey;
+        Object.entries(state.buttons).forEach(([key, btn]) => {
+            if (!btn) {
+                return;
+            }
+            btn.classList.toggle('active', key === strategyKey);
+        });
+        if (state.unitElement) {
+            state.unitElement.textContent = strategy.unit || 'Кг корма / 100 кг биомассы';
+        }
+
+        renderFeedChart(feedId, strategy);
+    }
+
+    function renderFeedChart(feedId, strategy) {
+        const state = feedChartStates[feedId];
+        if (!state) {
+            return;
+        }
+
+        const canvas = document.getElementById(state.canvasId);
+        if (!canvas) {
+            return;
+        }
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js is not loaded');
+            return;
+        }
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            return;
+        }
+
+        const wrapper = canvas.parentElement;
+        if (wrapper) {
+            const computedHeight = wrapper.clientHeight || 260;
+            const computedWidth = wrapper.clientWidth || canvas.clientWidth || 320;
+            canvas.height = computedHeight;
+            canvas.width = computedWidth;
+        }
+
+        if (feedChartsRegistry[feedId]) {
+            try {
+                feedChartsRegistry[feedId].destroy();
+            } catch (error) {
+                console.warn('renderFeedChart destroy error:', error);
+            }
+            feedChartsRegistry[feedId] = null;
+        }
+
+        const palette = [
+            '#f6ad55', '#68d391', '#63b3ed', '#fc8181', '#b794f4',
+            '#fbd38d', '#81e6d9', '#90cdf4', '#f687b3', '#cbd5f5',
+        ];
+
+        const datasets = (strategy.datasets || []).map((dataset, index) => ({
+            label: dataset.label || `Диапазон ${index + 1}`,
+            data: dataset.data || [],
+            borderColor: palette[index % palette.length],
+            backgroundColor: palette[index % palette.length],
+            fill: false,
+            spanGaps: true,
+            tension: 0.25,
+            pointRadius: 3,
+            borderWidth: 2,
+        }));
+
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: strategy.temperatures || [],
+                datasets,
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'nearest',
+                    intersect: false,
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Температура, °C',
+                        },
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: strategy.unit || 'Кг корма / 100 кг биомассы',
+                        },
+                        beginAtZero: true,
+                    },
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                const value = context.parsed.y;
+                                if (value === null || value === undefined) {
+                                    return `${context.dataset.label}: данных нет`;
+                                }
+                                return `${context.dataset.label}: ${value.toFixed(2)}`;
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        feedChartsRegistry[feedId] = chart;
+    }
+
+    function destroyFeedCharts() {
+        Object.keys(feedChartsRegistry).forEach(key => {
+            try {
+                feedChartsRegistry[key].destroy();
+            } catch (error) {
+                console.warn('destroyFeedCharts error:', error);
+            }
+            delete feedChartsRegistry[key];
+        });
+        Object.keys(feedChartStates).forEach(key => delete feedChartStates[key]);
     }
 
     function renderFeedsTable(feeds) {

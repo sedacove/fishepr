@@ -361,12 +361,20 @@
             return '';
         }
 
+        const ratioValue = plan.ratio_per_100kg;
+        const ratioFormatted = (ratioValue !== null && ratioValue !== undefined && !isNaN(ratioValue))
+            ? formatNumber(ratioValue, 2)
+            : '';
+        const ratioHtml = ratioFormatted
+            ? `<div class="pool-feeding-ratio text-muted small">Коэфф.: ${ratioFormatted}</div>`
+            : '';
+
         return `
             <div class="pool-feeding-inline">
-                <i class="bi bi-bowl-hot"></i>
                 <div class="pool-feeding-text">
                     <div>${feedName}: ${strategyLabel}</div>
                     <div class="pool-feeding-amount">${amount} кг</div>
+                    ${ratioHtml}
                 </div>
             </div>
         `;
