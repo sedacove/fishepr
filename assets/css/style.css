@@ -1,3 +1,10 @@
+.submenu-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    align-items: flex-start;
+    text-align: left;
+}
 /**
  * Основные стили ERP системы
  */
@@ -67,6 +74,193 @@ body {
 
 [data-theme="dark"] .navbar-text {
     color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.nav-item-has-submenu {
+    position: relative;
+}
+
+.nav-link-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+}
+
+.mobile-submenu {
+    padding-left: 1.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.mobile-submenu a {
+    display: block;
+    padding: 0.35rem 0;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.mobile-submenu-group .dropdown-item {
+    padding-left: 0.5rem;
+}
+
+@media (min-width: 992px) {
+    .mobile-submenu {
+        display: none !important;
+    }
+}
+
+.navbar-submenu-wrapper {
+    display: none;
+    background-color: #161b22;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.navbar-submenu-wrapper.active {
+    display: block;
+}
+
+.navbar-submenu-wrapper .container {
+    position: relative;
+}
+
+.submenu-panel {
+    display: none;
+    padding: 0.85rem 0 1rem;
+}
+
+.submenu-panel.active {
+    display: block;
+}
+
+.submenu-links {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.submenu-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1rem;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #f8f9fa;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid transparent;
+    min-width: 180px;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    text-align: left;
+}
+
+.submenu-link:hover,
+.submenu-link:focus {
+    background: rgba(13, 110, 253, 0.15);
+    border-color: rgba(13, 110, 253, 0.4);
+    color: #fff;
+}
+
+.submenu-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.submenu-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffd166;
+    flex-shrink: 0;
+}
+
+.submenu-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.submenu-desc {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.submenu-group {
+    position: relative;
+}
+
+.submenu-link.has-children {
+    cursor: pointer;
+    width: 100%;
+}
+
+.submenu-link.has-children .submenu-info {
+    flex-grow: 1;
+}
+
+.submenu-link.has-children i {
+    font-size: 0.85rem;
+    transition: transform 0.2s ease;
+}
+
+.submenu-link.has-children.open i {
+    transform: rotate(-180deg);
+}
+
+.submenu-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    display: none;
+    min-width: 220px;
+    padding: 0.75rem 0;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    z-index: 1050;
+}
+
+.submenu-dropdown.open {
+    display: block;
+}
+
+.submenu-dropdown-item {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #212529;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.submenu-dropdown-item:hover,
+.submenu-dropdown-item:focus {
+    background-color: rgba(13, 110, 253, 0.08);
+}
+
+[data-theme="dark"] .navbar-submenu-wrapper {
+    background-color: #111418;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .submenu-dropdown {
+    background-color: #1f242d;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .submenu-dropdown-item {
+    color: #f8f9fa;
+}
+
+[data-theme="dark"] .submenu-dropdown-item:hover,
+[data-theme="dark"] .submenu-dropdown-item:focus {
+    background-color: rgba(102, 162, 255, 0.1);
 }
 
 /* Часы */

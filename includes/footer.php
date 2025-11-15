@@ -39,6 +39,7 @@
     
     <!-- Theme Toggle Script -->
     <script src="<?php echo asset_url('assets/js/theme.js'); ?>"></script>
+    <script src="<?php echo asset_url('assets/js/nav.js'); ?>"></script>
 
     <?php if (!empty($extra_body_scripts) && is_array($extra_body_scripts)): ?>
         <?php foreach ($extra_body_scripts as $scriptPath): ?>

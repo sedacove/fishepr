@@ -146,28 +146,18 @@ if (!isset($page_title)) {
                                 <li class="nav-item">
                                     <a class="nav-link" href="<?php echo BASE_URL; ?>work">Рабочая</a>
                                 </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="poolsDropdown" role="button" data-bs-toggle="dropdown">
-                            Бассейны
+                    <li class="nav-item nav-item-has-submenu">
+                        <a class="nav-link nav-link-toggle" href="#" data-submenu-trigger="pools">
+                            Внести <i class="bi bi-chevron-down ms-1 d-none d-lg-inline"></i>
                         </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>measurements">Замеры</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>harvests">Отборы</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>mortality">Падеж</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>weighings">Навески</a>
-                            </li>
-                        </ul>
+                        <div class="mobile-submenu d-lg-none">
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>meter-readings">Приборы учета</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>measurements">Замеры</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>harvests">Отборы</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>mortality">Падеж</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>weighings">Навески</a>
+                        </div>
                     </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="<?php echo BASE_URL; ?>meter-readings">Приборы</a>
-                                </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo BASE_URL; ?>tasks">Задачи</a>
                     </li>
@@ -188,66 +178,28 @@ if (!isset($page_title)) {
                         </a>
                     </li>
                     <?php endif; ?>
-                    <?php if (isAdmin()): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo BASE_URL; ?>logs">Логи</a>
-                    </li>
-                    <?php endif; ?>
                 </ul>
                 <ul class="navbar-nav">
                     <?php if (isAdmin()): ?>
-                    <li class="nav-item dropdown d-flex align-items-center me-3">
-                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" title="Администрирование">
-                            <i class="bi bi-gear"></i>
+                    <li class="nav-item nav-item-has-submenu me-3">
+                        <a class="nav-link nav-link-toggle" href="#" data-submenu-trigger="admin" title="Настройки">
+                            <i class="bi bi-gear"></i> <i class="bi bi-chevron-down ms-1 d-none d-lg-inline"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>users">
-                                    <i class="bi bi-people"></i> Пользователи
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pools">
-                                    <i class="bi bi-water"></i> Бассейны
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>plantings">
-                                    <i class="bi bi-inbox"></i> Посадки
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>sessions">
-                                    <i class="bi bi-diagram-3"></i> Сессии
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>counterparties">
-                                    <i class="bi bi-building"></i> Контрагенты
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>meters">
-                                    <i class="bi bi-speedometer"></i> Приборы учета
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>news">
-                                    <i class="bi bi-newspaper"></i> Новости
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>shift-tasks">
-                                    <i class="bi bi-check2-square"></i> Задания смены
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>settings">
-                                    <i class="bi bi-sliders"></i> Настройки
-                                </a>
-                            </li>
-                        </ul>
+                        <div class="mobile-submenu d-lg-none">
+                            <div class="mobile-submenu-group mb-2">
+                                <div class="text-muted small mb-1">Конфигурация</div>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>pools">Бассейны</a>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>plantings">Посадки</a>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>sessions">Сессии</a>
+                            </div>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>users">Пользователи</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>counterparties">Контрагенты</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>meters">Приборы учета</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>news">Новости</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>shift-tasks">Задания смены</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>settings">Системные настройки</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>logs">Логи</a>
+                        </div>
                     </li>
                     <?php endif; ?>
                     <li class="nav-item d-flex align-items-center">
@@ -275,6 +227,104 @@ if (!isset($page_title)) {
             </div>
         </div>
     </nav>
+    <div class="navbar-submenu-wrapper" id="navbarSubmenuWrapper">
+        <div class="container">
+            <div class="submenu-panel" data-submenu-panel="pools">
+                <div class="submenu-links">
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>meter-readings">
+                        <span class="submenu-title">Приборы учета</span>
+                        <span class="submenu-desc">Внесение показаний счетчиков</span>
+                    </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>measurements">
+                        <span class="submenu-title">Замеры</span>
+                        <span class="submenu-desc">Параметры воды</span>
+                    </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>harvests">
+                        <span class="submenu-title">Отборы</span>
+                        <span class="submenu-desc">История выборок рыбы</span>
+                    </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>mortality">
+                        <span class="submenu-title">Падеж</span>
+                        <span class="submenu-desc">Статистика по смертности</span>
+                    </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>weighings">
+                        <span class="submenu-title">Навески</span>
+                        <span class="submenu-desc">Живой вес по бассейнам</span>
+                    </a>
+                </div>
+            </div>
+            <?php if (isAdmin()): ?>
+            <div class="submenu-panel" data-submenu-panel="admin">
+                <div class="submenu-links">
+                    <div class="submenu-group">
+                        <button class="submenu-link has-children" type="button" data-submenu-dropdown-toggle="admin-config">
+                            <span class="submenu-icon"><i class="bi bi-diagram-3"></i></span>
+                            <span class="submenu-info">
+                                <span class="submenu-title">Конфигурация</span>
+                                <span class="submenu-desc">Бассейны, посадки, сессии</span>
+                            </span>
+                            <i class="bi bi-chevron-down ms-2"></i>
+                        </button>
+                        <div class="submenu-dropdown" data-submenu-dropdown="admin-config">
+                            <a class="submenu-dropdown-item" href="<?php echo BASE_URL; ?>pools">Бассейны</a>
+                            <a class="submenu-dropdown-item" href="<?php echo BASE_URL; ?>plantings">Посадки</a>
+                            <a class="submenu-dropdown-item" href="<?php echo BASE_URL; ?>sessions">Сессии</a>
+                        </div>
+                    </div>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>users">
+                        <span class="submenu-icon"><i class="bi bi-people"></i></span>
+                        <span class="submenu-info">
+                            <span class="submenu-title">Пользователи</span>
+                            <span class="submenu-desc">Права доступа и учетные записи</span>
+                        </span>
+                    </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>counterparties">
+                        <span class="submenu-icon"><i class="bi bi-building"></i></span>
+                        <span class="submenu-info">
+                            <span class="submenu-title">Контрагенты</span>
+                            <span class="submenu-desc">Поставщики и покупатели</span>
+                        </span>
+                    </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>meters">
+                        <span class="submenu-icon"><i class="bi bi-speedometer"></i></span>
+                        <span class="submenu-info">
+                            <span class="submenu-title">Приборы учета</span>
+                            <span class="submenu-desc">Счетчики и показания</span>
+                        </span>
+                    </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>news">
+                        <span class="submenu-icon"><i class="bi bi-newspaper"></i></span>
+                        <span class="submenu-info">
+                            <span class="submenu-title">Новости</span>
+                            <span class="submenu-desc">Актуальные объявления</span>
+                        </span>
+                    </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>shift-tasks">
+                        <span class="submenu-icon"><i class="bi bi-check2-square"></i></span>
+                        <span class="submenu-info">
+                            <span class="submenu-title">Задания смены</span>
+                            <span class="submenu-desc">Шаблоны и чек-листы</span>
+                        </span>
+                    </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>settings">
+                        <span class="submenu-icon"><i class="bi bi-sliders"></i></span>
+                        <span class="submenu-info">
+                            <span class="submenu-title">Системные настройки</span>
+                            <span class="submenu-desc">Параметры платформы</span>
+                        </span>
+                    </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>logs">
+                        <span class="submenu-icon"><i class="bi bi-clipboard-data"></i></span>
+                        <span class="submenu-info">
+                            <span class="submenu-title">Логи</span>
+                            <span class="submenu-desc">Журнал системных событий</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
     <?php endif; ?>
     
     <main class="main-content">
