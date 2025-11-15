@@ -20,7 +20,7 @@ if (!function_exists('asset_url')) {
 
 // Если уже авторизован, перенаправляем на главную
 if (isLoggedIn()) {
-    header('Location: ' . BASE_URL . 'index.php');
+    header('Location: ' . BASE_URL);
     exit;
 }
 
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if ($result['success']) {
             // Редирект на страницу, с которой пришли, или на главную
-            $redirect = $_SESSION['redirect_after_login'] ?? BASE_URL . 'index.php';
+            $redirect = $_SESSION['redirect_after_login'] ?? BASE_URL;
             unset($_SESSION['redirect_after_login']);
             header('Location: ' . $redirect);
             exit;
