@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Work\SessionSummary;
 use App\Models\Work\WorkPool;
+use App\Repositories\FeedRepository;
 use App\Repositories\HarvestRepository;
 use App\Repositories\MeasurementRepository;
 use App\Repositories\MortalityRepository;
@@ -11,6 +12,7 @@ use App\Repositories\PoolRepository;
 use App\Repositories\SessionRepository;
 use App\Repositories\WeighingRepository;
 use App\Support\Exceptions\ValidationException;
+use App\Support\FeedingFormula;
 use DateTime;
 use PDO;
 
@@ -57,6 +59,16 @@ class WorkService
      * @var WeighingRepository Репозиторий для работы с навесками
      */
     private WeighingRepository $weighings;
+
+    /**
+     * @var FeedRepository Репозиторий кормов
+     */
+    private FeedRepository $feeds;
+
+    /**
+     * @var array<int,array> Кеш загруженных кормов
+     */
+    private array $feedCache = [];
 
     /**
      * @var array Настройки температуры (bad_below, acceptable_min, good_min, good_max, acceptable_max, bad_above)
@@ -108,6 +120,7 @@ class WorkService
         $this->mortality = new MortalityRepository($pdo);
         $this->harvests = new HarvestRepository($pdo);
         $this->weighings = new WeighingRepository($pdo);
+        $this->feeds = new FeedRepository($pdo);
 
         $this->temperatureSettings = [
             'bad_below' => (float)\getSetting('temp_bad_below', 10),
@@ -181,7 +194,13 @@ class WorkService
             'start_fish_count' => isset($sessionRow['start_fish_count']) ? (int)$sessionRow['start_fish_count'] : null,
             'planting_name' => $sessionRow['planting_name'] ?? null,
             'planting_fish_breed' => $sessionRow['planting_fish_breed'] ?? null,
+            'feed_id' => isset($sessionRow['feed_id']) ? (int)$sessionRow['feed_id'] : null,
+            'feeding_strategy' => $sessionRow['feeding_strategy'] ?? null,
         ]);
+
+        if (isset($sessionRow['feed_name'])) {
+            $session->feed_name = $sessionRow['feed_name'];
+        }
 
         $startDate = $session->start_date ?? $sessionRow['created_at'] ?? null;
         if (!$startDate) {
@@ -192,6 +211,7 @@ class WorkService
         $this->applyMeasurementInfo($session, $poolId);
         $this->applyMortalityInfo($session, $poolId);
         $this->applyCurrentLoad($session, $poolId, $startDate);
+        $this->applyFeedingPlan($session, $sessionRow);
 
         return $session->toArray();
     }
@@ -317,6 +337,99 @@ class WorkService
             'fish_count' => $currentFishCount,
             'weight_is_approximate' => $weightApproximate,
         ];
+    }
+
+    /**
+     * Рассчитывает рекомендованный объём кормления для текущей сессии
+     *
+     * Алгоритм:
+     * 1. Проверяем, что у сессии задан корм и стратегия кормления.
+     * 2. Собираем исходные данные: последнюю температуру воды, средний вес рыбы и текущую биомассу.
+     * 3. Получаем формулу из карточки корма и подставляем значения (T — температура, W — вес в граммах).
+     * 4. Формула возвращает норму кормления в кг на 1 кг биомассы. Домножаем на фактическую биомассу
+     *    и сохраняем результат вместе с исходными параметрами.
+     * 5. Во всех шагах предусмотрены проверки и безопасная обработка ошибок, чтобы карточка сессии
+     *    оставалась стабильной даже при некорректных данных.
+     */
+    private function applyFeedingPlan(SessionSummary $session, array $sessionRow): void
+    {
+        $session->feeding_plan = null;
+
+        $feedId = $session->feed_id;
+        $strategy = $session->feeding_strategy ?: $sessionRow['feeding_strategy'] ?? null;
+        if (!$feedId || !$strategy) {
+            return;
+        }
+
+        $dailyFeedings = (int)($sessionRow['daily_feedings'] ?? 0);
+        if ($dailyFeedings <= 0) {
+            return;
+        }
+
+        $temperature = $session->last_measurement['temperature'] ?? null;
+        $avgWeightKg = $session->avg_fish_weight;
+        $biomassKg = $session->current_load['weight'] ?? null;
+
+        if ($temperature === null || $avgWeightKg === null || $biomassKg === null) {
+            return;
+        }
+
+        $feed = $this->getFeed($feedId);
+        if (!$feed) {
+            return;
+        }
+        $session->feed_name = $feed['name'] ?? $session->feed_name;
+
+        $formulaField = 'formula_' . $strategy;
+        $formula = $feed[$formulaField] ?? null;
+        if (!$formula) {
+            return;
+        }
+
+        $avgWeightGrams = $avgWeightKg * 1000;
+        try {
+            $ratio = FeedingFormula::evaluate($formula, (float)$temperature, (float)$avgWeightGrams);
+        } catch (\InvalidArgumentException $e) {
+            error_log('Feeding formula evaluation failed for feed #' . $feedId . ': ' . $e->getMessage());
+            return;
+        }
+
+        $ratio = max(0, (float)$ratio);
+        $recommended = max(0, $ratio * (float)$biomassKg);
+
+        $perFeeding = max(0, $recommended / $dailyFeedings);
+
+        $session->feeding_plan = [
+            'feed_name' => $session->feed_name,
+            'strategy' => $strategy,
+            'strategy_label' => $this->getStrategyLabel($strategy),
+            'ratio_per_kg' => $ratio,
+            'recommended_total' => $recommended,
+            'per_feeding' => $perFeeding,
+            'temperature' => (float)$temperature,
+            'avg_weight_kg' => $avgWeightKg,
+            'avg_weight_g' => $avgWeightGrams,
+            'biomass_kg' => (float)$biomassKg,
+            'formula' => $formula,
+        ];
+    }
+
+    private function getFeed(int $feedId): ?array
+    {
+        if (!isset($this->feedCache[$feedId])) {
+            $this->feedCache[$feedId] = $this->feeds->findById($feedId) ?: null;
+        }
+
+        return $this->feedCache[$feedId];
+    }
+
+    private function getStrategyLabel(string $strategy): string
+    {
+        return match ($strategy) {
+            'econom' => 'Эконом',
+            'growth' => 'Рост',
+            default => 'Норма',
+        };
     }
 
     private function calculateDiff(?string $timestamp): array

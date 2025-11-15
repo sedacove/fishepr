@@ -17,11 +17,13 @@ class SessionRepository extends Repository
                     p.name AS pool_name,
                     pl.name AS planting_name,
                     pl.fish_breed AS planting_fish_breed,
+                    f.name AS feed_name,
                     u.login AS created_by_login,
                     u.full_name AS created_by_name
              FROM sessions s
              LEFT JOIN pools p ON p.id = s.pool_id
              LEFT JOIN plantings pl ON pl.id = s.planting_id
+             LEFT JOIN feeds f ON f.id = s.feed_id
              LEFT JOIN users u ON u.id = s.created_by
              WHERE s.is_completed = ?
              ORDER BY s.start_date DESC, s.created_at DESC'
@@ -45,10 +47,12 @@ class SessionRepository extends Repository
         $stmt = $this->pdo->prepare(
             'SELECT s.*,
                     p.name AS pool_name,
-                    pl.name AS planting_name
+                    pl.name AS planting_name,
+                    f.name AS feed_name
              FROM sessions s
              LEFT JOIN pools p ON p.id = s.pool_id
              LEFT JOIN plantings pl ON pl.id = s.planting_id
+             LEFT JOIN feeds f ON f.id = s.feed_id
              WHERE s.id = ?'
         );
         $stmt->execute([$id]);
@@ -68,8 +72,9 @@ class SessionRepository extends Repository
         $stmt = $this->pdo->prepare(
             'INSERT INTO sessions (
                 name, pool_id, planting_id, start_date,
-                start_mass, start_fish_count, previous_fcr, created_by
-             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+                start_mass, start_fish_count, previous_fcr,
+                daily_feedings, feed_id, feeding_strategy, created_by
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         $stmt->execute([
             $data['name'],
@@ -79,6 +84,9 @@ class SessionRepository extends Repository
             $data['start_mass'],
             $data['start_fish_count'],
             $data['previous_fcr'],
+            $data['daily_feedings'],
+            $data['feed_id'],
+            $data['feeding_strategy'],
             $data['created_by'],
         ]);
 
@@ -102,7 +110,10 @@ class SessionRepository extends Repository
                 start_date = ?,
                 start_mass = ?,
                 start_fish_count = ?,
-                previous_fcr = ?
+                previous_fcr = ?,
+                daily_feedings = ?,
+                feed_id = ?,
+                feeding_strategy = ?
              WHERE id = ?'
         );
         $stmt->execute([
@@ -113,6 +124,9 @@ class SessionRepository extends Repository
             $data['start_mass'],
             $data['start_fish_count'],
             $data['previous_fcr'],
+            $data['daily_feedings'],
+            $data['feed_id'],
+            $data['feeding_strategy'],
             $id,
         ]);
     }
@@ -254,9 +268,11 @@ class SessionRepository extends Repository
         $stmt = $this->pdo->prepare(
             'SELECT s.*,
                     pl.name AS planting_name,
-                    pl.fish_breed AS planting_fish_breed
+                    pl.fish_breed AS planting_fish_breed,
+                    f.name AS feed_name
              FROM sessions s
              LEFT JOIN plantings pl ON pl.id = s.planting_id
+             LEFT JOIN feeds f ON f.id = s.feed_id
              WHERE s.pool_id = ? AND s.is_completed = 0
              ORDER BY s.start_date DESC, s.created_at DESC
              LIMIT 1'
@@ -290,11 +306,13 @@ class SessionRepository extends Repository
                     pl.supplier AS supplier,
                     pl.price AS planting_price,
                     pl.delivery_cost AS delivery_cost,
+                    f.name AS feed_name,
                     u.login AS created_by_login,
                     u.full_name AS created_by_name
              FROM sessions s
              LEFT JOIN pools p ON p.id = s.pool_id
              LEFT JOIN plantings pl ON pl.id = s.planting_id
+             LEFT JOIN feeds f ON f.id = s.feed_id
              LEFT JOIN users u ON u.id = s.created_by
              WHERE s.id = ?'
         );

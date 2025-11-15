@@ -191,6 +191,7 @@ if (!isset($page_title)) {
                                 <a class="dropdown-item" href="<?php echo BASE_URL; ?>pools">Бассейны</a>
                                 <a class="dropdown-item" href="<?php echo BASE_URL; ?>plantings">Посадки</a>
                                 <a class="dropdown-item" href="<?php echo BASE_URL; ?>sessions">Сессии</a>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>feeds">Корма</a>
                             </div>
                             <a class="dropdown-item" href="<?php echo BASE_URL; ?>users">Пользователи</a>
                             <a class="dropdown-item" href="<?php echo BASE_URL; ?>counterparties">Контрагенты</a>
@@ -269,6 +270,7 @@ if (!isset($page_title)) {
                             <a class="submenu-dropdown-item" href="<?php echo BASE_URL; ?>pools">Бассейны</a>
                             <a class="submenu-dropdown-item" href="<?php echo BASE_URL; ?>plantings">Посадки</a>
                             <a class="submenu-dropdown-item" href="<?php echo BASE_URL; ?>sessions">Сессии</a>
+                            <a class="submenu-dropdown-item" href="<?php echo BASE_URL; ?>feeds">Корма</a>
                         </div>
                     </div>
                     <a class="submenu-link" href="<?php echo BASE_URL; ?>users">

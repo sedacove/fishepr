@@ -203,6 +203,45 @@
     margin-top: 0.25rem;
 }
 
+.pool-feeding-inline {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.4rem;
+    font-size: 0.8rem;
+}
+
+.pool-feeding-inline i {
+    font-size: 1rem;
+    background: rgba(255, 193, 7, 0.2);
+    color: #b08000;
+    border-radius: 8px;
+    padding: 0.2rem 0.35rem;
+}
+
+.pool-feeding-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    padding: 0.35rem 0.6rem;
+    background: rgba(255, 193, 7, 0.12);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 193, 7, 0.4);
+}
+
+.pool-feeding-text strong {
+    font-weight: 600;
+}
+
+.pool-feeding-amount {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-top: 0.15rem;
+}
+
 .pool-block-divider {
     height: 1px;
     background-color: #e0e0e0;
@@ -358,6 +397,20 @@
 
 [data-theme="dark"] .pool-stat-label {
     color: #999 !important;
+}
+
+[data-theme="dark"] .pool-feeding-inline {
+    color: #f8f9fa;
+}
+
+[data-theme="dark"] .pool-feeding-inline i {
+    background: rgba(255, 193, 7, 0.25);
+    color: #ffd966;
+}
+
+[data-theme="dark"] .pool-feeding-text {
+    background: rgba(255, 193, 7, 0.18);
+    border-color: rgba(255, 193, 7, 0.5);
 }
 
 [data-theme="dark"] .pool-stat-value.text-danger {

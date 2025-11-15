@@ -56,6 +56,26 @@ class SessionSummary extends Model
      * @var string|null Порода рыбы
      */
     public ?string $planting_fish_breed = null;
+
+    /**
+     * @var int|null Количество кормежек в день
+     */
+    public ?int $daily_feedings = null;
+
+    /**
+     * @var int|null ID корма
+     */
+    public ?int $feed_id = null;
+
+    /**
+     * @var string|null Название корма
+     */
+    public ?string $feed_name = null;
+
+    /**
+     * @var string|null Стратегия кормления (econom/normal/growth)
+     */
+    public ?string $feeding_strategy = null;
     
     /**
      * @var string|null Дата и время последнего взвешивания
@@ -121,6 +141,11 @@ class SessionSummary extends Model
      * @var array|null Данные о падеже за последние часы
      */
     public ?array $mortality_last_hours = null;
+
+    /**
+     * @var array|null Расчет нормы кормления
+     */
+    public ?array $feeding_plan = null;
 }
 
 

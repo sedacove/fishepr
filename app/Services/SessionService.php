@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Session\Session;
+use App\Repositories\FeedRepository;
 use App\Repositories\SessionRepository;
 use App\Support\Exceptions\ValidationException;
 use PDO;
@@ -21,10 +22,18 @@ require_once __DIR__ . '/../../includes/activity_log.php';
  */
 class SessionService
 {
+    private const FEEDING_STRATEGIES = ['econom', 'normal', 'growth'];
+    private const DEFAULT_DAILY_FEEDINGS = 3;
+
     /**
      * @var SessionRepository Репозиторий для работы с сессиями
      */
     private SessionRepository $sessions;
+
+    /**
+     * @var FeedRepository Репозиторий кормов
+     */
+    private FeedRepository $feeds;
     
     /**
      * @var PDO Подключение к базе данных
@@ -40,6 +49,7 @@ class SessionService
     {
         $this->pdo = $pdo;
         $this->sessions = new SessionRepository($pdo);
+        $this->feeds = new FeedRepository($pdo);
     }
 
     /**
@@ -67,6 +77,8 @@ class SessionService
                     $data['fcr'] = round($data['feed_amount'] / $gain, 4);
                 }
             }
+            $data['feeding_strategy'] = $data['feeding_strategy'] ?? 'normal';
+            $data['daily_feedings'] = (int)($data['daily_feedings'] ?? self::DEFAULT_DAILY_FEEDINGS);
             return $data;
         }, $items);
     }
@@ -91,6 +103,8 @@ class SessionService
         $data['start_date'] = $this->formatFormDate($data['start_date']);
         $data['end_date'] = $data['end_date'] ? $this->formatFormDate($data['end_date']) : null;
         $data['is_completed'] = (bool) $data['is_completed'];
+        $data['feeding_strategy'] = $data['feeding_strategy'] ?? 'normal';
+        $data['daily_feedings'] = (int)($data['daily_feedings'] ?? self::DEFAULT_DAILY_FEEDINGS);
 
         if (!empty($data['end_mass']) && !empty($data['feed_amount']) && !empty($data['start_mass'])) {
             $gain = $data['end_mass'] - $data['start_mass'];
@@ -120,6 +134,14 @@ class SessionService
     public function getActivePlantings(): array
     {
         return $this->sessions->getActivePlantings();
+    }
+
+    /**
+     * @return array<int,array{id:int,name:string}>
+     */
+    public function getFeeds(): array
+    {
+        return $this->feeds->options();
     }
 
     public function create(array $payload, int $userId): int
@@ -261,6 +283,21 @@ class SessionService
             $previousFcr = $this->parseNonNegativeFloat($payload['previous_fcr'], 'previous_fcr', 'Прошлый FCR должен быть неотрицательным числом');
         }
 
+        $dailyFeedings = (int)($payload['daily_feedings'] ?? self::DEFAULT_DAILY_FEEDINGS);
+        if ($dailyFeedings <= 0) {
+            throw new ValidationException('daily_feedings', 'Количество кормежек должно быть больше нуля');
+        }
+
+        $feedId = (int)($payload['feed_id'] ?? 0);
+        if ($feedId <= 0 || !$this->feeds->exists($feedId)) {
+            throw new ValidationException('feed_id', 'Выберите корм из списка');
+        }
+
+        $strategy = $payload['feeding_strategy'] ?? 'normal';
+        if (!in_array($strategy, self::FEEDING_STRATEGIES, true)) {
+            throw new ValidationException('feeding_strategy', 'Некорректная стратегия кормления');
+        }
+
         return [
             'name' => $name,
             'pool_id' => $poolId,
@@ -269,6 +306,9 @@ class SessionService
             'start_mass' => $startMass,
             'start_fish_count' => $startFishCount,
             'previous_fcr' => $previousFcr,
+            'daily_feedings' => $dailyFeedings,
+            'feed_id' => $feedId,
+            'feeding_strategy' => $strategy,
         ];
     }
 
@@ -334,7 +374,7 @@ class SessionService
                 $old = $old !== null ? (float) $old : null;
                 $value = $value !== null ? (float) $value : null;
             }
-            if (in_array($key, ['start_fish_count', 'pool_id', 'planting_id'])) {
+            if (in_array($key, ['start_fish_count', 'pool_id', 'planting_id', 'daily_feedings', 'feed_id'])) {
                 $old = $old !== null ? (int) $old : null;
                 $value = $value !== null ? (int) $value : null;
             }

@@ -10,6 +10,11 @@
     const baseUrl = config.baseUrl || '';
     const isAdmin = Boolean(config.isAdmin);
     const maxPoolCapacityKg = Number(config.maxPoolCapacityKg) || 0;
+    const feedingStrategyLabels = {
+        econom: 'Эконом',
+        normal: 'Норма',
+        growth: 'Рост'
+    };
 
     let measurementWarningTimeoutMinutes = 60;
     let poolsList = [];
@@ -280,6 +285,11 @@
             `;
         }
 
+        const feedingHtml = renderFeedingPlanInline(session.feeding_plan);
+        if (feedingHtml) {
+            html += feedingHtml;
+        }
+
         html += '</div>';
 
         html += '<div class="pool-stats-right">';
@@ -337,6 +347,29 @@
 
         html += '</div>';
         return html;
+    }
+
+    function renderFeedingPlanInline(plan) {
+        if (!plan || plan.per_feeding === null || plan.per_feeding === undefined) {
+            return '';
+        }
+
+        const feedName = escapeHtml(plan.feed_name || 'Корм');
+        const strategyLabel = escapeHtml(plan.strategy_label || feedingStrategyLabels[plan.strategy] || 'Норма');
+        const amount = formatNumber(plan.per_feeding, 2);
+        if (!amount) {
+            return '';
+        }
+
+        return `
+            <div class="pool-feeding-inline">
+                <i class="bi bi-bowl-hot"></i>
+                <div class="pool-feeding-text">
+                    <div>${feedName}: ${strategyLabel}</div>
+                    <div class="pool-feeding-amount">${amount} кг</div>
+                </div>
+            </div>
+        `;
     }
 
     function getFillProgressClass(percent) {

@@ -23,6 +23,7 @@ $router->get('/news', 'NewsController@index');
 $router->get('/meters', 'MetersController@index');
 $router->get('/pools', 'PoolsController@index');
 $router->get('/plantings', 'PlantingsController@index');
+$router->get('/feeds', 'FeedsController@index');
 $router->get('/sessions', 'SessionsController@index');
 $router->get('/users', 'UsersController@index');
 $router->get('/settings', 'SettingsController@index');

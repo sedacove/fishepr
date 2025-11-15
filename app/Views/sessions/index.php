@@ -50,6 +50,9 @@ require_once __DIR__ . '/../../../includes/section_descriptions.php';
                                     <th>Название</th>
                                     <th>Бассейн</th>
                                     <th>Посадка</th>
+                                    <th>Корм</th>
+                                    <th>Стратегия</th>
+                                    <th>Кормлений/день</th>
                                     <th>Дата начала</th>
                                     <th>Масса (кг)</th>
                                     <th>Количество (шт)</th>
@@ -58,7 +61,7 @@ require_once __DIR__ . '/../../../includes/section_descriptions.php';
                             </thead>
                             <tbody id="activeSessionsBody">
                                 <tr>
-                                    <td colspan="8" class="text-center">
+                                    <td colspan="11" class="text-center">
                                         <div class="spinner-border" role="status">
                                             <span class="visually-hidden">Загрузка...</span>
                                         </div>
@@ -82,6 +85,9 @@ require_once __DIR__ . '/../../../includes/section_descriptions.php';
                                     <th>Название</th>
                                     <th>Бассейн</th>
                                     <th>Посадка</th>
+                                    <th>Корм</th>
+                                    <th>Стратегия</th>
+                                    <th>Кормлений/день</th>
                                     <th>Дата начала</th>
                                     <th>Дата окончания</th>
                                     <th>Масса нач. (кг)</th>
@@ -93,7 +99,7 @@ require_once __DIR__ . '/../../../includes/section_descriptions.php';
                             </thead>
                             <tbody id="completedSessionsBody">
                                 <tr>
-                                    <td colspan="11" class="text-center">
+                                    <td colspan="14" class="text-center">
                                         <div class="spinner-border" role="status">
                                             <span class="visually-hidden">Загрузка...</span>
                                         </div>
@@ -158,6 +164,27 @@ require_once __DIR__ . '/../../../includes/section_descriptions.php';
                         <div class="col-md-4 mb-3">
                             <label for="sessionPreviousFcr" class="form-label">Прошлый FCR</label>
                             <input type="number" class="form-control" id="sessionPreviousFcr" name="previous_fcr" step="0.0001" min="0">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="sessionDailyFeedings" class="form-label">Кормёжек в день <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="sessionDailyFeedings" name="daily_feedings" min="1" value="3" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="sessionFeedingStrategy" class="form-label">Стратегия кормления</label>
+                            <select class="form-select" id="sessionFeedingStrategy" name="feeding_strategy">
+                                <option value="econom">Эконом</option>
+                                <option value="normal" selected>Норма</option>
+                                <option value="growth">Рост</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="sessionFeed" class="form-label">Корм <span class="text-danger">*</span></label>
+                            <select class="form-select" id="sessionFeed" name="feed_id" required>
+                                <option value="">Выберите корм</option>
+                            </select>
                         </div>
                     </div>
                 </form>

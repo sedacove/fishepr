@@ -9,11 +9,17 @@
     const config = window.sessionsConfig || {};
     const baseUrl = config.baseUrl || '';
     const apiBase = new URL('.', baseUrl || window.location.href).toString();
+    const strategyLabels = {
+        econom: 'Эконом',
+        normal: 'Норма',
+        growth: 'Рост',
+    };
 
     let currentEditId = null;
     let currentTab = 0;
     let poolsCache = [];
     let plantingsCache = [];
+    let feedsCache = [];
 
     function apiUrl(path) {
         return new URL(path, apiBase).toString();
@@ -46,12 +52,23 @@
                 }
             },
         });
+
+        $.ajax({
+            url: apiUrl('api/sessions.php?action=get_feeds'),
+            method: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    feedsCache = response.data || [];
+                }
+            },
+        });
     }
 
     function loadSessions(completed) {
         currentTab = completed;
         const bodyId = completed ? '#completedSessionsBody' : '#activeSessionsBody';
-        const colspan = completed ? 11 : 8;
+        const colspan = completed ? 14 : 11;
         const tbody = $(bodyId);
         tbody.html(`
             <tr>
@@ -85,7 +102,7 @@
         tbody.empty();
 
         if (!sessions.length) {
-            const colspan = isCompleted ? 11 : 8;
+            const colspan = isCompleted ? 14 : 11;
             tbody.html(`<tr><td colspan="${colspan}" class="text-center text-muted">Сессии не найдены</td></tr>`);
             return;
         }
@@ -93,12 +110,18 @@
         sessions.forEach(function (session) {
             if (isCompleted) {
                 const fcrDisplay = session.fcr !== undefined && session.fcr !== null ? Number(session.fcr).toFixed(4) : '-';
+                const strategy = strategyLabels[session.feeding_strategy] || '—';
+                const feedName = session.feed_name ? escapeHtml(session.feed_name) : '—';
+                const daily = session.daily_feedings ?? '—';
                 tbody.append(`
                     <tr>
                         <td>${session.id}</td>
                         <td>${escapeHtml(session.name)}</td>
                         <td>${escapeHtml(session.pool_name || '-')}</td>
                         <td>${escapeHtml(session.planting_name || '-')}</td>
+                        <td>${feedName}</td>
+                        <td>${escapeHtml(strategy)}</td>
+                        <td>${daily}</td>
                         <td>${escapeHtml(session.start_date || '-')}</td>
                         <td>${escapeHtml(session.end_date || '-')}</td>
                         <td>${session.start_mass ?? '-'}</td>
@@ -116,12 +139,18 @@
                     </tr>
                 `);
             } else {
+                const strategy = strategyLabels[session.feeding_strategy] || '—';
+                const feedName = session.feed_name ? escapeHtml(session.feed_name) : '—';
+                const daily = session.daily_feedings ?? '—';
                 tbody.append(`
                     <tr>
                         <td>${session.id}</td>
                         <td>${escapeHtml(session.name)}</td>
                         <td>${escapeHtml(session.pool_name || '-')}</td>
                         <td>${escapeHtml(session.planting_name || '-')}</td>
+                        <td>${feedName}</td>
+                        <td>${escapeHtml(strategy)}</td>
+                        <td>${daily}</td>
                         <td>${escapeHtml(session.start_date || '-')}</td>
                         <td>${session.start_mass ?? '-'}</td>
                         <td>${session.start_fish_count ?? '-'}</td>
@@ -150,6 +179,9 @@
         setCurrentDate('#sessionStartDate');
         populateSelect('#sessionPool', poolsCache, 'Выберите бассейн');
         populateSelect('#sessionPlanting', plantingsCache, 'Выберите посадку');
+        populateSelect('#sessionFeed', feedsCache, 'Выберите корм');
+        $('#sessionDailyFeedings').val(3);
+        $('#sessionFeedingStrategy').val('normal');
         bootstrap.Modal.getOrCreateInstance(document.getElementById('sessionModal')).show();
     }
 
@@ -158,6 +190,7 @@
         $('#sessionModalTitle').text('Редактировать сессию');
         populateSelect('#sessionPool', poolsCache, 'Выберите бассейн');
         populateSelect('#sessionPlanting', plantingsCache, 'Выберите посадку');
+        populateSelect('#sessionFeed', feedsCache, 'Выберите корм');
 
         $.ajax({
             url: apiUrl(`api/sessions.php?action=get&id=${id}`),
@@ -174,6 +207,9 @@
                     $('#sessionStartMass').val(session.start_mass);
                     $('#sessionStartFishCount').val(session.start_fish_count);
                     $('#sessionPreviousFcr').val(session.previous_fcr || '');
+                    $('#sessionDailyFeedings').val(session.daily_feedings || 3);
+                    $('#sessionFeed').val(session.feed_id || '');
+                    $('#sessionFeedingStrategy').val(session.feeding_strategy || 'normal');
 
                     if (session.is_completed) {
                         $('#completeSessionId').val(session.id);
@@ -210,6 +246,9 @@
             start_mass: parseFloat($('#sessionStartMass').val()),
             start_fish_count: parseInt($('#sessionStartFishCount').val(), 10),
             previous_fcr: valueOrNull('#sessionPreviousFcr'),
+            daily_feedings: parseInt($('#sessionDailyFeedings').val(), 10) || 3,
+            feed_id: parseInt($('#sessionFeed').val(), 10),
+            feeding_strategy: $('#sessionFeedingStrategy').val(),
         };
 
         if (currentEditId) {

@@ -74,6 +74,9 @@ class SessionsController
                 case 'get_plantings':
                     JsonResponse::success($this->service->getActivePlantings());
                     return;
+                case 'get_feeds':
+                    JsonResponse::success($this->service->getFeeds());
+                    return;
 
                 case 'create':
                     $this->assertPost($method);

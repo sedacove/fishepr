@@ -51,6 +51,21 @@ class Session extends Model
      * @var float|null Предыдущий FCR (Feed Conversion Ratio)
      */
     public ?float $previous_fcr = null;
+
+    /**
+     * @var int Количество кормежек в день
+     */
+    public int $daily_feedings = 3;
+
+    /**
+     * @var int|null ID выбранного корма
+     */
+    public ?int $feed_id = null;
+
+    /**
+     * @var string Стратегия кормления
+     */
+    public string $feeding_strategy = 'normal';
     
     /**
      * @var bool Завершена ли сессия
@@ -106,6 +121,11 @@ class Session extends Model
      * @var string|null Порода рыбы (из JOIN)
      */
     public ?string $planting_fish_breed = null;
+
+    /**
+     * @var string|null Название корма
+     */
+    public ?string $feed_name = null;
     
     /**
      * @var string|null Логин пользователя, создавшего сессию (из JOIN)

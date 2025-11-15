@@ -46,6 +46,21 @@ class SessionDetails extends Model
      * @var float|null Предыдущий FCR (Feed Conversion Ratio)
      */
     public ?float $previous_fcr = null;
+
+    /**
+     * @var int|null Количество кормежек в день
+     */
+    public ?int $daily_feedings = null;
+
+    /**
+     * @var int|null ID корма
+     */
+    public ?int $feed_id = null;
+
+    /**
+     * @var string|null Стратегия кормления
+     */
+    public ?string $feeding_strategy = null;
     
     /**
      * @var float|null Конечная масса (кг)
@@ -116,6 +131,11 @@ class SessionDetails extends Model
      * @var float|null Стоимость доставки (из JOIN)
      */
     public ?float $delivery_cost = null;
+
+    /**
+     * @var string|null Название корма
+     */
+    public ?string $feed_name = null;
 }
 
 
