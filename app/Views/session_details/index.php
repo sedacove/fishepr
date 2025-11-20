@@ -30,6 +30,16 @@ $sessionDetailsConfig = [
     </div>
 
     <div id="sessionContent" style="display: none;">
+        <!-- График прогноза роста рыбы -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Прогноз роста рыбы (идеальная кривая)</h4>
+            </div>
+            <div class="card-body">
+                <canvas id="growthForecastChart"></canvas>
+            </div>
+        </div>
+
         <div class="card mb-4">
             <div class="card-header">
                 <h3 class="mb-0">Информация о сессии</h3>

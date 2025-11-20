@@ -23,6 +23,11 @@
     padding: 1.5rem;
 }
 
+#growthForecastChart {
+    max-height: 500px;
+    width: 100% !important;
+}
+
 #temperatureChart,
 #oxygenChart,
 #mortalityChart,

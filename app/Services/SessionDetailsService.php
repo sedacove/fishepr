@@ -11,6 +11,7 @@ use App\Repositories\HarvestRepository;
 use App\Repositories\MeasurementRepository;
 use App\Repositories\MortalityRepository;
 use App\Repositories\SessionRepository;
+use App\Repositories\SettingsRepository;
 use App\Repositories\WeighingRepository;
 use App\Support\Exceptions\ValidationException;
 use PDO;
@@ -54,6 +55,11 @@ class SessionDetailsService
     private WeighingRepository $weighings;
 
     /**
+     * @var SettingsRepository Репозиторий для работы с настройками
+     */
+    private SettingsRepository $settings;
+
+    /**
      * Конструктор сервиса
      * 
      * @param PDO $pdo Подключение к базе данных
@@ -65,6 +71,7 @@ class SessionDetailsService
         $this->mortality = new MortalityRepository($pdo);
         $this->harvests = new HarvestRepository($pdo);
         $this->weighings = new WeighingRepository($pdo);
+        $this->settings = new SettingsRepository($pdo);
     }
 
     /**
@@ -140,12 +147,21 @@ class SessionDetailsService
             ]))->toArray();
         }, $this->weighings->listForPoolSince($poolId, $startDate));
 
+        // Получаем настройки формулы прогноза роста
+        // Формула: W(t) = max_weight / (1 + exp(-coefficient * (t - inflection_point)))
+        $growthForecastSettings = [
+            'max_weight' => (float)($this->settings->getValue('growth_forecast_max_weight') ?? 2500),
+            'coefficient' => (float)($this->settings->getValue('growth_forecast_coefficient') ?? 0.015),
+            'inflection_point' => (float)($this->settings->getValue('growth_forecast_inflection_point') ?? 220),
+        ];
+
         return [
             'session' => $sessionModel->toArray(),
             'measurements' => $measurements,
             'mortality' => $mortality,
             'harvests' => $harvests,
             'weighings' => $weighings,
+            'growth_forecast' => $growthForecastSettings,
         ];
     }
 }
