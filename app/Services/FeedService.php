@@ -232,30 +232,44 @@ class FeedService
     }
 
     /**
+     * Строит данные для графиков корма на основе одной таблицы.
+     * Для каждой стратегии вычисляются коэффициенты по новой логике.
+     *
      * @param array<string,mixed> $row
      */
     private function buildFeedChartPayload(array $row): array
     {
+        // Используем одну таблицу (formula_normal) для всех стратегий
+        $yaml = $row['formula_normal'] ?? null;
+        if (!$yaml) {
+            return [
+                'id' => (int)($row['id'] ?? 0),
+                'name' => $row['name'] ?? 'Корм',
+                'granule' => $row['granule'] ?? null,
+                'manufacturer' => $row['manufacturer'] ?? null,
+                'strategies' => [],
+            ];
+        }
+
+        try {
+            $table = FeedTableParser::parse($yaml);
+        } catch (InvalidArgumentException $e) {
+            error_log(sprintf('Feed chart parse error for feed #%s: %s', $row['id'] ?? '?', $e->getMessage()));
+            return [
+                'id' => (int)($row['id'] ?? 0),
+                'name' => $row['name'] ?? 'Корм',
+                'granule' => $row['granule'] ?? null,
+                'manufacturer' => $row['manufacturer'] ?? null,
+                'strategies' => [],
+            ];
+        }
+
         $strategies = [];
         foreach (['econom', 'normal', 'growth'] as $strategy) {
-            $field = 'formula_' . $strategy;
-            $yaml = $row[$field] ?? null;
-            if (!$yaml) {
-                continue;
-            }
-
-            try {
-                $table = FeedTableParser::parse($yaml);
-            } catch (InvalidArgumentException $e) {
-                error_log(sprintf('Feed chart parse error for feed #%s (%s): %s', $row['id'] ?? '?', $strategy, $e->getMessage()));
-                continue;
-            }
-
             $strategyPayload = $this->buildStrategyChart($table, $strategy);
             if ($strategyPayload === null) {
                 continue;
             }
-
             $strategies[] = $strategyPayload;
         }
 
@@ -352,13 +366,15 @@ class FeedService
         $manufacturer = trim((string)($payload['manufacturer'] ?? ''));
         $description = trim((string)($payload['description'] ?? ''));
 
+        // Валидируем только основную таблицу (formula_normal)
+        // Остальные поля можно оставить в БД, но не используем для расчетов
         return [
             'name' => $name,
             'granule' => $granule !== '' ? $granule : null,
             'description' => $description !== '' ? $description : null,
-            'formula_econom' => $this->validateFeedTable($payload['formula_econom'] ?? null, 'formula_econom'),
+            'formula_econom' => null, // Не используется, оставляем null
             'formula_normal' => $this->validateFeedTable($payload['formula_normal'] ?? null, 'formula_normal'),
-            'formula_growth' => $this->validateFeedTable($payload['formula_growth'] ?? null, 'formula_growth'),
+            'formula_growth' => null, // Не используется, оставляем null
             'manufacturer' => $manufacturer !== '' ? $manufacturer : null,
         ];
     }

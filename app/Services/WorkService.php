@@ -384,13 +384,15 @@ class WorkService
         }
         $session->feed_name = $feed['name'] ?? $session->feed_name;
 
-        $table = $this->getFeedTable($feed, $strategy);
+        // Используем одну таблицу для всех стратегий (берем из formula_normal)
+        $table = $this->getFeedTable($feed);
         if (!$table) {
             return;
         }
 
         $avgWeightGrams = $avgWeightKg * 1000;
-        $match = FeedTableParser::resolveRate($table, (float)$temperature, (float)$avgWeightGrams);
+        // Вычисляем коэффициент с учетом стратегии кормления
+        $match = FeedTableParser::resolveRateWithStrategy($table, (float)$temperature, (float)$avgWeightGrams, $strategy);
         if (!$match) {
             return;
         }
@@ -426,21 +428,24 @@ class WorkService
         return $this->feedCache[$feedId];
     }
 
-    private function getFeedTable(array $feed, string $strategy): ?array
+    /**
+     * Получает таблицу кормления из корма.
+     * Используется одна таблица (formula_normal) для всех стратегий.
+     *
+     * @param array $feed Данные корма
+     * @return array|null Распарсенная таблица или null
+     */
+    private function getFeedTable(array $feed): ?array
     {
-        $field = $this->resolveFeedTableField($strategy);
-        if (!$field) {
-            return null;
-        }
-
         $feedId = (int)($feed['id'] ?? 0);
-        $cacheKey = $feedId . '|' . $strategy;
+        $cacheKey = $feedId . '|table';
 
         if (array_key_exists($cacheKey, $this->feedTableCache)) {
             return $this->feedTableCache[$cacheKey];
         }
 
-        $rawYaml = $feed[$field] ?? null;
+        // Используем formula_normal как основную таблицу для всех стратегий
+        $rawYaml = $feed['formula_normal'] ?? null;
         if (!$rawYaml) {
             $this->feedTableCache[$cacheKey] = null;
             return null;
@@ -455,16 +460,6 @@ class WorkService
 
         $this->feedTableCache[$cacheKey] = $table;
         return $table;
-    }
-
-    private function resolveFeedTableField(string $strategy): ?string
-    {
-        return match ($strategy) {
-            'econom' => 'formula_econom',
-            'growth' => 'formula_growth',
-            'normal' => 'formula_normal',
-            default => null,
-        };
     }
 
     private function getStrategyLabel(string $strategy): string

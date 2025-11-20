@@ -173,33 +173,127 @@ YAML;
     }
 
     /**
-     * Возвращает коэффициент для заданных параметров.
+     * Возвращает коэффициент для заданных параметров (старый метод, для обратной совместимости).
      *
      * @return array{value:float, temperature:float, weight_label:string}|null
      */
     public static function resolveRate(array $table, float $temperature, float $weightGrams): ?array
     {
-        $temp = self::matchTemperature($temperature, $table['temperatures'] ?? []);
-        if ($temp === null) {
-            return null;
-        }
+        return self::resolveRateWithStrategy($table, $temperature, $weightGrams, 'normal');
+    }
 
+    /**
+     * Возвращает коэффициент для заданных параметров с учетом стратегии кормления.
+     *
+     * Логика расчета:
+     * - Эконом: выбирается МЕНЬШИЙ коэффициент из двух соседних температурных значений
+     * - Норма: линейная интерполяция между двумя соседними значениями пропорционально температуре
+     * - Рост: выбирается БОЛЬШИЙ коэффициент из двух соседних температурных значений
+     *
+     * @param array $table Распарсенная таблица кормления
+     * @param float $temperature Текущая температура воды (°C)
+     * @param float $weightGrams Средний вес рыбы (граммы)
+     * @param string $strategy Стратегия кормления: 'econom', 'normal', 'growth'
+     * @return array{value:float, temperature:float, weight_label:string, temp_lower:float|null, temp_upper:float|null, coeff_lower:float|null, coeff_upper:float|null}|null
+     */
+    public static function resolveRateWithStrategy(array $table, float $temperature, float $weightGrams, string $strategy): ?array
+    {
         $range = self::matchWeightRange($weightGrams, $table['weight_ranges'] ?? []);
         if ($range === null) {
             return null;
         }
 
-        $tempKey = (string) $temp;
         $label = $range['label'];
-
-        if (!isset($table['values'][$tempKey][$label])) {
+        $temperatures = $table['temperatures'] ?? [];
+        if (empty($temperatures)) {
             return null;
         }
 
+        $sortedTemps = array_values($temperatures);
+        sort($sortedTemps, SORT_NUMERIC);
+
+        // Находим два соседних значения температуры
+        $tempLower = null;
+        $tempUpper = null;
+        $coeffLower = null;
+        $coeffUpper = null;
+
+        // Если температура меньше минимальной - используем минимальную
+        if ($temperature <= $sortedTemps[0]) {
+            $tempLower = $sortedTemps[0];
+            $tempKey = (string) $tempLower;
+            if (isset($table['values'][$tempKey][$label])) {
+                $coeffLower = (float)$table['values'][$tempKey][$label];
+                $coeffUpper = $coeffLower;
+                $tempUpper = $tempLower;
+            } else {
+                return null;
+            }
+        }
+        // Если температура больше максимальной - используем максимальную
+        elseif ($temperature >= $sortedTemps[count($sortedTemps) - 1]) {
+            $tempUpper = $sortedTemps[count($sortedTemps) - 1];
+            $tempKey = (string) $tempUpper;
+            if (isset($table['values'][$tempKey][$label])) {
+                $coeffUpper = (float)$table['values'][$tempKey][$label];
+                $coeffLower = $coeffUpper;
+                $tempLower = $tempUpper;
+            } else {
+                return null;
+            }
+        }
+        // Температура между двумя значениями - находим соседние
+        else {
+            for ($i = 0; $i < count($sortedTemps) - 1; $i++) {
+                if ($temperature >= $sortedTemps[$i] && $temperature <= $sortedTemps[$i + 1]) {
+                    $tempLower = $sortedTemps[$i];
+                    $tempUpper = $sortedTemps[$i + 1];
+                    break;
+                }
+            }
+
+            if ($tempLower === null || $tempUpper === null) {
+                return null;
+            }
+
+            $tempLowerKey = (string) $tempLower;
+            $tempUpperKey = (string) $tempUpper;
+
+            if (!isset($table['values'][$tempLowerKey][$label]) || !isset($table['values'][$tempUpperKey][$label])) {
+                return null;
+            }
+
+            $coeffLower = (float)$table['values'][$tempLowerKey][$label];
+            $coeffUpper = (float)$table['values'][$tempUpperKey][$label];
+        }
+
+        // Вычисляем итоговый коэффициент в зависимости от стратегии
+        $finalCoeff = null;
+        if ($strategy === 'econom') {
+            // Эконом: выбираем МЕНЬШИЙ коэффициент
+            $finalCoeff = min($coeffLower, $coeffUpper);
+        } elseif ($strategy === 'growth') {
+            // Рост: выбираем БОЛЬШИЙ коэффициент
+            $finalCoeff = max($coeffLower, $coeffUpper);
+        } else {
+            // Норма: линейная интерполяция
+            if ($tempLower === $tempUpper) {
+                $finalCoeff = $coeffLower;
+            } else {
+                // Линейная интерполяция: coeff = coeffLower + (coeffUpper - coeffLower) * (temp - tempLower) / (tempUpper - tempLower)
+                $ratio = ($temperature - $tempLower) / ($tempUpper - $tempLower);
+                $finalCoeff = $coeffLower + ($coeffUpper - $coeffLower) * $ratio;
+            }
+        }
+
         return [
-            'value' => (float)$table['values'][$tempKey][$label],
-            'temperature' => $temp,
+            'value' => $finalCoeff,
+            'temperature' => $temperature,
             'weight_label' => $label,
+            'temp_lower' => $tempLower,
+            'temp_upper' => $tempUpper,
+            'coeff_lower' => $coeffLower,
+            'coeff_upper' => $coeffUpper,
         ];
     }
 

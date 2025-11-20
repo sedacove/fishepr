@@ -125,36 +125,22 @@ require_once __DIR__ . '/../../../includes/section_descriptions.php';
                         </div>
                     </div>
 
-                    <div class="row g-4">
-                        <div class="col-md-4">
-                            <div class="form-label d-flex justify-content-between align-items-center">
-                                <span>Таблица «Эконом»</span>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-feed-template="#feedFormulaEconom">
-                                    Вставить шаблон
-                                </button>
-                            </div>
-                            <textarea class="form-control feed-table-textarea font-monospace" id="feedFormulaEconom" name="formula_econom" rows="16"></textarea>
-                            <div class="form-text">Можно настроить под конкретный корм.</div>
+                    <div class="mb-3">
+                        <div class="form-label d-flex justify-content-between align-items-center mb-2">
+                            <span>Таблица коэффициентов кормления <span class="text-danger">*</span></span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-feed-template="#feedFormulaNormal">
+                                Вставить шаблон
+                            </button>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-label d-flex justify-content-between align-items-center">
-                                <span>Таблица «Норма»</span>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-feed-template="#feedFormulaNormal">
-                                    Вставить шаблон
-                                </button>
-                            </div>
-                            <textarea class="form-control feed-table-textarea font-monospace" id="feedFormulaNormal" name="formula_normal" rows="16"></textarea>
-                            <div class="form-text">Если значения совпадают с эконом, можно оставить поле пустым.</div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-label d-flex justify-content-between align-items-center">
-                                <span>Таблица «Рост»</span>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-feed-template="#feedFormulaGrowth">
-                                    Вставить шаблон
-                                </button>
-                            </div>
-                            <textarea class="form-control feed-table-textarea font-monospace" id="feedFormulaGrowth" name="formula_growth" rows="16"></textarea>
-                            <div class="form-text">Можно использовать собственные диапазоны и температуры.</div>
+                        <textarea class="form-control feed-table-textarea font-monospace" id="feedFormulaNormal" name="formula_normal" rows="16" required></textarea>
+                        <div class="form-text">
+                            Эта таблица используется для расчета всех трех стратегий кормления (Эконом, Норма, Рост).
+                            <br>
+                            <strong>Эконом:</strong> выбирается меньший коэффициент из двух соседних температурных значений.
+                            <br>
+                            <strong>Норма:</strong> вычисляется интерполяция между двумя соседними значениями пропорционально температуре.
+                            <br>
+                            <strong>Рост:</strong> выбирается больший коэффициент из двух соседних температурных значений.
                         </div>
                     </div>
 

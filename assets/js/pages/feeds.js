@@ -475,9 +475,7 @@
                 document.getElementById('feedManufacturer').value = feed.manufacturer || '';
                 document.getElementById('feedGranule').value = feed.granule || '';
                 document.getElementById('feedDescription').value = feed.description || '';
-                document.getElementById('feedFormulaEconom').value = feed.formula_econom || '';
                 document.getElementById('feedFormulaNormal').value = feed.formula_normal || '';
-                document.getElementById('feedFormulaGrowth').value = feed.formula_growth || '';
                 toggleNormsSection(true, feed.norm_images || []);
                 feedModalInstance.show();
             })
@@ -550,9 +548,7 @@
             manufacturer: document.getElementById('feedManufacturer').value.trim(),
             granule: document.getElementById('feedGranule').value.trim(),
             description: document.getElementById('feedDescription').value.trim(),
-            formula_econom: document.getElementById('feedFormulaEconom').value.trim(),
             formula_normal: document.getElementById('feedFormulaNormal').value.trim(),
-            formula_growth: document.getElementById('feedFormulaGrowth').value.trim(),
         };
 
         if (currentFeedId) {
