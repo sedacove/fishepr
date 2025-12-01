@@ -31,6 +31,11 @@ class Session extends Model
      * @var int ID посадки
      */
     public int $planting_id;
+
+    /**
+     * @var int|null ID микстовой посадки (если используется микстовая посадка)
+     */
+    public ?int $mixed_planting_id = null;
     
     /**
      * @var string Дата начала сессии

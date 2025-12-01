@@ -156,6 +156,9 @@ if (!isset($page_title)) {
                             <a class="dropdown-item" href="<?php echo BASE_URL; ?>harvests">Отборы</a>
                             <a class="dropdown-item" href="<?php echo BASE_URL; ?>mortality">Падеж</a>
                             <a class="dropdown-item" href="<?php echo BASE_URL; ?>weighings">Навески</a>
+                            <?php if (isAdmin()): ?>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>partial-transplants">Частичная пересадка</a>
+                            <?php endif; ?>
                         </div>
                     </li>
                     <li class="nav-item">
@@ -252,6 +255,12 @@ if (!isset($page_title)) {
                         <span class="submenu-title">Навески</span>
                         <span class="submenu-desc">Живой вес по бассейнам</span>
                     </a>
+                    <?php if (isAdmin()): ?>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>partial-transplants">
+                        <span class="submenu-title">Частичная пересадка</span>
+                        <span class="submenu-desc">Перемещение биомассы между сессиями</span>
+                    </a>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php if (isAdmin()): ?>

@@ -116,7 +116,9 @@ class MeterReadingService
         if ($latestReading !== null) {
             $latestValue = (float)$latestReading['reading_value'];
             if ($value < $latestValue) {
-                throw new DomainException("Новое показание ({$value}) не может быть меньше последнего показания ({$latestValue})");
+                $formattedValue = number_format($value, 2, '.', '');
+                $formattedLatest = number_format($latestValue, 2, '.', '');
+                throw new DomainException("Новое показание ({$formattedValue}) не может быть меньше последнего показания ({$formattedLatest})");
             }
         }
 
@@ -193,7 +195,9 @@ class MeterReadingService
         if ($previousReading !== null) {
             $previousValue = (float)$previousReading['reading_value'];
             if ($value < $previousValue) {
-                throw new DomainException("Новое показание ({$value}) не может быть меньше предыдущего показания ({$previousValue})");
+                $formattedValue = number_format($value, 2, '.', '');
+                $formattedPrevious = number_format($previousValue, 2, '.', '');
+                throw new DomainException("Новое показание ({$formattedValue}) не может быть меньше предыдущего показания ({$formattedPrevious})");
             }
         }
 
@@ -201,7 +205,9 @@ class MeterReadingService
         if ($nextReading !== null) {
             $nextValue = (float)$nextReading['reading_value'];
             if ($value > $nextValue) {
-                throw new DomainException("Новое показание ({$value}) не может быть больше следующего показания ({$nextValue})");
+                $formattedValue = number_format($value, 2, '.', '');
+                $formattedNext = number_format($nextValue, 2, '.', '');
+                throw new DomainException("Новое показание ({$formattedValue}) не может быть больше следующего показания ({$formattedNext})");
             }
         }
 

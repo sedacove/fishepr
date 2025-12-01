@@ -284,7 +284,21 @@
             },
             error: function(xhr, status, error) {
                 console.error('saveReading error:', status, error, xhr.responseText);
-                showAlert('danger', 'Ошибка при сохранении показания');
+                
+                // Пытаемся извлечь сообщение об ошибке из ответа сервера
+                let errorMessage = 'Ошибка при сохранении показания';
+                try {
+                    if (xhr.responseText) {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        if (errorResponse.message) {
+                            errorMessage = errorResponse.message;
+                        }
+                    }
+                } catch (e) {
+                    // Если не удалось распарсить JSON, используем общее сообщение
+                }
+                
+                showAlert('danger', errorMessage);
             }
         });
     }
