@@ -134,3 +134,47 @@
     }
 }
 
+/* Стили для выпадающего списка с чекбоксами */
+.dropdown-checkbox-wrapper {
+    position: relative;
+}
+
+.dropdown-menu-checkbox {
+    max-height: 300px;
+    overflow-y: auto;
+    min-width: 100%;
+}
+
+.dropdown-menu-checkbox .dropdown-item {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    white-space: nowrap;
+}
+
+.dropdown-menu-checkbox .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-menu-checkbox .dropdown-item label {
+    cursor: pointer;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-menu-checkbox .form-check-input {
+    margin-top: 0;
+    flex-shrink: 0;
+}
+
+.dropdown-menu-checkbox .dropdown-divider {
+    margin: 0.5rem 0;
+}
+
+.dropdown-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+

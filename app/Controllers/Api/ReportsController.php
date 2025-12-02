@@ -57,15 +57,33 @@ class ReportsController
     {
         $dateFrom = $_GET['date_from'] ?? null;
         $dateTo = $_GET['date_to'] ?? null;
-        $counterpartyId = isset($_GET['counterparty_id']) && $_GET['counterparty_id'] !== '' 
-            ? (int)$_GET['counterparty_id'] 
-            : null;
+        
+        // Обработка множественного выбора контрагентов
+        $counterpartyIds = null;
+        if (isset($_GET['counterparty_id'])) {
+            if (is_array($_GET['counterparty_id'])) {
+                // Множественный выбор
+                $counterpartyIds = array_filter(array_map('intval', $_GET['counterparty_id']), function($id) {
+                    return $id > 0;
+                });
+                if (empty($counterpartyIds)) {
+                    $counterpartyIds = null;
+                }
+            } else {
+                // Одиночный выбор (для обратной совместимости)
+                $id = (int)$_GET['counterparty_id'];
+                if ($id > 0) {
+                    $counterpartyIds = [$id];
+                }
+            }
+        }
+        
         $plantingId = isset($_GET['planting_id']) && $_GET['planting_id'] !== '' 
             ? (int)$_GET['planting_id'] 
             : null;
 
         try {
-            $data = $this->reportService->getHarvestsReport($dateFrom, $dateTo, $counterpartyId, $plantingId);
+            $data = $this->reportService->getHarvestsReport($dateFrom, $dateTo, $counterpartyIds, $plantingId);
             JsonResponse::success($data);
         } catch (\Exception $e) {
             JsonResponse::error($e->getMessage(), 500);

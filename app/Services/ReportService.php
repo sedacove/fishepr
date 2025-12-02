@@ -30,11 +30,11 @@ class ReportService
      * 
      * @param string|null $dateFrom Дата начала периода (формат YYYY-MM-DD)
      * @param string|null $dateTo Дата окончания периода (формат YYYY-MM-DD)
-     * @param int|null $counterpartyId ID контрагента (null для всех)
+     * @param array|null $counterpartyIds Массив ID контрагентов (null для всех)
      * @param int|null $plantingId ID посадки (null для всех)
      * @return array Данные отчета: список отборов, итоги, информация о фильтрах
      */
-    public function getHarvestsReport(?string $dateFrom, ?string $dateTo, ?int $counterpartyId, ?int $plantingId): array
+    public function getHarvestsReport(?string $dateFrom, ?string $dateTo, ?array $counterpartyIds, ?int $plantingId): array
     {
         // Валидация дат
         if ($dateFrom && !$this->isValidDate($dateFrom)) {
@@ -45,7 +45,7 @@ class ReportService
         }
 
         // Получаем отборы с фильтрами
-        $harvests = $this->harvests->listForReport($dateFrom, $dateTo, $counterpartyId, $plantingId);
+        $harvests = $this->harvests->listForReport($dateFrom, $dateTo, $counterpartyIds, $plantingId);
 
         // Вычисляем итоги
         $totalWeight = 0.0;
@@ -56,10 +56,14 @@ class ReportService
         }
 
         // Получаем информацию о фильтрах для отображения
-        $counterpartyName = null;
-        if ($counterpartyId !== null) {
-            $counterparty = $this->counterparties->findById($counterpartyId);
-            $counterpartyName = $counterparty ? $counterparty['name'] : null;
+        $counterpartyNames = [];
+        if ($counterpartyIds !== null && !empty($counterpartyIds)) {
+            foreach ($counterpartyIds as $counterpartyId) {
+                $counterparty = $this->counterparties->findById($counterpartyId);
+                if ($counterparty) {
+                    $counterpartyNames[] = $counterparty['name'];
+                }
+            }
         }
 
         $plantingName = null;
@@ -77,8 +81,8 @@ class ReportService
             'filters' => [
                 'date_from' => $dateFrom,
                 'date_to' => $dateTo,
-                'counterparty_id' => $counterpartyId,
-                'counterparty_name' => $counterpartyName,
+                'counterparty_ids' => $counterpartyIds,
+                'counterparty_names' => $counterpartyNames,
                 'planting_id' => $plantingId,
                 'planting_name' => $plantingName,
             ],

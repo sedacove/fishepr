@@ -225,11 +225,11 @@ class HarvestRepository extends Repository
      * 
      * @param string|null $dateFrom Дата начала периода (формат YYYY-MM-DD)
      * @param string|null $dateTo Дата окончания периода (формат YYYY-MM-DD)
-     * @param int|null $counterpartyId ID контрагента (null для всех)
+     * @param array|null $counterpartyIds Массив ID контрагентов (null для всех)
      * @param int|null $plantingId ID посадки (null для всех)
      * @return array Массив отборов с информацией о контрагенте, бассейне и посадке
      */
-    public function listForReport(?string $dateFrom, ?string $dateTo, ?int $counterpartyId, ?int $plantingId): array
+    public function listForReport(?string $dateFrom, ?string $dateTo, ?array $counterpartyIds, ?int $plantingId): array
     {
         $conditions = [];
         $params = [];
@@ -244,10 +244,11 @@ class HarvestRepository extends Repository
             $params[] = $dateTo;
         }
 
-        // Фильтр по контрагенту
-        if ($counterpartyId !== null) {
-            $conditions[] = 'h.counterparty_id = ?';
-            $params[] = $counterpartyId;
+        // Фильтр по контрагентам (поддержка множественного выбора)
+        if ($counterpartyIds !== null && !empty($counterpartyIds)) {
+            $placeholders = implode(',', array_fill(0, count($counterpartyIds), '?'));
+            $conditions[] = "h.counterparty_id IN ({$placeholders})";
+            $params = array_merge($params, $counterpartyIds);
         }
 
         // Фильтр по посадке (через сессию отбора)

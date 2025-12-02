@@ -14,6 +14,9 @@
     const totalFishCountEl = document.getElementById('totalFishCount');
     const totalAvgWeightEl = document.getElementById('totalAvgWeight');
 
+    // Инициализация выпадающего списка с чекбоксами для контрагентов
+    initCounterpartyDropdown();
+
     // Обработчик отправки формы фильтров
     filtersForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -26,14 +29,72 @@
     });
 
     /**
+     * Инициализирует выпадающий список с чекбоксами для контрагентов
+     */
+    function initCounterpartyDropdown() {
+        const selectAllCheckbox = document.getElementById('counterpartySelectAll');
+        const checkboxes = document.querySelectorAll('.counterparty-checkbox');
+        const dropdownButton = document.getElementById('counterpartyDropdown');
+        const dropdownText = dropdownButton.querySelector('.dropdown-text');
+
+        // Обработчик "Выбрать все"
+        selectAllCheckbox.addEventListener('change', function() {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateDropdownText();
+        });
+
+        // Обработчики для отдельных чекбоксов
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // Обновляем состояние "Выбрать все"
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                const noneChecked = Array.from(checkboxes).every(cb => !cb.checked);
+                selectAllCheckbox.checked = allChecked;
+                selectAllCheckbox.indeterminate = !allChecked && !noneChecked;
+                
+                updateDropdownText();
+            });
+        });
+
+        // Обновление текста кнопки
+        function updateDropdownText() {
+            const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+            if (checkedBoxes.length === 0) {
+                dropdownText.textContent = 'Все контрагенты';
+            } else if (checkedBoxes.length === checkboxes.length) {
+                dropdownText.textContent = 'Все контрагенты';
+            } else if (checkedBoxes.length === 1) {
+                dropdownText.textContent = checkedBoxes[0].dataset.name;
+            } else {
+                dropdownText.textContent = `Выбрано: ${checkedBoxes.length}`;
+            }
+        }
+
+        // Предотвращаем закрытие dropdown при клике внутри
+        const dropdownMenu = document.getElementById('counterpartyDropdownMenu');
+        dropdownMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+
+    /**
      * Генерирует отчет на основе фильтров
      */
     function generateReport() {
         const formData = new FormData(filtersForm);
         const params = new URLSearchParams();
         
+        // Обрабатываем контрагентов отдельно
+        const counterpartyCheckboxes = document.querySelectorAll('.counterparty-checkbox:checked');
+        counterpartyCheckboxes.forEach(checkbox => {
+            params.append('counterparty_id[]', checkbox.value);
+        });
+        
+        // Обрабатываем остальные поля формы
         for (const [key, value] of formData.entries()) {
-            if (value) {
+            if (value && key !== 'counterparty_id[]') {
                 params.append(key, value);
             }
         }
@@ -135,8 +196,8 @@
 
         // Формируем информацию о фильтрах
         const filterInfo = [];
-        if (filters.counterparty_name) {
-            filterInfo.push(`Контрагент: ${filters.counterparty_name}`);
+        if (filters.counterparty_names && filters.counterparty_names.length > 0) {
+            filterInfo.push(`Контрагент: ${filters.counterparty_names.join(', ')}`);
         } else {
             filterInfo.push('Контрагент: Все');
         }

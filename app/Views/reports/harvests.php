@@ -28,15 +28,32 @@ $extra_styles[] = 'assets/css/pages/reports.css';
                     <input type="date" class="form-control" id="dateTo" name="date_to">
                 </div>
                 <div class="col-md-3">
-                    <label for="counterpartyId" class="form-label">Контрагент</label>
-                    <select class="form-select" id="counterpartyId" name="counterparty_id">
-                        <option value="">Все</option>
-                        <?php foreach ($counterparties as $counterparty): ?>
-                            <option value="<?php echo htmlspecialchars($counterparty['id']); ?>">
-                                <?php echo htmlspecialchars($counterparty['name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <label class="form-label">Контрагент</label>
+                    <div class="dropdown-checkbox-wrapper">
+                        <button class="btn btn-outline-secondary form-control text-start dropdown-toggle" type="button" id="counterpartyDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="dropdown-text">Все контрагенты</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-checkbox" aria-labelledby="counterpartyDropdown" id="counterpartyDropdownMenu">
+                            <li>
+                                <label class="dropdown-item">
+                                    <input type="checkbox" class="form-check-input me-2" id="counterpartySelectAll" value="all">
+                                    <strong>Выбрать все</strong>
+                                </label>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <?php foreach ($counterparties as $counterparty): ?>
+                                <li>
+                                    <label class="dropdown-item">
+                                        <input type="checkbox" class="form-check-input me-2 counterparty-checkbox" 
+                                               name="counterparty_id[]" 
+                                               value="<?php echo htmlspecialchars($counterparty['id']); ?>"
+                                               data-name="<?php echo htmlspecialchars($counterparty['name']); ?>">
+                                        <?php echo htmlspecialchars($counterparty['name']); ?>
+                                    </label>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
                 </div>
                 <div class="col-md-3">
                     <label for="plantingId" class="form-label">Аквакультура</label>
