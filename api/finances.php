@@ -37,6 +37,9 @@ try {
         case 'summary':
             echo json_encode(getFinanceSummary($pdo));
             break;
+        case 'total_summary':
+            echo json_encode(getTotalFinanceSummary($pdo));
+            break;
         case 'get_expense':
             echo json_encode(getFinanceRecord($pdo, 'expenses'));
             break;
@@ -334,6 +337,25 @@ function getFinanceSummary(PDO $pdo): array
         'success' => true,
         'data' => [
             'filter' => $filter,
+            'expenses' => $expensesTotal,
+            'incomes' => $incomesTotal,
+            'balance' => $incomesTotal - $expensesTotal,
+        ],
+    ];
+}
+
+function getTotalFinanceSummary(PDO $pdo): array
+{
+    // Общий баланс за все время, без фильтров
+    $expenseStmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) FROM finance_expenses");
+    $expensesTotal = (float)$expenseStmt->fetchColumn();
+
+    $incomeStmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) FROM finance_incomes");
+    $incomesTotal = (float)$incomeStmt->fetchColumn();
+
+    return [
+        'success' => true,
+        'data' => [
             'expenses' => $expensesTotal,
             'incomes' => $incomesTotal,
             'balance' => $incomesTotal - $expensesTotal,

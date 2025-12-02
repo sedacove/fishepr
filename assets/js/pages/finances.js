@@ -4,6 +4,7 @@ let incomesPage = 1;
 
 function loadFinances() {
     loadSummary();
+    loadTotalSummary();
     loadExpenses(expensesPage);
     loadIncomes(incomesPage);
 }
@@ -21,6 +22,27 @@ function loadSummary() {
                 $('#incomesValue').text(formatCurrency(data.incomes));
                 $('#expensesValue').text(formatCurrency(data.expenses));
             }
+        }
+    });
+}
+
+function loadTotalSummary() {
+    $.ajax({
+        url: BASE_URL + 'api/finances.php',
+        method: 'GET',
+        data: { action: 'total_summary' },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                const data = response.data;
+                $('#totalBalanceValue').text(formatCurrency(data.balance));
+            } else {
+                console.error('Ошибка загрузки общего баланса:', response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Ошибка AJAX при загрузке общего баланса:', status, error);
+            console.error('Ответ сервера:', xhr.responseText);
         }
     });
 }
@@ -236,6 +258,7 @@ function saveExpense() {
     submitFinanceForm(payload, action, '#expenseModal', function() {
         loadExpenses(expensesPage);
         loadSummary();
+        loadTotalSummary();
     });
 }
 
@@ -258,6 +281,7 @@ function saveIncome() {
     submitFinanceForm(payload, action, '#incomeModal', function() {
         loadIncomes(incomesPage);
         loadSummary();
+        loadTotalSummary();
     });
 }
 
@@ -309,6 +333,7 @@ function deleteExpense(id) {
                 showAlert('success', response.message);
                 loadExpenses(expensesPage);
                 loadSummary();
+                loadTotalSummary();
             } else {
                 showAlert('danger', response.message || 'Ошибка удаления');
             }
@@ -335,6 +360,7 @@ function deleteIncome(id) {
                 showAlert('success', response.message);
                 loadIncomes(incomesPage);
                 loadSummary();
+                loadTotalSummary();
             } else {
                 showAlert('danger', response.message || 'Ошибка удаления');
             }
