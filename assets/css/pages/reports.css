@@ -155,6 +155,11 @@
     background-color: #f8f9fa;
 }
 
+/* Убираем белый фон при hover в темной теме */
+[data-theme="dark"] .dropdown-menu-checkbox .dropdown-item:hover {
+    background-color: transparent;
+}
+
 .dropdown-menu-checkbox .dropdown-item label {
     cursor: pointer;
     margin: 0;
