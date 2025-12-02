@@ -12,8 +12,8 @@
     const isAdmin = Boolean(config.isAdmin);
 
     let currentEditId = null;
-    let currentPoolId = null;
-    let poolsList = [];
+    let currentSessionId = null;
+    let sessionsList = [];
     let counterpartiesList = [];
 
     function normalizeBaseUrl(value) {
@@ -28,7 +28,7 @@
     }
 
     function init() {
-        loadPools();
+        loadSessions();
         if (isAdmin) {
             loadCounterpartiesList();
         }
@@ -60,22 +60,22 @@
         }
     }
 
-    function loadPools() {
+    function loadSessions() {
         $.ajax({
-            url: apiUrl('api/harvests.php?action=get_pools'),
+            url: apiUrl('api/harvests.php?action=get_active_sessions'),
             method: 'GET',
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    poolsList = response.data || [];
-                    createTabs(poolsList);
+                    sessionsList = response.data || [];
+                    createTabs(sessionsList);
                 } else {
-                    showAlert('danger', response.message || 'Не удалось загрузить бассейны');
+                    showAlert('danger', response.message || 'Не удалось загрузить сессии');
                 }
             },
             error: function(xhr, status, error) {
-                console.error('loadPools error:', status, error, xhr.responseText);
-                showAlert('danger', 'Ошибка при загрузке бассейнов');
+                console.error('loadSessions error:', status, error, xhr.responseText);
+                showAlert('danger', 'Ошибка при загрузке сессий');
             }
         });
     }
@@ -113,63 +113,105 @@
         select.prop('disabled', !isAdmin);
     }
 
-    function createTabs(pools) {
+    function createTabs(sessions) {
         const tabsNav = $('#poolsTabs');
         const tabsContent = $('#poolsTabContent');
         tabsNav.empty();
         tabsContent.empty();
 
-        if (!pools.length) {
-            tabsContent.html('<div class="alert alert-info">Нет активных бассейнов</div>');
-            return;
-        }
+        // Создаем табы для активных сессий
+        if (sessions.length > 0) {
+            let firstActiveIndex = 0;
 
-        let firstActiveIndex = -1;
-        pools.forEach(function(pool, index) {
-            if (pool.active_session && firstActiveIndex === -1) {
-                firstActiveIndex = index;
-            }
-        });
+            sessions.forEach(function(session, index) {
+                const tabId = `session-${session.id}`;
+                const isActive = index === firstActiveIndex;
 
-        pools.forEach(function(pool, index) {
-            const tabId = `pool-${pool.id}`;
-            const hasSession = Boolean(pool.active_session);
-            const isActive = firstActiveIndex !== -1 && index === firstActiveIndex;
+                const tabHtml = `
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link ${isActive ? 'active' : ''}"
+                                id="${tabId}-tab"
+                                data-bs-toggle="tab" data-bs-target="#${tabId}" onclick="switchSession(${session.id})"
+                                type="button"
+                                role="tab"
+                                title="${escapeHtml(session.pool_name || 'Бассейн')}: ${escapeHtml(session.session_name || session.name)}">
+                            ${escapeHtml(session.pool_name || 'Бассейн')}: ${escapeHtml(session.session_name || session.name)}
+                        </button>
+                    </li>
+                `;
+                tabsNav.append(tabHtml);
 
-            const tabHtml = `
+                const colSpan = isAdmin ? 8 : 7;
+                const contentHtml = `
+                    <div class="tab-pane fade ${isActive ? 'show active' : ''}" id="${tabId}" role="tabpanel">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                                    <h5 class="mb-0">
+                                        Отборы для сессии "${escapeHtml(session.session_name || session.name)}"
+                                        <small class="text-muted">(Бассейн: ${escapeHtml(session.pool_name || '')})</small>
+                                    </h5>
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="openAddModal(${session.id})">
+                                        <i class="bi bi-plus-circle"></i> Добавить отбор
+                                    </button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Дата и время</th>
+                                                <th>Вес (кг)</th>
+                                                <th>Количество рыб (шт)</th>
+                                                <th>Контрагент</th>
+                                                <th>Кто делал</th>
+                                                ${isAdmin ? '<th class="text-center">Действия</th>' : ''}
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recordsBody-${session.id}">
+                                            <tr>
+                                                <td colspan="${colSpan}" class="text-center">
+                                                    <div class="spinner-border spinner-border-sm" role="status">
+                                                        <span class="visually-hidden">Загрузка...</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                tabsContent.append(contentHtml);
+            });
+
+            // Добавляем таб "Прошлые сессии"
+            const completedTabHtml = `
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link ${isActive ? 'active' : ''} ${hasSession ? '' : 'disabled'}"
-                            id="${tabId}-tab"
-                            ${hasSession ? `data-bs-toggle="tab" data-bs-target="#${tabId}" onclick="switchPool(${pool.id})"` : ''}
+                    <button class="nav-link"
+                            id="completed-sessions-tab"
+                            data-bs-toggle="tab" data-bs-target="#completed-sessions" onclick="loadCompletedSessions()"
                             type="button"
-                            role="tab"
-                            ${hasSession ? '' : 'disabled'}
-                            title="${hasSession ? `${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}: ${escapeHtml(pool.active_session.session_name)}` : escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`) + ' (Нет активной сессии)'}">
-                        ${hasSession ? `${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}: ${escapeHtml(pool.active_session.session_name)}` : `${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)} <i class="bi bi-x-circle text-muted"></i>`}
+                            role="tab">
+                        Прошлые сессии
                     </button>
                 </li>
             `;
-            tabsNav.append(tabHtml);
+            tabsNav.append(completedTabHtml);
 
-            const colSpan = isAdmin ? 6 : 5;
-            const contentHtml = `
-                <div class="tab-pane fade ${isActive ? 'show active' : ''}" id="${tabId}" role="tabpanel">
+            const completedColSpan = isAdmin ? 8 : 7;
+            const completedContentHtml = `
+                <div class="tab-pane fade" id="completed-sessions" role="tabpanel">
                     <div class="card">
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                                <h5 class="mb-0">
-                                    Отборы для бассейна "${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}"
-                                    ${hasSession ? `<small class="text-muted">(Сессия: ${escapeHtml(pool.active_session.session_name)})</small>` : '<small class="text-muted">(Нет активной сессии)</small>'}
-                                </h5>
-                                <button type="button" class="btn btn-sm btn-primary" onclick="openAddModal(${pool.id})">
-                                    <i class="bi bi-plus-circle"></i> Добавить отбор
-                                </button>
-                            </div>
+                            <h5 class="mb-3">Отборы из завершенных сессий</h5>
                             <div class="table-responsive">
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
                                             <th>Дата и время</th>
+                                            <th>Сессия</th>
+                                            <th>Бассейн</th>
                                             <th>Вес (кг)</th>
                                             <th>Количество рыб (шт)</th>
                                             <th>Контрагент</th>
@@ -177,12 +219,10 @@
                                             ${isAdmin ? '<th class="text-center">Действия</th>' : ''}
                                         </tr>
                                     </thead>
-                                    <tbody id="recordsBody-${pool.id}">
+                                    <tbody id="completedRecordsBody">
                                         <tr>
-                                            <td colspan="${colSpan}" class="text-center">
-                                                <div class="spinner-border spinner-border-sm" role="status">
-                                                    <span class="visually-hidden">Загрузка...</span>
-                                                </div>
+                                            <td colspan="${completedColSpan}" class="text-center text-muted">
+                                                Нажмите на вкладку для загрузки данных
                                             </td>
                                         </tr>
                                     </tbody>
@@ -192,22 +232,24 @@
                     </div>
                 </div>
             `;
-            tabsContent.append(contentHtml);
-        });
+            tabsContent.append(completedContentHtml);
 
-        if (firstActiveIndex !== -1) {
-            currentPoolId = pools[firstActiveIndex].id;
-            loadRecords(currentPoolId);
+            if (sessions.length > 0) {
+                currentSessionId = sessions[firstActiveIndex].id;
+                loadRecords(currentSessionId);
+            }
+        } else {
+            tabsContent.html('<div class="alert alert-info">Нет активных сессий</div>');
         }
     }
 
-    function switchPool(poolId) {
-        currentPoolId = poolId;
-        loadRecords(poolId);
+    function switchSession(sessionId) {
+        currentSessionId = sessionId;
+        loadRecords(sessionId);
     }
 
-    function loadRecords(poolId) {
-        const tbody = $(`#recordsBody-${poolId}`);
+    function loadRecords(sessionId) {
+        const tbody = $(`#recordsBody-${sessionId}`);
         const colSpan = isAdmin ? 6 : 5;
         tbody.html(`
             <tr>
@@ -220,12 +262,12 @@
         `);
 
         $.ajax({
-            url: apiUrl(`api/harvests.php?action=list&pool_id=${poolId}`),
+            url: apiUrl(`api/harvests.php?action=list&session_id=${sessionId}`),
             method: 'GET',
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    renderRecords(response.data || [], poolId);
+                    renderRecords(response.data || [], sessionId);
                 } else {
                     showAlert('danger', response.message || 'Не удалось загрузить записи');
                     tbody.html(`<tr><td colspan="${colSpan}" class="text-center text-muted">Не удалось загрузить данные</td></tr>`);
@@ -239,8 +281,41 @@
         });
     }
 
-    function renderRecords(records, poolId) {
-        const tbody = $(`#recordsBody-${poolId}`);
+    function loadCompletedSessions() {
+        const tbody = $('#completedRecordsBody');
+        const colSpan = isAdmin ? 8 : 7;
+        tbody.html(`
+            <tr>
+                <td colspan="${colSpan}" class="text-center">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
+                </td>
+            </tr>
+        `);
+
+        $.ajax({
+            url: apiUrl('api/harvests.php?action=list_completed'),
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    renderCompletedRecords(response.data || []);
+                } else {
+                    showAlert('danger', response.message || 'Не удалось загрузить записи');
+                    tbody.html(`<tr><td colspan="${colSpan}" class="text-center text-muted">Не удалось загрузить данные</td></tr>`);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('loadCompletedSessions error:', status, error, xhr.responseText);
+                showAlert('danger', 'Ошибка при загрузке записей');
+                tbody.html(`<tr><td colspan="${colSpan}" class="text-center text-danger">Ошибка при загрузке данных</td></tr>`);
+            }
+        });
+    }
+
+    function renderRecords(records, sessionId) {
+        const tbody = $(`#recordsBody-${sessionId}`);
         tbody.empty();
         const colSpan = isAdmin ? 6 : 5;
 
@@ -293,7 +368,64 @@
         });
     }
 
-    function openAddModal(poolId) {
+    function renderCompletedRecords(records) {
+        const tbody = $('#completedRecordsBody');
+        tbody.empty();
+        const colSpan = isAdmin ? 8 : 7;
+
+        if (!records.length) {
+            tbody.html(`<tr><td colspan="${colSpan}" class="text-center text-muted">Записи не найдены</td></tr>`);
+            return;
+        }
+
+        records.forEach(function(record) {
+            const counterpartyName = record.counterparty_name ? escapeHtml(record.counterparty_name) : '—';
+            const userInfo = record.created_by_full_name
+                ? `${escapeHtml(record.created_by_full_name)} (${escapeHtml(record.created_by_login)})`
+                : escapeHtml(record.created_by_login || 'Неизвестно');
+            const sessionName = record.session_name ? escapeHtml(record.session_name) : '—';
+            const poolName = record.pool_name ? escapeHtml(record.pool_name) : '—';
+
+            const canEdit = isAdmin || Boolean(record.can_edit);
+            let actionsHtml = '';
+            if (isAdmin) {
+                actionsHtml = '<td class="text-center">';
+                actionsHtml += `
+                    <button class="btn btn-sm btn-primary me-2" onclick="openEditModal(${record.id})" title="Редактировать">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                `;
+                actionsHtml += `
+                    <button class="btn btn-sm btn-danger" onclick="deleteRecord(${record.id})" title="Удалить">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
+                actionsHtml += '</td>';
+            } else if (canEdit) {
+                actionsHtml = '<td class="text-center">' +
+                    `<button class="btn btn-sm btn-primary" onclick="openEditModal(${record.id})" title="Редактировать">` +
+                    '<i class="bi bi-pencil"></i>' +
+                    '</button>' +
+                    '</td>';
+            }
+
+            const row = `
+                <tr>
+                    <td>${escapeHtml(record.recorded_at_display || '')}</td>
+                    <td>${sessionName}</td>
+                    <td>${poolName}</td>
+                    <td>${formatNumber(record.weight, 2)}</td>
+                    <td>${formatInteger(record.fish_count)}</td>
+                    <td>${counterpartyName}</td>
+                    <td>${userInfo}</td>
+                    ${actionsHtml || ''}
+                </tr>
+            `;
+            tbody.append(row);
+        });
+    }
+
+    function openAddModal(sessionId) {
         currentEditId = null;
         clearFormErrors();
         $('#recordModalTitle').text('Добавить отбор');
@@ -302,10 +434,11 @@
         $('#recordPool').prop('disabled', false);
 
         const select = $('#recordPool');
-        select.empty().append('<option value="">Выберите бассейн</option>');
-        poolsList.forEach(function(pool) {
-            const selected = poolId && pool.id === poolId ? 'selected' : '';
-            select.append(`<option value="${pool.id}" ${selected}>${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}</option>`);
+        select.empty().append('<option value="">Выберите сессию</option>');
+        sessionsList.forEach(function(session) {
+            const selected = sessionId && session.id === sessionId ? 'selected' : '';
+            const label = `${escapeHtml(session.pool_name || 'Бассейн')}: ${escapeHtml(session.session_name || session.name)}`;
+            select.append(`<option value="${session.id}" ${selected}>${label}</option>`);
         });
 
         if (isAdmin) {
@@ -319,9 +452,9 @@
 
         populateCounterpartySelect('#recordCounterparty', null);
 
-        if (poolId) {
-            $('#currentPoolId').val(poolId);
-            $('#recordPool').val(poolId);
+        if (sessionId) {
+            $('#currentPoolId').val(sessionId);
+            $('#recordPool').val(sessionId);
         }
 
         const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('recordModal'));
@@ -341,16 +474,17 @@
                 if (response.success) {
                     const record = response.data || {};
                     $('#recordId').val(record.id || '');
-                    $('#currentPoolId').val(record.pool_id || '');
+                    $('#currentPoolId').val(record.session_id || '');
 
                     const select = $('#recordPool');
-                    select.empty().append('<option value="">Выберите бассейн</option>');
-                    poolsList.forEach(function(pool) {
-                        const selected = pool.id === record.pool_id ? 'selected' : '';
-                        select.append(`<option value="${pool.id}" ${selected}>${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}</option>`);
+                    select.empty().append('<option value="">Выберите сессию</option>');
+                    sessionsList.forEach(function(session) {
+                        const selected = session.id === record.session_id ? 'selected' : '';
+                        const label = `${escapeHtml(session.pool_name || 'Бассейн')}: ${escapeHtml(session.session_name || session.name)}`;
+                        select.append(`<option value="${session.id}" ${selected}>${label}</option>`);
                     });
 
-                    $('#recordPool').val(record.pool_id || '');
+                    $('#recordPool').val(record.session_id || '');
                     $('#recordWeight').val(record.weight != null ? record.weight : '');
                     $('#recordFishCount').val(record.fish_count != null ? record.fish_count : '');
                     populateCounterpartySelect('#recordCounterparty', record.counterparty_id || null);
@@ -389,9 +523,9 @@
             return;
         }
 
-        const poolIdValue = $('#currentPoolId').val() || $('#recordPool').val();
+        const sessionIdValue = $('#currentPoolId').val() || $('#recordPool').val();
         const payload = {
-            pool_id: parseInt(poolIdValue, 10),
+            session_id: parseInt(sessionIdValue, 10),
             weight: parseFloat($('#recordWeight').val()),
             fish_count: parseInt($('#recordFishCount').val(), 10)
         };
@@ -422,8 +556,8 @@
                     showAlert('success', response.message || 'Запись сохранена');
                     const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('recordModal'));
                     modal.hide();
-                    if (payload.pool_id) {
-                        loadRecords(payload.pool_id);
+                    if (payload.session_id) {
+                        loadRecords(payload.session_id);
                     }
                 } else {
                     handleFormError(response.message || 'Не удалось сохранить запись', response.field || null);
@@ -439,7 +573,8 @@
 
     function handleFormError(message, field) {
         const fieldMap = {
-            pool_id: '#recordPool',
+            session_id: '#recordPool',
+            pool_id: '#recordPool', // для обратной совместимости
             weight: '#recordWeight',
             fish_count: '#recordFishCount',
             counterparty_id: '#recordCounterparty',
@@ -452,7 +587,7 @@
         }
 
         const lower = message ? message.toLowerCase() : '';
-        if (lower.includes('бассейн')) {
+        if (lower.includes('сессия') || lower.includes('бассейн')) {
             showFieldError('#recordPool', message);
         } else if (lower.includes('вес')) {
             showFieldError('#recordWeight', message);
@@ -481,10 +616,10 @@
             success: function(response) {
                 if (response.success) {
                     showAlert('success', response.message || 'Запись удалена');
-                    if (currentPoolId) {
-                        loadRecords(currentPoolId);
+                    if (currentSessionId) {
+                        loadRecords(currentSessionId);
                     } else {
-                        loadPools();
+                        loadSessions();
                     }
                 } else {
                     showAlert('danger', response.message || 'Не удалось удалить запись');
@@ -547,7 +682,8 @@
         });
     }
 
-    window.switchPool = switchPool;
+    window.switchSession = switchSession;
+    window.loadCompletedSessions = loadCompletedSessions;
     window.openAddModal = openAddModal;
     window.openEditModal = openEditModal;
     window.saveRecord = saveRecord;

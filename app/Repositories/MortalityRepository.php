@@ -8,7 +8,7 @@ use PDO;
  * Репозиторий для работы со смертностью
  * 
  * Выполняет SQL запросы к таблице mortality:
- * - получение списка записей смертности для бассейна
+ * - получение списка записей смертности для сессии
  * - поиск записи смертности по ID
  * - создание, обновление, удаление записей смертности
  * - получение дневных итогов смертности
@@ -17,32 +17,62 @@ use PDO;
 class MortalityRepository extends Repository
 {
     /**
-     * Получает список записей смертности для указанного бассейна
+     * Получает список записей смертности для указанной сессии
      * 
-     * @param int $poolId ID бассейна
+     * @param int $sessionId ID сессии
      * @return array Массив записей смертности, отсортированных по дате записи (от новых к старым)
      */
-    public function listByPool(int $poolId): array
+    public function listBySession(int $sessionId): array
     {
         $stmt = $this->pdo->prepare(
             'SELECT 
                 m.*,
                 u.login AS created_by_login,
-                u.full_name AS created_by_name
+                u.full_name AS created_by_name,
+                s.id AS session_id,
+                s.name AS session_name,
+                p.id AS pool_id,
+                p.name AS pool_name
              FROM mortality m
+             INNER JOIN sessions s ON s.id = m.session_id
+             LEFT JOIN pools p ON p.id = s.pool_id
              LEFT JOIN users u ON m.created_by = u.id
-             WHERE m.pool_id = ?
+             WHERE m.session_id = ?
              ORDER BY m.recorded_at DESC'
         );
-        $stmt->execute([$poolId]);
+        $stmt->execute([$sessionId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
     /**
-     * Находит запись смертности по ID с информацией о пользователе и бассейне
+     * Получает список записей смертности из завершенных сессий
+     * 
+     * Используется для отображения падежей из завершенных сессий в отдельном табе.
+     * 
+     * @return array Массив записей смертности с информацией о сессии и бассейне
+     */
+    public function listForCompletedSessions(): array
+    {
+        $stmt = $this->pdo->query(
+            'SELECT m.*, ' .
+            'u.login AS created_by_login, u.full_name AS created_by_name, ' .
+            's.id AS session_id, s.name AS session_name, ' .
+            'p.id AS pool_id, p.name AS pool_name ' .
+            'FROM mortality m ' .
+            'INNER JOIN sessions s ON s.id = m.session_id ' .
+            'LEFT JOIN pools p ON p.id = s.pool_id ' .
+            'LEFT JOIN users u ON m.created_by = u.id ' .
+            'WHERE s.is_completed = 1 ' .
+            'ORDER BY m.recorded_at DESC'
+        );
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    /**
+     * Находит запись смертности по ID с информацией о пользователе, сессии и бассейне
      * 
      * @param int $id ID записи смертности
-     * @return array|null Данные записи с информацией о создателе и бассейне или null, если не найдено
+     * @return array|null Данные записи с информацией о создателе, сессии и бассейне или null, если не найдено
      */
     public function findWithUser(int $id): ?array
     {
@@ -51,10 +81,14 @@ class MortalityRepository extends Repository
                 m.*,
                 u.login AS created_by_login,
                 u.full_name AS created_by_name,
+                s.id AS session_id,
+                s.name AS session_name,
+                p.id AS pool_id,
                 p.name AS pool_name
              FROM mortality m
+             INNER JOIN sessions s ON s.id = m.session_id
+             LEFT JOIN pools p ON p.id = s.pool_id
              LEFT JOIN users u ON m.created_by = u.id
-             LEFT JOIN pools p ON m.pool_id = p.id
              WHERE m.id = ?'
         );
         $stmt->execute([$id]);
@@ -65,20 +99,26 @@ class MortalityRepository extends Repository
     /**
      * Создает новую запись смертности
      * 
-     * @param int $poolId ID бассейна
+     * @param int $sessionId ID сессии
      * @param float $weight Вес
      * @param int $fishCount Количество рыбы
      * @param string $recordedAt Дата и время записи
      * @param int $userId ID пользователя, создающего запись
      * @return int ID созданной записи
      */
-    public function insert(int $poolId, float $weight, int $fishCount, string $recordedAt, int $userId): int
+    public function insert(int $sessionId, float $weight, int $fishCount, string $recordedAt, int $userId): int
     {
+        // Получаем pool_id из сессии для обратной совместимости с внешним ключом
+        $stmtSession = $this->pdo->prepare('SELECT pool_id FROM sessions WHERE id = ?');
+        $stmtSession->execute([$sessionId]);
+        $session = $stmtSession->fetch(PDO::FETCH_ASSOC);
+        $poolId = $session ? (int)$session['pool_id'] : null;
+
         $stmt = $this->pdo->prepare(
-            'INSERT INTO mortality (pool_id, weight, fish_count, recorded_at, created_by)
-             VALUES (?, ?, ?, ?, ?)'
+            'INSERT INTO mortality (session_id, pool_id, weight, fish_count, recorded_at, created_by)
+             VALUES (?, ?, ?, ?, ?, ?)'
         );
-        $stmt->execute([$poolId, $weight, $fishCount, $recordedAt, $userId]);
+        $stmt->execute([$sessionId, $poolId, $weight, $fishCount, $recordedAt, $userId]);
         return (int)$this->pdo->lastInsertId();
     }
 
@@ -122,16 +162,15 @@ class MortalityRepository extends Repository
     }
 
     /**
-     * Получает дневные итоги смертности для бассейна с определенной даты
+     * Получает дневные итоги смертности для сессии
      * 
      * Группирует записи смертности по дням и суммирует вес и количество.
      * Используется для построения графиков смертности.
      * 
-     * @param int $poolId ID бассейна
-     * @param string $startDate Дата начала (в формате БД)
+     * @param int $sessionId ID сессии
      * @return array Массив дневных итогов, отсортированных по дате (от старых к новым)
      */
-    public function getDailyTotalsForPoolSince(int $poolId, string $startDate): array
+    public function getDailyTotalsForSession(int $sessionId): array
     {
         $stmt = $this->pdo->prepare(
             'SELECT 
@@ -139,33 +178,30 @@ class MortalityRepository extends Repository
                 SUM(weight) AS total_weight,
                 SUM(fish_count) AS total_count
              FROM mortality
-             WHERE pool_id = ?
-               AND recorded_at >= ?
+             WHERE session_id = ?
              GROUP BY day
              ORDER BY day ASC'
         );
-        $stmt->execute([$poolId, $startDate]);
+        $stmt->execute([$sessionId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
     /**
-     * Получает сумму смертности для бассейна с определенной даты
+     * Получает сумму смертности для сессии
      * 
-     * @param int $poolId ID бассейна
-     * @param string $startDate Дата начала (в формате БД)
+     * @param int $sessionId ID сессии
      * @return array Массив с ключами total_weight и total_count
      */
-    public function sumForPoolSince(int $poolId, string $startDate): array
+    public function sumForSession(int $sessionId): array
     {
         $stmt = $this->pdo->prepare(
             'SELECT 
                 COALESCE(SUM(weight), 0) AS total_weight,
                 COALESCE(SUM(fish_count), 0) AS total_count
              FROM mortality
-             WHERE pool_id = ?
-               AND recorded_at >= ?'
+             WHERE session_id = ?'
         );
-        $stmt->execute([$poolId, $startDate]);
+        $stmt->execute([$sessionId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: ['total_weight' => 0, 'total_count' => 0];
         return [
             'total_weight' => (float)$row['total_weight'],
@@ -174,23 +210,23 @@ class MortalityRepository extends Repository
     }
 
     /**
-     * Получает сумму количества смертности для бассейна за указанное количество часов
+     * Получает сумму количества смертности для сессии за указанное количество часов
      * 
      * Используется для расчета статусов смертности на странице "Работа".
      * 
-     * @param int $poolId ID бассейна
+     * @param int $sessionId ID сессии
      * @param int $hours Количество часов для расчета
      * @return int Сумма количества смертности за период
      */
-    public function sumCountForHours(int $poolId, int $hours): int
+    public function sumCountForHours(int $sessionId, int $hours): int
     {
         $stmt = $this->pdo->prepare(
             'SELECT COALESCE(SUM(fish_count), 0) AS total_count
              FROM mortality
-             WHERE pool_id = ?
+             WHERE session_id = ?
                AND recorded_at >= DATE_SUB(NOW(), INTERVAL ? HOUR)'
         );
-        $stmt->bindValue(1, $poolId, PDO::PARAM_INT);
+        $stmt->bindValue(1, $sessionId, PDO::PARAM_INT);
         $stmt->bindValue(2, $hours, PDO::PARAM_INT);
         $stmt->execute();
         return (int)($stmt->fetchColumn() ?: 0);
@@ -240,15 +276,16 @@ class MortalityRepository extends Repository
         $placeholders = implode(',', array_fill(0, count($poolIds), '?'));
         $stmt = $this->pdo->prepare(
             "SELECT 
-                pool_id,
-                DATE(recorded_at) AS record_date,
-                COALESCE(SUM(fish_count), 0) AS total_count,
-                COALESCE(SUM(weight), 0) AS total_weight
-             FROM mortality
-             WHERE pool_id IN ($placeholders)
-               AND recorded_at >= ?
-               AND recorded_at <= ?
-             GROUP BY pool_id, DATE(recorded_at)"
+                s.pool_id,
+                DATE(m.recorded_at) AS record_date,
+                COALESCE(SUM(m.fish_count), 0) AS total_count,
+                COALESCE(SUM(m.weight), 0) AS total_weight
+             FROM mortality m
+             INNER JOIN sessions s ON s.id = m.session_id
+             WHERE s.pool_id IN ($placeholders)
+               AND m.recorded_at >= ?
+               AND m.recorded_at <= ?
+             GROUP BY s.pool_id, DATE(m.recorded_at)"
         );
         $params = array_merge($poolIds, [$startDate, $endDate]);
         $stmt->execute($params);

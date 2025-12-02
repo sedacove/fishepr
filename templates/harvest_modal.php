@@ -27,12 +27,12 @@ $saveFunction = $saveFunction ?? 'saveHarvest';
             <div class="modal-body">
                 <form id="<?php echo htmlspecialchars($formId); ?>">
                     <input type="hidden" id="harvestId" name="id">
-                    <input type="hidden" id="<?php echo htmlspecialchars($currentPoolId); ?>" name="pool_id">
+                    <input type="hidden" id="<?php echo htmlspecialchars($currentPoolId); ?>" name="session_id">
                     
                     <div class="mb-3">
-                        <label for="<?php echo htmlspecialchars($poolSelectId); ?>" class="form-label">Бассейн <span class="text-danger">*</span></label>
-                        <select class="form-select" id="<?php echo htmlspecialchars($poolSelectId); ?>" name="pool_id" required>
-                            <option value="">Выберите бассейн</option>
+                        <label for="<?php echo htmlspecialchars($poolSelectId); ?>" class="form-label">Сессия <span class="text-danger">*</span></label>
+                        <select class="form-select" id="<?php echo htmlspecialchars($poolSelectId); ?>" name="session_id" required>
+                            <option value="">Выберите сессию</option>
                         </select>
                     </div>
                     

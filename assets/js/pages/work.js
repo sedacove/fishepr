@@ -143,10 +143,10 @@
                         <button type="button" class="pool-action-btn" onclick="openMeasurementModal(${pool.id})" title="Выполнить замер">
                             <i class="bi bi-thermometer-half"></i>
                         </button>
-                        <button type="button" class="pool-action-btn" onclick="openMortalityModal(${pool.id})" title="Зарегистрировать падеж">
+                        <button type="button" class="pool-action-btn" onclick="openMortalityModal(${session ? session.id : null})" title="Зарегистрировать падеж">
                             <i class="bi bi-exclamation-triangle"></i>
                         </button>
-                        <button type="button" class="pool-action-btn" onclick="openHarvestModal(${pool.id})" title="Добавить отбор">
+                        <button type="button" class="pool-action-btn" onclick="openHarvestModal(${session ? session.id : null})" title="Добавить отбор">
                             <i class="bi bi-box-arrow-up"></i>
                         </button>
                     </div>
@@ -500,17 +500,36 @@
         }
     }
 
-    function openMortalityModal(poolId) {
+    function openMortalityModal(sessionId) {
         $('#mortalityModalTitle').text('Зарегистрировать падеж');
         $('#mortalityForm')[0].reset();
         $('#mortalityId').val('');
         $('#mortalityPool').prop('disabled', false);
 
-        const select = $('#mortalityPool');
-        select.empty().append('<option value="">Выберите бассейн</option>');
-        poolsList.forEach(function(pool) {
-            const selected = (poolId && pool.id === poolId) ? 'selected' : '';
-            select.append(`<option value="${pool.id}" ${selected}>${escapeHtml(pool.name)}</option>`);
+        // Загружаем активные сессии для выбора
+        $.ajax({
+            url: `${baseUrl}api/mortality.php?action=get_active_sessions`,
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    const select = $('#mortalityPool');
+                    select.empty().append('<option value="">Выберите сессию</option>');
+                    (response.data || []).forEach(function(session) {
+                        const selected = (sessionId && session.id === sessionId) ? 'selected' : '';
+                        const label = `${escapeHtml(session.pool_name || 'Бассейн')}: ${escapeHtml(session.session_name || session.name)}`;
+                        select.append(`<option value="${session.id}" ${selected}>${label}</option>`);
+                    });
+
+                    if (sessionId) {
+                        $('#currentMortalityPoolId').val(sessionId);
+                        $('#mortalityPool').val(sessionId);
+                    }
+                }
+            },
+            error: function() {
+                showAlert('danger', 'Не удалось загрузить список сессий');
+            }
         });
 
         if (isAdmin) {
@@ -522,28 +541,42 @@
             $('#mortalityDateTime').prop('required', false);
         }
 
-        if (poolId) {
-            $('#currentMortalityPoolId').val(poolId);
-            $('#mortalityPool').val(poolId);
-        }
-
         const modal = getModalInstance('mortalityModal');
         if (modal) {
             modal.show();
         }
     }
 
-    function openHarvestModal(poolId) {
+    function openHarvestModal(sessionId) {
         $('#harvestModalTitle').text('Добавить отбор');
         $('#harvestForm')[0].reset();
         $('#harvestId').val('');
         $('#harvestPool').prop('disabled', false);
 
-        const select = $('#harvestPool');
-        select.empty().append('<option value="">Выберите бассейн</option>');
-        poolsList.forEach(function(pool) {
-            const selected = (poolId && pool.id === poolId) ? 'selected' : '';
-            select.append(`<option value="${pool.id}" ${selected}>${escapeHtml(pool.name)}</option>`);
+        // Загружаем активные сессии для выбора
+        $.ajax({
+            url: `${baseUrl}api/harvests.php?action=get_active_sessions`,
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    const select = $('#harvestPool');
+                    select.empty().append('<option value="">Выберите сессию</option>');
+                    (response.data || []).forEach(function(session) {
+                        const selected = (sessionId && session.id === sessionId) ? 'selected' : '';
+                        const label = `${escapeHtml(session.pool_name || 'Бассейн')}: ${escapeHtml(session.session_name || session.name)}`;
+                        select.append(`<option value="${session.id}" ${selected}>${label}</option>`);
+                    });
+
+                    if (sessionId) {
+                        $('#currentHarvestPoolId').val(sessionId);
+                        $('#harvestPool').val(sessionId);
+                    }
+                }
+            },
+            error: function() {
+                showAlert('danger', 'Не удалось загрузить список сессий');
+            }
         });
 
         if (isAdmin) {
@@ -553,11 +586,6 @@
         } else {
             $('#harvestDateTimeField').hide();
             $('#harvestDateTime').prop('required', false);
-        }
-
-        if (poolId) {
-            $('#currentHarvestPoolId').val(poolId);
-            $('#harvestPool').val(poolId);
         }
 
         const counterpartySelect = $('#harvestCounterparty');
@@ -654,9 +682,9 @@
             return;
         }
 
-        const poolId = $('#currentMortalityPoolId').val() || $('#mortalityPool').val();
+        const sessionId = $('#currentMortalityPoolId').val() || $('#mortalityPool').val();
         const formData = {
-            pool_id: parseInt(poolId, 10),
+            session_id: parseInt(sessionId, 10),
             weight: parseFloat($('#mortalityWeight').val()),
             fish_count: parseInt($('#mortalityFishCount').val(), 10)
         };
@@ -705,9 +733,9 @@
             return;
         }
 
-        const poolId = $('#currentHarvestPoolId').val() || $('#harvestPool').val();
+        const sessionId = $('#currentHarvestPoolId').val() || $('#harvestPool').val();
         const formData = {
-            pool_id: parseInt(poolId, 10),
+            session_id: parseInt(sessionId, 10),
             weight: parseFloat($('#harvestWeight').val()),
             fish_count: parseInt($('#harvestFishCount').val(), 10)
         };

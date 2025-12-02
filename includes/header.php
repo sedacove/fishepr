@@ -170,6 +170,14 @@ if (!isset($page_title)) {
                         </a>
                     </li>
                     <?php if (isAdmin()): ?>
+                    <li class="nav-item nav-item-has-submenu me-3">
+                        <a class="nav-link nav-link-toggle" href="#" data-submenu-trigger="reports">
+                            Отчеты <i class="bi bi-chevron-down ms-1 d-none d-lg-inline"></i>
+                        </a>
+                        <div class="mobile-submenu d-lg-none">
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>reports/harvests">Отборы</a>
+                        </div>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo BASE_URL; ?>payroll">
                             ФЗП
@@ -329,6 +337,17 @@ if (!isset($page_title)) {
                         <span class="submenu-info">
                             <span class="submenu-title">Логи</span>
                             <span class="submenu-desc">Журнал системных событий</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+            <div class="submenu-panel" data-submenu-panel="reports">
+                <div class="submenu-links">
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>reports/harvests">
+                        <span class="submenu-icon"><i class="bi bi-file-earmark-text"></i></span>
+                        <span class="submenu-info">
+                            <span class="submenu-title">Отборы</span>
+                            <span class="submenu-desc">Отчет по отгрузкам</span>
                         </span>
                     </a>
                 </div>

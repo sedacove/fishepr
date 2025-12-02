@@ -58,9 +58,18 @@ class HarvestsController
                 case 'get_pools':
                     JsonResponse::success($this->service->getPools());
                     return;
+                case 'get_active_sessions':
+                    JsonResponse::success($this->service->getActiveSessions());
+                    return;
                 case 'list':
-                    $poolId = (int)$request->getQuery('pool_id', 0);
-                    JsonResponse::success($this->service->listByPool($poolId, $userId, $isAdmin));
+                    $sessionId = (int)$request->getQuery('session_id', 0);
+                    if ($sessionId <= 0) {
+                        throw new ValidationException('session_id', 'ID сессии не указан');
+                    }
+                    JsonResponse::success($this->service->listBySession($sessionId, $userId, $isAdmin));
+                    return;
+                case 'list_completed':
+                    JsonResponse::success($this->service->listCompletedSessionsHarvests($userId, $isAdmin));
                     return;
                 case 'get':
                     $id = (int)$request->getQuery('id', 0);

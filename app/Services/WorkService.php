@@ -212,8 +212,8 @@ class WorkService
 
         $this->applyWeighingInfo($session, $poolId, $startDate);
         $this->applyMeasurementInfo($session, $poolId);
-        $this->applyMortalityInfo($session, $poolId);
-        $this->applyCurrentLoad($session, $poolId, $startDate);
+        $this->applyMortalityInfo($session, $sessionRow['id']);
+        $this->applyCurrentLoad($session, $sessionRow['id']);
         $this->applyFeedingPlan($session, $sessionRow);
 
         return $session->toArray();
@@ -289,9 +289,9 @@ class WorkService
         ] : null;
     }
 
-    private function applyMortalityInfo(SessionSummary $session, int $poolId): void
+    private function applyMortalityInfo(SessionSummary $session, int $sessionId): void
     {
-        $count = $this->mortality->sumCountForHours($poolId, $this->mortalityHours);
+        $count = $this->mortality->sumCountForHours($sessionId, $this->mortalityHours);
         $colorClass = 'text-danger';
         if ($count <= $this->mortalityThresholdGreen) {
             $colorClass = 'text-success';
@@ -306,7 +306,7 @@ class WorkService
         ];
     }
 
-    private function applyCurrentLoad(SessionSummary $session, int $poolId, string $startDate): void
+    private function applyCurrentLoad(SessionSummary $session, int $sessionId): void
     {
         $startMass = $session->start_mass;
         $startFishCount = $session->start_fish_count;
@@ -316,8 +316,8 @@ class WorkService
             return;
         }
 
-        $mortalityTotals = $this->mortality->sumForPoolSince($poolId, $startDate);
-        $harvestTotals = $this->harvests->sumForPoolSince($poolId, $startDate);
+        $mortalityTotals = $this->mortality->sumForSession($sessionId);
+        $harvestTotals = $this->harvests->sumForSession($sessionId);
 
         $currentWeight = null;
         $currentFishCount = null;

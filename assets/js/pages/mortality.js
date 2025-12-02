@@ -12,8 +12,8 @@
     const isAdmin = Boolean(config.isAdmin);
 
     let currentEditId = null;
-    let currentPoolId = null;
-    let poolsList = [];
+    let currentSessionId = null;
+    let sessionsList = [];
 
     function normalizeBaseUrl(value) {
         if (!value) {
@@ -27,7 +27,7 @@
     }
 
     function init() {
-        loadPools();
+        loadSessions();
     }
 
     if (document.readyState === 'loading') {
@@ -36,59 +36,52 @@
         init();
     }
 
-    function loadPools() {
+    function loadSessions() {
         $.ajax({
-            url: apiUrl('api/mortality.php?action=get_pools'),
+            url: apiUrl('api/mortality.php?action=get_active_sessions'),
             method: 'GET',
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    poolsList = response.data || [];
-                    createTabs(poolsList);
+                    sessionsList = response.data || [];
+                    createTabs(sessionsList);
                 } else {
-                    showAlert('danger', response.message || 'Не удалось загрузить бассейны');
+                    showAlert('danger', response.message || 'Не удалось загрузить сессии');
                 }
             },
             error: function(xhr, status, error) {
-                console.error('loadPools error:', status, error, xhr.responseText);
-                showAlert('danger', 'Ошибка при загрузке бассейнов');
+                console.error('loadSessions error:', status, error, xhr.responseText);
+                showAlert('danger', 'Ошибка при загрузке сессий');
             }
         });
     }
 
-    function createTabs(pools) {
+    function createTabs(sessions) {
         const tabsNav = $('#poolsTabs');
         const tabsContent = $('#poolsTabContent');
         tabsNav.empty();
         tabsContent.empty();
 
-        if (!pools.length) {
-            tabsContent.html('<div class="alert alert-info">Нет активных бассейнов</div>');
+        if (!sessions.length) {
+            tabsContent.html('<div class="alert alert-info">Нет активных сессий</div>');
             return;
         }
 
-        let firstActiveIndex = -1;
-        pools.forEach(function(pool, index) {
-            if (pool.active_session && firstActiveIndex === -1) {
-                firstActiveIndex = index;
-            }
-        });
+        let firstActiveIndex = 0;
 
-        pools.forEach(function(pool, index) {
-            const tabId = `pool-${pool.id}`;
-            const hasSession = Boolean(pool.active_session);
-            const isActive = firstActiveIndex !== -1 && index === firstActiveIndex;
+        sessions.forEach(function(session, index) {
+            const tabId = `session-${session.id}`;
+            const isActive = index === firstActiveIndex;
 
             const tabHtml = `
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link ${isActive ? 'active' : ''} ${hasSession ? '' : 'disabled'}"
+                    <button class="nav-link ${isActive ? 'active' : ''}"
                             id="${tabId}-tab"
-                            ${hasSession ? `data-bs-toggle="tab" data-bs-target="#${tabId}" onclick="switchPool(${pool.id})"` : ''}
+                            data-bs-toggle="tab" data-bs-target="#${tabId}" onclick="switchSession(${session.id})"
                             type="button"
                             role="tab"
-                            ${hasSession ? '' : 'disabled'}
-                            title="${hasSession ? `${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}: ${escapeHtml(pool.active_session.session_name)}` : escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`) + ' (Нет активной сессии)'}">
-                        ${hasSession ? `${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}: ${escapeHtml(pool.active_session.session_name)}` : `${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)} <i class="bi bi-x-circle text-muted"></i>`}
+                            title="${escapeHtml(session.pool_name || 'Бассейн')}: ${escapeHtml(session.session_name || session.name)}">
+                        ${escapeHtml(session.pool_name || 'Бассейн')}: ${escapeHtml(session.session_name || session.name)}
                     </button>
                 </li>
             `;
@@ -101,10 +94,10 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                                 <h5 class="mb-0">
-                                    Падеж для бассейна "${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}"
-                                    ${hasSession ? `<small class="text-muted">(Сессия: ${escapeHtml(pool.active_session.session_name)})</small>` : '<small class="text-muted">(Нет активной сессии)</small>'}
+                                    Падеж для сессии "${escapeHtml(session.session_name || session.name)}"
+                                    <small class="text-muted">(Бассейн: ${escapeHtml(session.pool_name || '')})</small>
                                 </h5>
-                                <button type="button" class="btn btn-sm btn-primary" onclick="openAddModal(${pool.id})">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="openAddModal(${session.id})">
                                     <i class="bi bi-plus-circle"></i> Зарегистрировать падеж
                                 </button>
                             </div>
@@ -119,7 +112,7 @@
                                             ${isAdmin ? '<th class="text-center">Действия</th>' : ''}
                                         </tr>
                                     </thead>
-                                    <tbody id="recordsBody-${pool.id}">
+                                    <tbody id="recordsBody-${session.id}">
                                         <tr>
                                             <td colspan="${colSpan}" class="text-center">
                                                 <div class="spinner-border spinner-border-sm" role="status">
@@ -137,19 +130,67 @@
             tabsContent.append(contentHtml);
         });
 
-        if (firstActiveIndex !== -1) {
-            currentPoolId = pools[firstActiveIndex].id;
-            loadRecords(currentPoolId);
+        // Добавляем таб "Прошлые сессии"
+        const completedTabHtml = `
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="completed-sessions-tab"
+                        data-bs-toggle="tab" data-bs-target="#completed-sessions" onclick="loadCompletedSessions()"
+                        type="button"
+                        role="tab">
+                    Прошлые сессии
+                </button>
+            </li>
+        `;
+        tabsNav.append(completedTabHtml);
+
+        const completedColSpan = isAdmin ? 7 : 6;
+        const completedContentHtml = `
+            <div class="tab-pane fade" id="completed-sessions" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="mb-3">Падеж из завершенных сессий</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Дата и время</th>
+                                        <th>Сессия</th>
+                                        <th>Бассейн</th>
+                                        <th>Вес (кг)</th>
+                                        <th>Количество рыб (шт)</th>
+                                        <th>Кто делал</th>
+                                        ${isAdmin ? '<th class="text-center">Действия</th>' : ''}
+                                    </tr>
+                                </thead>
+                                <tbody id="completedRecordsBody">
+                                    <tr>
+                                        <td colspan="${completedColSpan}" class="text-center text-muted">
+                                            Нажмите на вкладку для загрузки данных
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        tabsContent.append(completedContentHtml);
+
+        if (sessions.length > 0) {
+            currentSessionId = sessions[firstActiveIndex].id;
+            loadRecords(currentSessionId);
         }
     }
 
-    function switchPool(poolId) {
-        currentPoolId = poolId;
-        loadRecords(poolId);
+    function switchSession(sessionId) {
+        currentSessionId = sessionId;
+        loadRecords(sessionId);
     }
 
-    function loadRecords(poolId) {
-        const tbody = $(`#recordsBody-${poolId}`);
+    function loadRecords(sessionId) {
+        const tbody = $(`#recordsBody-${sessionId}`);
         const colSpan = isAdmin ? 5 : 4;
         tbody.html(`
             <tr>
@@ -162,12 +203,12 @@
         `);
 
         $.ajax({
-            url: apiUrl(`api/mortality.php?action=list&pool_id=${poolId}`),
+            url: apiUrl(`api/mortality.php?action=list&session_id=${sessionId}`),
             method: 'GET',
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    renderRecords(response.data || [], poolId);
+                    renderRecords(response.data || [], sessionId);
                 } else {
                     showAlert('danger', response.message || 'Не удалось загрузить записи');
                     tbody.html(`<tr><td colspan="${colSpan}" class="text-center text-muted">Не удалось загрузить данные</td></tr>`);
@@ -181,8 +222,41 @@
         });
     }
 
-    function renderRecords(records, poolId) {
-        const tbody = $(`#recordsBody-${poolId}`);
+    function loadCompletedSessions() {
+        const tbody = $('#completedRecordsBody');
+        const colSpan = isAdmin ? 7 : 6;
+        tbody.html(`
+            <tr>
+                <td colspan="${colSpan}" class="text-center">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
+                </td>
+            </tr>
+        `);
+
+        $.ajax({
+            url: apiUrl('api/mortality.php?action=list_completed'),
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    renderCompletedRecords(response.data || []);
+                } else {
+                    showAlert('danger', response.message || 'Не удалось загрузить записи');
+                    tbody.html(`<tr><td colspan="${colSpan}" class="text-center text-muted">Не удалось загрузить данные</td></tr>`);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('loadCompletedSessions error:', status, error, xhr.responseText);
+                showAlert('danger', 'Ошибка при загрузке записей');
+                tbody.html(`<tr><td colspan="${colSpan}" class="text-center text-danger">Ошибка при загрузке данных</td></tr>`);
+            }
+        });
+    }
+
+    function renderRecords(records, sessionId) {
+        const tbody = $(`#recordsBody-${sessionId}`);
         tbody.empty();
         const colSpan = isAdmin ? 5 : 4;
 
@@ -234,7 +308,62 @@
         });
     }
 
-    function openAddModal(poolId) {
+    function renderCompletedRecords(records) {
+        const tbody = $('#completedRecordsBody');
+        tbody.empty();
+        const colSpan = isAdmin ? 7 : 6;
+
+        if (!records.length) {
+            tbody.html(`<tr><td colspan="${colSpan}" class="text-center text-muted">Записи не найдены</td></tr>`);
+            return;
+        }
+
+        records.forEach(function(record) {
+            const userInfo = record.created_by_full_name
+                ? `${escapeHtml(record.created_by_full_name)} (${escapeHtml(record.created_by_login)})`
+                : escapeHtml(record.created_by_login || 'Неизвестно');
+            const sessionName = record.session_name ? escapeHtml(record.session_name) : '—';
+            const poolName = record.pool_name ? escapeHtml(record.pool_name) : '—';
+
+            const canEdit = isAdmin || Boolean(record.can_edit);
+            let actionsHtml = '';
+            if (isAdmin) {
+                actionsHtml = '<td class="text-center">';
+                actionsHtml += `
+                    <button class="btn btn-sm btn-primary me-2" onclick="openEditModal(${record.id})" title="Редактировать">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                `;
+                actionsHtml += `
+                    <button class="btn btn-sm btn-danger" onclick="deleteRecord(${record.id})" title="Удалить">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
+                actionsHtml += '</td>';
+            } else if (canEdit) {
+                actionsHtml = '<td class="text-center">' +
+                    `<button class="btn btn-sm btn-primary" onclick="openEditModal(${record.id})" title="Редактировать">` +
+                    '<i class="bi bi-pencil"></i>' +
+                    '</button>' +
+                    '</td>';
+            }
+
+            const row = `
+                <tr>
+                    <td>${escapeHtml(record.recorded_at_display || '')}</td>
+                    <td>${sessionName}</td>
+                    <td>${poolName}</td>
+                    <td>${formatNumber(record.weight, 2)}</td>
+                    <td>${formatInteger(record.fish_count)}</td>
+                    <td>${userInfo}</td>
+                    ${actionsHtml || ''}
+                </tr>
+            `;
+            tbody.append(row);
+        });
+    }
+
+    function openAddModal(sessionId) {
         currentEditId = null;
         $('#recordModalTitle').text('Добавить падеж');
         $('#recordForm')[0].reset();
@@ -242,10 +371,11 @@
         $('#recordPool').prop('disabled', false);
 
         const select = $('#recordPool');
-        select.empty().append('<option value="">Выберите бассейн</option>');
-        poolsList.forEach(function(pool) {
-            const selected = poolId && pool.id === poolId ? 'selected' : '';
-            select.append(`<option value="${pool.id}" ${selected}>${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}</option>`);
+        select.empty().append('<option value="">Выберите сессию</option>');
+        sessionsList.forEach(function(session) {
+            const selected = sessionId && session.id === sessionId ? 'selected' : '';
+            const label = `${escapeHtml(session.pool_name || 'Бассейн')}: ${escapeHtml(session.session_name || session.name)}`;
+            select.append(`<option value="${session.id}" ${selected}>${label}</option>`);
         });
 
         if (isAdmin) {
@@ -257,9 +387,9 @@
             $('#recordDateTime').prop('required', false);
         }
 
-        if (poolId) {
-            $('#currentPoolId').val(poolId);
-            $('#recordPool').val(poolId);
+        if (sessionId) {
+            $('#currentPoolId').val(sessionId);
+            $('#recordPool').val(sessionId);
         }
 
         const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('recordModal'));
@@ -278,16 +408,17 @@
                 if (response.success) {
                     const record = response.data || {};
                     $('#recordId').val(record.id || '');
-                    $('#currentPoolId').val(record.pool_id || '');
+                    $('#currentPoolId').val(record.session_id || '');
 
                     const select = $('#recordPool');
-                    select.empty().append('<option value="">Выберите бассейн</option>');
-                    poolsList.forEach(function(pool) {
-                        const selected = pool.id === record.pool_id ? 'selected' : '';
-                        select.append(`<option value="${pool.id}" ${selected}>${escapeHtml(pool.name || pool.pool_name || `Бассейн ${pool.id}`)}</option>`);
+                    select.empty().append('<option value="">Выберите сессию</option>');
+                    sessionsList.forEach(function(session) {
+                        const selected = session.id === record.session_id ? 'selected' : '';
+                        const label = `${escapeHtml(session.pool_name || 'Бассейн')}: ${escapeHtml(session.session_name || session.name)}`;
+                        select.append(`<option value="${session.id}" ${selected}>${label}</option>`);
                     });
 
-                    $('#recordPool').val(record.pool_id || '');
+                    $('#recordPool').val(record.session_id || '');
                     $('#recordWeight').val(record.weight != null ? record.weight : '');
                     $('#recordFishCount').val(record.fish_count != null ? record.fish_count : '');
 
@@ -324,9 +455,9 @@
             return;
         }
 
-        const poolIdValue = $('#currentPoolId').val() || $('#recordPool').val();
+        const sessionIdValue = $('#currentPoolId').val() || $('#recordPool').val();
         const payload = {
-            pool_id: parseInt(poolIdValue, 10),
+            session_id: parseInt(sessionIdValue, 10),
             weight: parseFloat($('#recordWeight').val()),
             fish_count: parseInt($('#recordFishCount').val(), 10)
         };
@@ -354,8 +485,8 @@
                     showAlert('success', response.message || 'Запись сохранена');
                     const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('recordModal'));
                     modal.hide();
-                    if (payload.pool_id) {
-                        loadRecords(payload.pool_id);
+                    if (payload.session_id) {
+                        loadRecords(payload.session_id);
                     }
                 } else {
                     showAlert('danger', response.message || 'Не удалось сохранить запись');
@@ -385,10 +516,10 @@
             success: function(response) {
                 if (response.success) {
                     showAlert('success', response.message || 'Запись удалена');
-                    if (currentPoolId) {
-                        loadRecords(currentPoolId);
+                    if (currentSessionId) {
+                        loadRecords(currentSessionId);
                     } else {
-                        loadPools();
+                        loadSessions();
                     }
                 } else {
                     showAlert('danger', response.message || 'Не удалось удалить запись');
@@ -466,7 +597,8 @@
         return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
     }
 
-    window.switchPool = switchPool;
+    window.switchSession = switchSession;
+    window.loadCompletedSessions = loadCompletedSessions;
     window.openAddModal = openAddModal;
     window.openEditModal = openEditModal;
     window.saveRecord = saveRecord;

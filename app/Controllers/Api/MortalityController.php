@@ -58,9 +58,15 @@ class MortalityController
         try {
             switch ($action) {
                 case 'list':
-                    $poolId = (int)$request->getQuery('pool_id', 0);
-                    $data = $this->service->listByPool($poolId, $userId, $isAdmin);
+                    $sessionId = (int)$request->getQuery('session_id', 0);
+                    if ($sessionId <= 0) {
+                        throw new ValidationException('session_id', 'ID сессии не указан', 400);
+                    }
+                    $data = $this->service->listBySession($sessionId, $userId, $isAdmin);
                     JsonResponse::success($data);
+                    return;
+                case 'list_completed':
+                    JsonResponse::success($this->service->listCompletedSessionsMortality($userId, $isAdmin));
                     return;
 
                 case 'get':
@@ -110,6 +116,9 @@ class MortalityController
 
                 case 'get_pools':
                     JsonResponse::success($this->service->getPools());
+                    return;
+                case 'get_active_sessions':
+                    JsonResponse::success($this->service->getActiveSessions());
                     return;
 
                 default:

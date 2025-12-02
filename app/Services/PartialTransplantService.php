@@ -333,13 +333,13 @@ class PartialTransplantService
         // Начальная масса
         $mass = (float)$session->start_mass;
 
-        // Вычитаем отборы для этого бассейна после начала сессии
+        // Вычитаем отборы для этой сессии
         $stmt = $this->pdo->prepare(<<<SQL
             SELECT COALESCE(SUM(weight), 0) AS total_harvests
             FROM harvests
-            WHERE pool_id = ? AND recorded_at >= ?
+            WHERE session_id = ?
         SQL);
-        $stmt->execute([$session->pool_id, $session->start_date . ' 00:00:00']);
+        $stmt->execute([$sessionId]);
         $harvests = $stmt->fetch(PDO::FETCH_ASSOC);
         $mass -= (float)($harvests['total_harvests'] ?? 0);
 
@@ -382,13 +382,13 @@ class PartialTransplantService
         // Начальное количество
         $count = (int)$session->start_fish_count;
 
-        // Вычитаем отборы для этого бассейна после начала сессии
+        // Вычитаем отборы для этой сессии
         $stmt = $this->pdo->prepare(<<<SQL
             SELECT COALESCE(SUM(fish_count), 0) AS total_harvests
             FROM harvests
-            WHERE pool_id = ? AND recorded_at >= ?
+            WHERE session_id = ?
         SQL);
-        $stmt->execute([$session->pool_id, $session->start_date . ' 00:00:00']);
+        $stmt->execute([$sessionId]);
         $harvests = $stmt->fetch(PDO::FETCH_ASSOC);
         $count -= (int)($harvests['total_harvests'] ?? 0);
 

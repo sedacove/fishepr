@@ -69,21 +69,21 @@ class MortalityService
     }
 
     /**
-     * Получает список записей смертности для указанного бассейна
+     * Получает список записей смертности для указанной сессии
      * 
-     * @param int $poolId ID бассейна
+     * @param int $sessionId ID сессии
      * @param int $currentUserId ID текущего пользователя
      * @param bool $isAdmin Является ли пользователь администратором
      * @return array Массив записей смертности с правами доступа
-     * @throws ValidationException Если бассейн не указан
+     * @throws ValidationException Если сессия не указана
      */
-    public function listByPool(int $poolId, int $currentUserId, bool $isAdmin): array
+    public function listBySession(int $sessionId, int $currentUserId, bool $isAdmin): array
     {
-        if ($poolId <= 0) {
-            throw new ValidationException('pool_id', 'ID бассейна не указан', 400);
+        if ($sessionId <= 0) {
+            throw new ValidationException('session_id', 'ID сессии не указан', 400);
         }
 
-        $records = $this->mortality->listByPool($poolId);
+        $records = $this->mortality->listBySession($sessionId);
         $result = [];
 
         foreach ($records as $row) {
@@ -92,7 +92,8 @@ class MortalityService
 
             $record = new MortalityRecord([
                 'id' => (int)$row['id'],
-                'pool_id' => (int)$row['pool_id'],
+                'pool_id' => isset($row['pool_id']) ? (int)$row['pool_id'] : null,
+                'session_id' => isset($row['session_id']) ? (int)$row['session_id'] : null,
                 'weight' => (float)$row['weight'],
                 'fish_count' => (int)$row['fish_count'],
                 'recorded_at' => $recordedAt->format('Y-m-d\TH:i'),
@@ -111,6 +112,51 @@ class MortalityService
         return $result;
     }
 
+    /**
+     * Получает список записей смертности из завершенных сессий
+     * 
+     * @param int $currentUserId ID текущего пользователя
+     * @param bool $isAdmin Является ли пользователь администратором
+     * @return array Массив записей смертности с информацией о сессии и бассейне
+     */
+    public function listCompletedSessionsMortality(int $currentUserId, bool $isAdmin): array
+    {
+        $records = $this->mortality->listForCompletedSessions();
+        $result = [];
+
+        foreach ($records as $row) {
+            $recordedAt = new DateTime($row['recorded_at']);
+            $createdAt = new DateTime($row['created_at']);
+
+            $record = new MortalityRecord([
+                'id' => (int)$row['id'],
+                'pool_id' => isset($row['pool_id']) ? (int)$row['pool_id'] : null,
+                'session_id' => isset($row['session_id']) ? (int)$row['session_id'] : null,
+                'weight' => (float)$row['weight'],
+                'fish_count' => (int)$row['fish_count'],
+                'recorded_at' => $recordedAt->format('Y-m-d\TH:i'),
+                'recorded_at_display' => $recordedAt->format('d.m.Y H:i'),
+                'created_at' => $createdAt->format('d.m.Y H:i'),
+                'created_by' => (int)$row['created_by'],
+                'created_by_login' => $row['created_by_login'] ?? null,
+                'created_by_name' => $row['created_by_name'] ?? null,
+                'created_by_full_name' => $row['created_by_name'] ?? null,
+                'can_edit' => $this->canEdit($row, $currentUserId, $isAdmin),
+            ]);
+
+            // Добавляем информацию о сессии и бассейне
+            $data = $record->toArray();
+            $data['session_id'] = isset($row['session_id']) ? (int)$row['session_id'] : null;
+            $data['session_name'] = $row['session_name'] ?? null;
+            $data['pool_id'] = isset($row['pool_id']) ? (int)$row['pool_id'] : null;
+            $data['pool_name'] = $row['pool_name'] ?? null;
+            
+            $result[] = $data;
+        }
+
+        return $result;
+    }
+
     public function get(int $id): array
     {
         $record = $this->mortality->findWithUser($id);
@@ -123,14 +169,14 @@ class MortalityService
 
     public function create(array $payload, int $userId, bool $isAdmin): int
     {
-        $poolId = isset($payload['pool_id']) ? (int)$payload['pool_id'] : 0;
-        if ($poolId <= 0) {
-            throw new ValidationException('pool_id', 'Бассейн обязателен для выбора');
+        $sessionId = isset($payload['session_id']) ? (int)$payload['session_id'] : 0;
+        if ($sessionId <= 0) {
+            throw new ValidationException('session_id', 'Сессия обязательна для выбора');
         }
 
-        $pool = $this->pools->findActive($poolId);
-        if (!$pool) {
-            throw new RuntimeException('Бассейн не найден или неактивен', 404);
+        $session = $this->sessions->find($sessionId);
+        if (!$session || $session->is_completed) {
+            throw new RuntimeException('Активная сессия не найдена', 404);
         }
 
         $weight = $this->extractFloat($payload, 'weight');
@@ -147,28 +193,36 @@ class MortalityService
             ? $this->normalizeDateTime($payload['recorded_at'])
             : date('Y-m-d H:i:s');
 
-        $id = $this->mortality->insert($poolId, $weight, $fishCount, $recordedAt, $userId);
+        $id = $this->mortality->insert($sessionId, $weight, $fishCount, $recordedAt, $userId);
 
         if ($isAdmin) {
-            \logActivity('create', 'mortality', $id, 'Добавлен падеж для бассейна: ' . ($pool['name'] ?? $poolId), [
-                'pool_id' => $poolId,
+            \logActivity('create', 'mortality', $id, 'Добавлен падеж для сессии: ' . $session->name, [
+                'session_id' => $sessionId,
+                'pool_id' => $session->pool_id,
                 'weight' => $weight,
                 'fish_count' => $fishCount,
                 'recorded_at' => $recordedAt,
             ]);
         }
 
-        $session = $this->sessions->findActiveByPool($poolId);
-        $createdByName = $_SESSION['user_full_name'] ?? $_SESSION['user_login'] ?? null;
+        try {
+            $pool = $this->pools->find($session->pool_id);
+            $createdByName = $_SESSION['user_full_name'] ?? $_SESSION['user_login'] ?? null;
 
-        \maybeSendMortalityAlert([
-            'pool_name' => $pool['name'] ?? ('Бассейн #' . $poolId),
-            'session_name' => $session['name'] ?? null,
-            'fish_count' => $fishCount,
-            'weight' => $weight,
-            'recorded_at' => $recordedAt,
-            'created_by' => $createdByName,
-        ]);
+            $poolName = $pool ? $pool->name : ('Бассейн #' . $session->pool_id);
+
+            \maybeSendMortalityAlert([
+                'pool_name' => $poolName,
+                'session_name' => $session->name,
+                'fish_count' => $fishCount,
+                'weight' => $weight,
+                'recorded_at' => $recordedAt,
+                'created_by' => $createdByName,
+            ]);
+        } catch (\Throwable $e) {
+            // Логируем ошибку, но не прерываем выполнение, так как запись уже создана
+            error_log('Ошибка при отправке уведомления о падеже: ' . $e->getMessage());
+        }
 
         return $id;
     }
@@ -190,18 +244,26 @@ class MortalityService
             );
         }
 
-        $poolId = $isAdmin && isset($payload['pool_id'])
-            ? (int)$payload['pool_id']
-            : (int)$existing['pool_id'];
-        if ($poolId <= 0) {
-            throw new ValidationException('pool_id', 'Бассейн обязателен для выбора');
+        $sessionId = $isAdmin && isset($payload['session_id'])
+            ? (int)$payload['session_id']
+            : (int)$existing['session_id'];
+        if ($sessionId <= 0) {
+            throw new ValidationException('session_id', 'Сессия обязательна для выбора');
         }
-        if ($poolId !== (int)$existing['pool_id']) {
-            $pool = $this->pools->findActive($poolId);
-            if (!$pool) {
-                throw new RuntimeException('Бассейн не найден или неактивен', 404);
-            }
+        
+        $session = $this->sessions->find($sessionId);
+        if (!$session) {
+            throw new RuntimeException('Сессия не найдена', 404);
         }
+        if ($isAdmin && $sessionId !== (int)$existing['session_id'] && $session->is_completed) {
+            throw new RuntimeException('Активная сессия не найдена', 404);
+        }
+        
+        // Обновляем pool_id из сессии для обратной совместимости
+        $updateData = [
+            'session_id' => $sessionId,
+            'pool_id' => $session->pool_id,
+        ];
 
         $weight = $this->extractFloat($payload, 'weight', (float)$existing['weight']);
         if ($weight <= 0) {
@@ -217,15 +279,15 @@ class MortalityService
             ? $this->normalizeDateTime($payload['recorded_at'])
             : $existing['recorded_at'];
 
-        $this->mortality->update($id, [
-            'pool_id' => $poolId,
-            'weight' => $weight,
-            'fish_count' => $fishCount,
-            'recorded_at' => $recordedAt,
-        ]);
+        $updateData['weight'] = $weight;
+        $updateData['fish_count'] = $fishCount;
+        $updateData['recorded_at'] = $recordedAt;
+        
+        $this->mortality->update($id, $updateData);
 
-        \logActivity('update', 'mortality', $id, 'Обновлён падеж для бассейна: ' . ($existing['pool_name'] ?? $poolId), [
-            'pool_id' => ['old' => $existing['pool_id'], 'new' => $poolId],
+        \logActivity('update', 'mortality', $id, 'Обновлён падеж для сессии: ' . ($existing['session_name'] ?? $sessionId), [
+            'session_id' => ['old' => $existing['session_id'], 'new' => $sessionId],
+            'pool_id' => ['old' => $existing['pool_id'] ?? null, 'new' => isset($session) ? $session->pool_id : ($existing['pool_id'] ?? null)],
             'weight' => ['old' => (float)$existing['weight'], 'new' => $weight],
             'fish_count' => ['old' => (int)$existing['fish_count'], 'new' => $fishCount],
             'recorded_at' => ['old' => $existing['recorded_at'], 'new' => $recordedAt],
@@ -245,8 +307,9 @@ class MortalityService
 
         $this->mortality->delete($id);
 
-        \logActivity('delete', 'mortality', $id, 'Удалён падеж для бассейна: ' . ($existing['pool_name'] ?? ''), [
-            'pool_id' => $existing['pool_id'],
+        \logActivity('delete', 'mortality', $id, 'Удалён падеж для сессии: ' . ($existing['session_name'] ?? ''), [
+            'session_id' => $existing['session_id'],
+            'pool_id' => $existing['pool_id'] ?? null,
             'weight' => $existing['weight'],
             'fish_count' => $existing['fish_count'],
             'recorded_at' => $existing['recorded_at'],
@@ -355,6 +418,7 @@ class MortalityService
 
     public function getPools(): array
     {
+        // Возвращаем активные бассейны с активными сессиями для обратной совместимости
         $pools = $this->pools->getActiveWithSessions();
         $result = [];
         foreach ($pools as $pool) {
@@ -365,6 +429,31 @@ class MortalityService
                 'active_session' => $pool['active_session'] ?? null,
             ];
         }
+        return $result;
+    }
+
+    /**
+     * Получает список активных сессий с информацией о бассейнах
+     * 
+     * @return array Массив активных сессий с информацией о бассейнах
+     */
+    public function getActiveSessions(): array
+    {
+        $sessions = $this->sessions->listByCompletionWithPoolSort(false);
+        $result = [];
+        
+        foreach ($sessions as $session) {
+            $result[] = [
+                'id' => (int)$session['id'],
+                'name' => $session['name'],
+                'session_name' => $session['name'],
+                'pool_id' => (int)$session['pool_id'],
+                'pool_name' => $session['pool_name'],
+                'start_date' => $session['start_date'],
+            ];
+        }
+        
+        // Данные уже отсортированы в SQL запросе по pool_sort_order
         return $result;
     }
 

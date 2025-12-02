@@ -101,6 +101,7 @@ class SessionDetailsService
         }
 
         $sessionModel = new SessionDetails($session);
+        $sessionId = (int)$sessionModel->id;
         $poolId = (int)$sessionModel->pool_id;
         $startDate = $sessionModel->start_date ?? $sessionModel->created_at ?? date('Y-m-d H:i:s', 0);
 
@@ -122,7 +123,7 @@ class SessionDetailsService
                 'total_weight' => (float)($row['total_weight'] ?? 0),
                 'total_count' => (int)($row['total_count'] ?? 0),
             ]))->toArray();
-        }, $this->mortality->getDailyTotalsForPoolSince($poolId, $startDate));
+        }, $this->mortality->getDailyTotalsForSession($sessionId));
 
         $harvests = array_map(function (array $row) {
             return (new HarvestSummary([
@@ -133,7 +134,7 @@ class SessionDetailsService
                 'counterparty_name' => $row['counterparty_name'] ?? null,
                 'counterparty_color' => $row['counterparty_color'] ?? null,
             ]))->toArray();
-        }, $this->harvests->listForPoolSince($poolId, $startDate));
+        }, $this->harvests->listForSession($sessionId));
 
         $weighings = array_map(function (array $row) {
             $fishCount = (int)$row['fish_count'];

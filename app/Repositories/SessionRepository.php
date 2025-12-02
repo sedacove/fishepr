@@ -15,6 +15,7 @@ class SessionRepository extends Repository
         $stmt = $this->pdo->prepare(
             'SELECT s.*, 
                     p.name AS pool_name,
+                    p.sort_order AS pool_sort_order,
                     pl.name AS planting_name,
                     pl.fish_breed AS planting_fish_breed,
                     f.name AS feed_name,
@@ -26,7 +27,7 @@ class SessionRepository extends Repository
              LEFT JOIN feeds f ON f.id = s.feed_id
              LEFT JOIN users u ON u.id = s.created_by
              WHERE s.is_completed = ?
-             ORDER BY s.start_date DESC, s.created_at DESC'
+             ORDER BY COALESCE(p.sort_order, 999999) ASC, p.id ASC, s.start_date DESC, s.created_at DESC'
         );
         $stmt->execute([$completed ? 1 : 0]);
 
@@ -34,6 +35,38 @@ class SessionRepository extends Repository
             fn ($row) => new Session($row),
             $stmt->fetchAll(PDO::FETCH_ASSOC) ?: []
         );
+    }
+    
+    /**
+     * Получает список активных сессий с данными для сортировки по бассейнам
+     * 
+     * Возвращает массив вместо объектов Session для доступа к pool_sort_order
+     * 
+     * @param bool $completed Завершенные сессии (true) или активные (false)
+     * @return array Массив данных сессий с pool_sort_order
+     */
+    public function listByCompletionWithPoolSort(bool $completed): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT s.*, 
+                    p.name AS pool_name,
+                    p.sort_order AS pool_sort_order,
+                    pl.name AS planting_name,
+                    pl.fish_breed AS planting_fish_breed,
+                    f.name AS feed_name,
+                    u.login AS created_by_login,
+                    u.full_name AS created_by_name
+             FROM sessions s
+             LEFT JOIN pools p ON p.id = s.pool_id
+             LEFT JOIN plantings pl ON pl.id = s.planting_id
+             LEFT JOIN feeds f ON f.id = s.feed_id
+             LEFT JOIN users u ON u.id = s.created_by
+             WHERE s.is_completed = ?
+             ORDER BY COALESCE(p.sort_order, 999999) ASC, p.id ASC, s.start_date DESC, s.created_at DESC'
+        );
+        $stmt->execute([$completed ? 1 : 0]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
     /**
