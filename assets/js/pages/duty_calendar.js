@@ -122,7 +122,11 @@ function renderCalendar() {
 // Создание ячейки дня
 function createDayCell(date, isOtherMonth) {
     const day = date.getDate();
-    const dateStr = date.toISOString().split('T')[0];
+    // Используем локальное время вместо UTC
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const dayStr = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${dayStr}`;
     const today = new Date();
     const isToday = date.toDateString() === today.toDateString();
     
@@ -164,14 +168,22 @@ function loadDutiesForMonth(year, month) {
     const startDate = new Date(year, month, 1);
     const endDate = new Date(year, month + 1, 0);
     
-    const startStr = startDate.toISOString().split('T')[0];
-    const endStr = endDate.toISOString().split('T')[0];
+    // Форматируем даты в локальном времени
+    function formatDateKey(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+    
+    const startStr = formatDateKey(startDate);
+    const endStr = formatDateKey(endDate);
     
     // Загружаем дежурных для каждого дня месяца
     const daysInMonth = endDate.getDate();
     for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, month, day);
-        const dateStr = date.toISOString().split('T')[0];
+        const dateStr = formatDateKey(date);
         
         $.ajax({
             url: BASE_URL + 'api/duty.php?action=get&date=' + dateStr,

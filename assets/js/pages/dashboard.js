@@ -719,7 +719,12 @@ function getShortestColumnIndexClient(columns) {
 }
 
     function buildApiDateKey(date) {
-        return new Date(date).toISOString().split('T')[0];
+        // Используем локальное время вместо UTC
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
     function fetchDutyByDate(apiDate) {
@@ -785,7 +790,7 @@ function renderDutyWeek(entries, container) {
     });
 
     const startDate = dutyRange.start ? parseDateString(dutyRange.start) : new Date();
-    const todayIso = new Date().toISOString().split('T')[0];
+    const todayIso = formatDateKey(new Date());
     const weekDayNames = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 
     let html = '<div class="duty-week-grid">';
@@ -817,7 +822,23 @@ function renderDutyWeek(entries, container) {
         `;
     }
     html += '</div>';
+    
+    // Добавляем кнопку "Печать бланка"
+    html += '<div class="mt-3 text-center">';
+    html += '<button type="button" class="btn btn-outline-primary btn-sm" id="printDutyProtocolBtn">';
+    html += '<i class="bi bi-printer me-2"></i> Печать бланка';
+    html += '</button>';
+    html += '</div>';
+    
     container.innerHTML = html;
+    
+    // Добавляем обработчик для кнопки печати
+    const printBtn = container.querySelector('#printDutyProtocolBtn');
+    if (printBtn) {
+        printBtn.addEventListener('click', function() {
+            openDutyProtocolPrint();
+        });
+    }
 }
 
 function loadShiftTasksWidget(container, options = {}) {
@@ -1981,4 +2002,18 @@ function getDaysText(days) {
 }
 
 window.toggleTaskComplete = toggleTaskComplete;
+
+function openDutyProtocolPrint() {
+    // Определяем текущий день (как в виджете) - используем formatDateKey для локального времени
+    const now = new Date();
+    const todayDate = formatDateKey(now);
+    
+    // Открываем шаблон в новом окне
+    const url = `${baseUrl}templates/duty_protocol_print.php?date=${todayDate}`;
+    window.open(url, '_blank');
+}
+
+// Удалено: функции showDutyProtocolPrintModal, printDutyProtocol, formatNumber больше не используются
+// Шаблон теперь открывается напрямую через templates/duty_protocol_print.php
+
 })();

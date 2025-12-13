@@ -318,6 +318,79 @@ try {
             ]);
             break;
             
+        case 'protocol':
+            // Получить протокол дежурства: дежурный и информация о кормлении по бассейнам
+            require_once __DIR__ . '/../app/Services/WorkService.php';
+            
+            // Используем дату, переданную из JavaScript (как в виджете Расписание дежурств)
+            // Если дата не передана, используем текущую календарную дату
+            // В виджете "Расписание дежурств" используется new Date().toISOString().split('T')[0]
+            $todayDate = $_GET['date'] ?? date('Y-m-d');
+            
+            // Получаем дежурного на указанную дату
+            $stmt = $pdo->prepare("
+                SELECT 
+                    d.*,
+                    u.login as user_login,
+                    u.full_name as user_full_name
+                FROM duty_schedule d
+                LEFT JOIN users u ON d.user_id = u.id
+                WHERE d.date = ?
+            ");
+            $stmt->execute([$todayDate]);
+            $duty = $stmt->fetch();
+            
+            $dutyInfo = null;
+            if ($duty) {
+                $dutyInfo = [
+                    'user_id' => $duty['user_id'],
+                    'user_login' => $duty['user_login'],
+                    'user_full_name' => $duty['user_full_name'],
+                    'is_fasting' => (bool)$duty['is_fasting']
+                ];
+            }
+            
+            // Получаем бассейны с активными сессиями и информацией о кормлении
+            $workService = new \App\Services\WorkService($pdo);
+            $pools = $workService->getPools();
+            
+            $poolsWithFeeding = [];
+            foreach ($pools as $pool) {
+                if (!isset($pool['active_session']) || !$pool['active_session']) {
+                    continue; // Пропускаем бассейны без активных сессий
+                }
+                
+                $session = $pool['active_session'];
+                $feedingPlan = $session['feeding_plan'] ?? null;
+                $dailyFeedings = $session['daily_feedings'] ?? null;
+                
+                $poolData = [
+                    'pool_id' => $pool['id'],
+                    'pool_name' => $pool['name'],
+                    'feeding_amount' => null,
+                    'daily_feedings' => $dailyFeedings,
+                    'is_fasting' => $dutyInfo && $dutyInfo['is_fasting'] ? true : false
+                ];
+                
+                // Если голодовка, не показываем норму кормления
+                if ($poolData['is_fasting']) {
+                    $poolData['feeding_amount'] = null;
+                } elseif ($feedingPlan && isset($feedingPlan['per_feeding'])) {
+                    $poolData['feeding_amount'] = round($feedingPlan['per_feeding'], 2);
+                }
+                
+                $poolsWithFeeding[] = $poolData;
+            }
+            
+            echo json_encode([
+                'success' => true,
+                'data' => [
+                    'duty' => $dutyInfo,
+                    'pools' => $poolsWithFeeding
+                ]
+            ]);
+            break;
+            
         default:
             throw new Exception('Неизвестное действие');
     }
