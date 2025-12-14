@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fisherp_web
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+      - ./storage:/var/www/html/storage
+      - ./uploads:/var/www/html/uploads
+    depends_on:
+      - db
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html
+      - DOCKER_ENV=1
+      - DB_HOST=db
+      - DB_NAME=u3154158_fisherp
+      - DB_USER=root
+      - DB_PASS=rootpassword
+      - BASE_URL=http://localhost:8000/
+    networks:
+      - fisherp_network
+
+  db:
+    image: mysql:8.0
+    container_name: fisherp_db
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: u3154158_fisherp
+      MYSQL_USER: fisherp_user
+      MYSQL_PASSWORD: fisherp_password
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./dumps:/docker-entrypoint-initdb.d
+    networks:
+      - fisherp_network
+    command: --default-authentication-plugin=mysql_native_password
+
+networks:
+  fisherp_network:
+    driver: bridge
+
+volumes:
+  db_data:
+

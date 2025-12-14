@@ -2008,9 +2008,18 @@ function openDutyProtocolPrint() {
     const now = new Date();
     const todayDate = formatDateKey(now);
     
-    // Открываем шаблон в новом окне
-    const url = `${baseUrl}templates/duty_protocol_print.php?date=${todayDate}`;
-    window.open(url, '_blank');
+    // Открываем шаблон в новом окне с параметром автопечати
+    const url = `${baseUrl}templates/duty_protocol_print.php?date=${todayDate}&autoPrint=1`;
+    const printWindow = window.open(url, '_blank');
+    
+    // После загрузки страницы автоматически вызываем печать
+    if (printWindow) {
+        printWindow.addEventListener('load', function() {
+            setTimeout(function() {
+                printWindow.print();
+            }, 250);
+        });
+    }
 }
 
 // Удалено: функции showDutyProtocolPrintModal, printDutyProtocol, formatNumber больше не используются

@@ -1,0 +1,14 @@
+.git
+.gitignore
+node_modules
+vendor
+.env
+*.log
+storage/logs/*
+!storage/logs/.gitkeep
+.DS_Store
+Thumbs.db
+README.md
+*.md
+!README.md
+
