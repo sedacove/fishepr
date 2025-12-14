@@ -1355,3 +1355,22 @@
 [2025-11-12 18:31:52] [requireAuth] BASE_URL: http://localhost/fisherp/
 [2025-11-12 18:31:52] [requireAuth] Redirect count: 1
 [2025-11-12 18:31:52] [requireAuth] User is logged in, continuing...
+[13-Dec-2025 23:01:34 Europe/Moscow] PHP Fatal error:  Uncaught Error: Call to undefined function getDBConnection() in /media/sedacove/ubuntu/projects/fisherp/fishepr/includes/auth.php:78
+Stack trace:
+#0 /media/sedacove/ubuntu/projects/fisherp/fishepr/auth/login.php(38): loginUser()
+#1 {main}
+  thrown in /media/sedacove/ubuntu/projects/fisherp/fishepr/includes/auth.php on line 78
+[13-Dec-2025 23:01:40 Europe/Moscow] PHP Fatal error:  Uncaught Error: Call to undefined function getDBConnection() in /media/sedacove/ubuntu/projects/fisherp/fishepr/includes/auth.php:78
+Stack trace:
+#0 /media/sedacove/ubuntu/projects/fisherp/fishepr/auth/login.php(38): loginUser()
+#1 {main}
+  thrown in /media/sedacove/ubuntu/projects/fisherp/fishepr/includes/auth.php on line 78
+[13-Dec-2025 23:02:35 Europe/Moscow] PHP Warning:  Undefined array key "REQUEST_METHOD" in /media/sedacove/ubuntu/projects/fisherp/fishepr/auth/login.php on line 31
+[13-Dec-2025 23:21:53 Europe/Moscow] PHP Warning:  Undefined array key "is_fasting" in /media/sedacove/ubuntu/projects/fisherp/fishepr/api/duty.php on line 185
+[13-Dec-2025 23:21:55 Europe/Moscow] PHP Warning:  Undefined array key "is_fasting" in /media/sedacove/ubuntu/projects/fisherp/fishepr/api/duty.php on line 185
+[13-Dec-2025 23:21:57 Europe/Moscow] PHP Warning:  Undefined array key "is_fasting" in /media/sedacove/ubuntu/projects/fisherp/fishepr/api/duty.php on line 185
+[13-Dec-2025 23:21:59 Europe/Moscow] PHP Warning:  Undefined array key "is_fasting" in /media/sedacove/ubuntu/projects/fisherp/fishepr/api/duty.php on line 185
+[13-Dec-2025 23:22:01 Europe/Moscow] PHP Warning:  Undefined array key "is_fasting" in /media/sedacove/ubuntu/projects/fisherp/fishepr/api/duty.php on line 185
+[13-Dec-2025 23:22:03 Europe/Moscow] PHP Warning:  Undefined array key "is_fasting" in /media/sedacove/ubuntu/projects/fisherp/fishepr/api/duty.php on line 185
+[13-Dec-2025 23:22:05 Europe/Moscow] PHP Warning:  Undefined array key "is_fasting" in /media/sedacove/ubuntu/projects/fisherp/fishepr/api/duty.php on line 185
+[13-Dec-2025 23:22:07 Europe/Moscow] PHP Warning:  Undefined array key "is_fasting" in /media/sedacove/ubuntu/projects/fisherp/fishepr/api/duty.php on line 185
