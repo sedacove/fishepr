@@ -354,6 +354,32 @@ class SessionRepository extends Repository
 
         return $row ?: null;
     }
+
+    /**
+     * Находит сессию для бассейна по дате
+     * 
+     * Ищет сессию, которая была активна в указанную дату для указанного бассейна.
+     * 
+     * @param int $poolId ID бассейна
+     * @param string $date Дата в формате Y-m-d или Y-m-d H:i:s
+     * @return array|null Данные сессии или null, если сессия не найдена
+     */
+    public function findByPoolAndDate(int $poolId, string $date): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT id
+             FROM sessions
+             WHERE pool_id = ?
+               AND start_date <= DATE(?)
+               AND (end_date IS NULL OR end_date >= DATE(?))
+             ORDER BY start_date DESC
+             LIMIT 1'
+        );
+        $stmt->execute([$poolId, $date, $date]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ?: null;
+    }
 }
 
 

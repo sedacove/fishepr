@@ -210,7 +210,8 @@ class WorkService
             throw new ValidationException('start_date', 'Дата начала сессии отсутствует', 400);
         }
 
-        $this->applyWeighingInfo($session, $poolId, $startDate);
+        $sessionId = (int)$sessionRow['id'];
+        $this->applyWeighingInfo($session, $poolId, $startDate, $sessionId);
         $this->applyMeasurementInfo($session, $poolId);
         $this->applyMortalityInfo($session, $sessionRow['id']);
         $this->applyCurrentLoad($session, $sessionRow['id']);
@@ -219,9 +220,14 @@ class WorkService
         return $session->toArray();
     }
 
-    private function applyWeighingInfo(SessionSummary $session, int $poolId, string $startDate): void
+    private function applyWeighingInfo(SessionSummary $session, int $poolId, string $startDate, int $sessionId): void
     {
-        $lastWeighing = $this->weighings->findLatestSince($poolId, $startDate);
+        // Используем session_id для поиска последней навески, если он доступен
+        // Иначе используем старый метод по pool_id и start_date для обратной совместимости
+        $lastWeighing = $this->weighings->findLatestForSession($sessionId);
+        if (!$lastWeighing) {
+            $lastWeighing = $this->weighings->findLatestSince($poolId, $startDate);
+        }
 
         $session->avg_fish_weight = null;
         $session->avg_weight_source = null;

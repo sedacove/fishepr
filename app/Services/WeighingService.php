@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Weighing\Weighing;
 use App\Repositories\PoolRepository;
+use App\Repositories\SessionRepository;
 use App\Repositories\WeighingRepository;
 use App\Support\Exceptions\ValidationException;
 use DomainException;
@@ -35,6 +36,11 @@ class WeighingService
     private PoolRepository $pools;
     
     /**
+     * @var SessionRepository Репозиторий для работы с сессиями
+     */
+    private SessionRepository $sessions;
+    
+    /**
      * @var PDO Подключение к базе данных
      */
     private PDO $pdo;
@@ -49,6 +55,7 @@ class WeighingService
         $this->pdo = $pdo;
         $this->weighings = new WeighingRepository($pdo);
         $this->pools = new PoolRepository($pdo);
+        $this->sessions = new SessionRepository($pdo);
     }
 
     /**
@@ -138,12 +145,18 @@ class WeighingService
         if (!$isAdmin || !$recordedAt) {
             $recordedAt = date('Y-m-d H:i:s');
         }
+        $recordedAt = $this->normalizeTimestamp($recordedAt);
+
+        // Определяем session_id на основе pool_id и даты
+        $session = $this->sessions->findByPoolAndDate($data['pool_id'], $recordedAt);
+        $sessionId = $session ? (int)$session['id'] : null;
 
         $id = $this->weighings->insert([
             'pool_id' => $data['pool_id'],
+            'session_id' => $sessionId,
             'weight' => $data['weight'],
             'fish_count' => $data['fish_count'],
-            'recorded_at' => $this->normalizeTimestamp($recordedAt),
+            'recorded_at' => $recordedAt,
             'created_by' => $userId,
         ]);
 
@@ -187,8 +200,13 @@ class WeighingService
             $recordedAt = $this->normalizeTimestamp($data['recorded_at']);
         }
 
+        // Определяем session_id на основе pool_id и даты
+        $session = $this->sessions->findByPoolAndDate($poolId, $recordedAt);
+        $sessionId = $session ? (int)$session['id'] : null;
+
         $updates = [
             'pool_id' => $poolId,
+            'session_id' => $sessionId,
             'weight' => $data['weight'],
             'fish_count' => $data['fish_count'],
             'recorded_at' => $recordedAt,

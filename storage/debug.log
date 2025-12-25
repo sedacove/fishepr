@@ -1374,3 +1374,198 @@ Stack trace:
 [13-Dec-2025 23:22:03 Europe/Moscow] PHP Warning:  Undefined array key "is_fasting" in /media/sedacove/ubuntu/projects/fisherp/fishepr/api/duty.php on line 185
 [13-Dec-2025 23:22:05 Europe/Moscow] PHP Warning:  Undefined array key "is_fasting" in /media/sedacove/ubuntu/projects/fisherp/fishepr/api/duty.php on line 185
 [13-Dec-2025 23:22:07 Europe/Moscow] PHP Warning:  Undefined array key "is_fasting" in /media/sedacove/ubuntu/projects/fisherp/fishepr/api/duty.php on line 185
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки temp_bad_below: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки temp_acceptable_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки temp_good_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки temp_good_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки temp_acceptable_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки temp_bad_above: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки oxygen_bad_below: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки oxygen_acceptable_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки oxygen_good_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки oxygen_good_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки oxygen_acceptable_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки oxygen_bad_above: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки measurement_edit_timeout_minutes: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Error in api/measurements.php: App\Support\JsonResponse::error(): Argument #2 ($status) must be of type int, string given, called in /var/www/html/app/Controllers/Api/MeasurementsController.php on line 126
+#0 /var/www/html/app/Controllers/Api/MeasurementsController.php(126): App\Support\JsonResponse::error('SQLSTATE[42S02]...', '42S02')
+#1 /var/www/html/api/measurements.php(11): App\Controllers\Api\MeasurementsController->handle(Object(App\Support\Request))
+#2 {main}
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки measurement_edit_timeout_minutes: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Error in api/mortality.php: App\Support\JsonResponse::error(): Argument #2 ($status) must be of type int, string given, called in /var/www/html/app/Controllers/Api/MortalityController.php on line 134
+#0 /var/www/html/app/Controllers/Api/MortalityController.php(134): App\Support\JsonResponse::error('SQLSTATE[42S02]...', '42S02')
+#1 /var/www/html/api/mortality.php(12): App\Controllers\Api\MortalityController->handle(Object(App\Support\Request))
+#2 {main}
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки temp_bad_below: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки temp_acceptable_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки temp_good_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки temp_good_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки temp_acceptable_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки temp_bad_above: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки oxygen_bad_below: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки oxygen_acceptable_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки oxygen_good_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки oxygen_good_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки oxygen_acceptable_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки oxygen_bad_above: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки measurement_edit_timeout_minutes: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Error in api/measurements.php: App\Support\JsonResponse::error(): Argument #2 ($status) must be of type int, string given, called in /var/www/html/app/Controllers/Api/MeasurementsController.php on line 126
+#0 /var/www/html/app/Controllers/Api/MeasurementsController.php(126): App\Support\JsonResponse::error('SQLSTATE[42S02]...', '42S02')
+#1 /var/www/html/api/measurements.php(11): App\Controllers\Api\MeasurementsController->handle(Object(App\Support\Request))
+#2 {main}
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Ошибка получения настройки measurement_edit_timeout_minutes: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:26:56 Europe/Moscow] Error in api/mortality.php: App\Support\JsonResponse::error(): Argument #2 ($status) must be of type int, string given, called in /var/www/html/app/Controllers/Api/MortalityController.php on line 134
+#0 /var/www/html/app/Controllers/Api/MortalityController.php(134): App\Support\JsonResponse::error('SQLSTATE[42S02]...', '42S02')
+#1 /var/www/html/api/mortality.php(12): App\Controllers\Api\MortalityController->handle(Object(App\Support\Request))
+#2 {main}
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки temp_bad_below: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки temp_acceptable_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки temp_good_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки temp_good_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки temp_acceptable_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки temp_bad_above: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки oxygen_bad_below: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки oxygen_acceptable_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки oxygen_good_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки oxygen_good_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки oxygen_acceptable_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки oxygen_bad_above: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки measurement_edit_timeout_minutes: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Error in api/measurements.php: App\Support\JsonResponse::error(): Argument #2 ($status) must be of type int, string given, called in /var/www/html/app/Controllers/Api/MeasurementsController.php on line 126
+#0 /var/www/html/app/Controllers/Api/MeasurementsController.php(126): App\Support\JsonResponse::error('SQLSTATE[42S02]...', '42S02')
+#1 /var/www/html/api/measurements.php(11): App\Controllers\Api\MeasurementsController->handle(Object(App\Support\Request))
+#2 {main}
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки measurement_edit_timeout_minutes: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Error in api/mortality.php: App\Support\JsonResponse::error(): Argument #2 ($status) must be of type int, string given, called in /var/www/html/app/Controllers/Api/MortalityController.php on line 134
+#0 /var/www/html/app/Controllers/Api/MortalityController.php(134): App\Support\JsonResponse::error('SQLSTATE[42S02]...', '42S02')
+#1 /var/www/html/api/mortality.php(12): App\Controllers\Api\MortalityController->handle(Object(App\Support\Request))
+#2 {main}
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки temp_bad_below: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки temp_acceptable_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки temp_good_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки temp_good_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки temp_acceptable_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки temp_bad_above: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки oxygen_bad_below: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки oxygen_acceptable_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки oxygen_good_min: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки oxygen_good_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки oxygen_acceptable_max: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки oxygen_bad_above: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки measurement_edit_timeout_minutes: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Error in api/measurements.php: App\Support\JsonResponse::error(): Argument #2 ($status) must be of type int, string given, called in /var/www/html/app/Controllers/Api/MeasurementsController.php on line 126
+#0 /var/www/html/app/Controllers/Api/MeasurementsController.php(126): App\Support\JsonResponse::error('SQLSTATE[42S02]...', '42S02')
+#1 /var/www/html/api/measurements.php(11): App\Controllers\Api\MeasurementsController->handle(Object(App\Support\Request))
+#2 {main}
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки debug_mode: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Ошибка получения настройки measurement_edit_timeout_minutes: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'u3154158_fisherp.settings' doesn't exist
+[25-Dec-2025 19:27:08 Europe/Moscow] Error in api/mortality.php: App\Support\JsonResponse::error(): Argument #2 ($status) must be of type int, string given, called in /var/www/html/app/Controllers/Api/MortalityController.php on line 134
+#0 /var/www/html/app/Controllers/Api/MortalityController.php(134): App\Support\JsonResponse::error('SQLSTATE[42S02]...', '42S02')
+#1 /var/www/html/api/mortality.php(12): App\Controllers\Api\MortalityController->handle(Object(App\Support\Request))
+#2 {main}
+[25-Dec-2025 19:39:12 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /media/sedacove/ubuntu/projects/fisherp/fishepr/migrations/migrate.php:18
+Stack trace:
+#0 /media/sedacove/ubuntu/projects/fisherp/fishepr/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 {main}
+  thrown in /media/sedacove/ubuntu/projects/fisherp/fishepr/migrations/migrate.php on line 18
+[25-Dec-2025 19:39:33 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /media/sedacove/ubuntu/projects/fisherp/fishepr/migrations/migrate.php:18
+Stack trace:
+#0 /media/sedacove/ubuntu/projects/fisherp/fishepr/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 {main}
+  thrown in /media/sedacove/ubuntu/projects/fisherp/fishepr/migrations/migrate.php on line 18
+[25-Dec-2025 19:40:56 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /var/www/html/migrations/migrate.php:18
+Stack trace:
+#0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 {main}
+  thrown in /var/www/html/migrations/migrate.php on line 18
+[25-Dec-2025 19:41:12 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /var/www/html/migrations/migrate.php:18
+Stack trace:
+#0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 {main}
+  thrown in /var/www/html/migrations/migrate.php on line 18
+[25-Dec-2025 19:41:15 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /var/www/html/migrations/migrate.php:18
+Stack trace:
+#0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 {main}
+  thrown in /var/www/html/migrations/migrate.php on line 18
+[25-Dec-2025 19:41:24 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /var/www/html/migrations/migrate.php:18
+Stack trace:
+#0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 {main}
+  thrown in /var/www/html/migrations/migrate.php on line 18
+[25-Dec-2025 19:41:28 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /var/www/html/migrations/migrate.php:18
+Stack trace:
+#0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 {main}
+  thrown in /var/www/html/migrations/migrate.php on line 18
+[25-Dec-2025 19:41:33 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /var/www/html/migrations/migrate.php:18
+Stack trace:
+#0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 {main}
+  thrown in /var/www/html/migrations/migrate.php on line 18
+[25-Dec-2025 19:41:36 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /var/www/html/migrations/migrate.php:18
+Stack trace:
+#0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 {main}
+  thrown in /var/www/html/migrations/migrate.php on line 18
+[25-Dec-2025 19:41:37 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /var/www/html/migrations/migrate.php:18
+Stack trace:
+#0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 Command line code(1): require('/var/www/html/m...')
+#2 {main}
+  thrown in /var/www/html/migrations/migrate.php on line 18
+[25-Dec-2025 19:41:40 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /var/www/html/migrations/migrate.php:18
+Stack trace:
+#0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 {main}
+  thrown in /var/www/html/migrations/migrate.php on line 18
+[25-Dec-2025 19:41:47 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /var/www/html/migrations/migrate.php:18
+Stack trace:
+#0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 {main}
+  thrown in /var/www/html/migrations/migrate.php on line 18
+[25-Dec-2025 19:41:51 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /var/www/html/migrations/migrate.php:18
+Stack trace:
+#0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 Command line code(1): require('/var/www/html/m...')
+#2 {main}
+  thrown in /var/www/html/migrations/migrate.php on line 18
+[25-Dec-2025 19:41:52 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /var/www/html/migrations/migrate.php:18
+Stack trace:
+#0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 {main}
+  thrown in /var/www/html/migrations/migrate.php on line 18
+[25-Dec-2025 19:41:56 Europe/Moscow] PHP Fatal error:  Uncaught Error: Undefined constant "DB_HOST" in /var/www/html/migrations/migrate.php:18
+Stack trace:
+#0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
+#1 {main}
+  thrown in /var/www/html/migrations/migrate.php on line 18

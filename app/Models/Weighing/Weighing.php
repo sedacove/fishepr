@@ -23,6 +23,11 @@ class Weighing extends Model
     public int $pool_id;
     
     /**
+     * @var int|null ID сессии
+     */
+    public ?int $session_id = null;
+    
+    /**
      * @var float Масса взвешивания (кг)
      */
     public float $weight;

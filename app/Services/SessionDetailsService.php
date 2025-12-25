@@ -136,6 +136,15 @@ class SessionDetailsService
             ]))->toArray();
         }, $this->harvests->listForSession($sessionId));
 
+        // Используем session_id для получения навесок, если он есть
+        // Иначе используем старый метод по pool_id и start_date для обратной совместимости
+        $weighingsData = [];
+        if ($sessionId) {
+            $weighingsData = $this->weighings->listForSession($sessionId);
+        } else {
+            $weighingsData = $this->weighings->listForPoolSince($poolId, $startDate);
+        }
+        
         $weighings = array_map(function (array $row) {
             $fishCount = (int)$row['fish_count'];
             $weight = (float)$row['weight'];
@@ -146,7 +155,7 @@ class SessionDetailsService
                 'fish_count' => $fishCount,
                 'avg_weight' => $avg,
             ]))->toArray();
-        }, $this->weighings->listForPoolSince($poolId, $startDate));
+        }, $weighingsData);
 
         // Получаем настройки формулы прогноза роста
         // Формула: W(t) = max_weight / (1 + exp(-coefficient * (t - inflection_point)))
