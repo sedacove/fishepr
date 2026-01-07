@@ -21,3 +21,5 @@ ADD INDEX `idx_session_id` (`session_id`);
 ALTER TABLE `weighings`
 ADD CONSTRAINT `fk_weighings_session_id` FOREIGN KEY (`session_id`) REFERENCES `sessions`(`id`) ON DELETE RESTRICT;
 
+
+

@@ -1569,3 +1569,59 @@ Stack trace:
 #0 /var/www/html/migrations/migrate.php(223): MigrationRunner->__construct()
 #1 {main}
   thrown in /var/www/html/migrations/migrate.php on line 18
+[25-Dec-2025 19:51:07 Europe/Moscow] PHP Fatal error:  Uncaught Error: Call to undefined function getDBConnection() in /var/www/html/debug_feeding_calculation.php:9
+Stack trace:
+#0 {main}
+  thrown in /var/www/html/debug_feeding_calculation.php on line 9
+[25-Dec-2025 19:51:10 Europe/Moscow] PHP Fatal error:  Uncaught Error: Call to undefined function getDBConnection() in /var/www/html/debug_feeding_calculation.php:9
+Stack trace:
+#0 {main}
+  thrown in /var/www/html/debug_feeding_calculation.php on line 9
+[25-Dec-2025 19:51:42 Europe/Moscow] PHP Fatal error:  Uncaught Error: Call to undefined function getDBConnection() in /var/www/html/test_feeding.php:5
+Stack trace:
+#0 {main}
+  thrown in /var/www/html/test_feeding.php on line 5
+[25-Dec-2025 19:54:23 Europe/Moscow] PHP Fatal error:  Uncaught Error: Call to undefined function getDBConnection() in /var/www/html/check_coefficient.php:5
+Stack trace:
+#0 {main}
+  thrown in /var/www/html/check_coefficient.php on line 5
+[06-Jan-2026 11:10:23 Europe/Moscow] [FEEDING DEBUG pool=9] temp=12.20°C, weight_kg=0.874, weight_g=874.0, strategy=normal, range=800-1000 (6.0 мм), temp_range=[12.0-14.0]°C, coeff=[1.00-1.20], final=1.0200 (rounded=1.02), biomass=1309.52 kg
+
+[06-Jan-2026 11:10:25 Europe/Moscow] [FEEDING DEBUG pool=9] temp=12.20°C, weight_kg=0.874, weight_g=874.0, strategy=normal, range=800-1000 (6.0 мм), temp_range=[12.0-14.0]°C, coeff=[1.00-1.20], final=1.0200 (rounded=1.02), biomass=1309.52 kg
+
+[06-Jan-2026 11:10:27 Europe/Moscow] [FEEDING DEBUG pool=9] temp=12.20°C, weight_kg=0.874, weight_g=874.0, strategy=normal, range=800-1000 (6.0 мм), temp_range=[12.0-14.0]°C, coeff=[1.00-1.20], final=1.0200 (rounded=1.02), biomass=1309.52 kg
+
+[06-Jan-2026 11:10:28 Europe/Moscow] [FEEDING DEBUG pool=9] temp=12.20°C, weight_kg=0.874, weight_g=874.0, strategy=normal, range=800-1000 (6.0 мм), temp_range=[12.0-14.0]°C, coeff=[1.00-1.20], final=1.0200 (rounded=1.02), biomass=1309.52 kg
+
+[06-Jan-2026 12:09:05 Europe/Moscow] [FEEDING DEBUG pool=9] temp=12.20°C, weight_kg=0.874, weight_g=874.0, strategy=normal, range=800-1000 (6.0 мм), temp_range=[12.0-14.0]°C, coeff=[1.00-1.20], final=1.0200 (rounded=1.02), biomass=1309.52 kg
+
+[06-Jan-2026 12:09:30 Europe/Moscow] [FEEDING DEBUG pool=9] temp=12.20°C, weight_kg=0.874, weight_g=874.0, strategy=normal, range=800-1000 (6.0 мм), temp_range=[12.0-14.0]°C, coeff=[1.00-1.20], final=1.0200 (rounded=1.02), biomass=1309.52 kg
+
+[06-Jan-2026 12:11:18 Europe/Moscow] PHP Fatal error:  Uncaught Error: Class "App\Repositories\PoolRepository" not found in /var/www/html/app/Services/WorkService.php:122
+Stack trace:
+#0 /var/www/html/debug_session_feeding.php(342): App\Services\WorkService->__construct(Object(PDO))
+#1 {main}
+  thrown in /var/www/html/app/Services/WorkService.php on line 122
+[06-Jan-2026 12:11:28 Europe/Moscow] PHP Fatal error:  Uncaught Error: Call to undefined function getDBConnection() in Command line code:3
+Stack trace:
+#0 {main}
+  thrown in Command line code on line 3
+[06-Jan-2026 12:12:06 Europe/Moscow] PHP Fatal error:  Uncaught Error: Class "App\Repositories\PoolRepository" not found in /var/www/html/app/Services/WorkService.php:122
+Stack trace:
+#0 /var/www/html/debug_session_feeding.php(342): App\Services\WorkService->__construct(Object(PDO))
+#1 {main}
+  thrown in /var/www/html/app/Services/WorkService.php on line 122
+[06-Jan-2026 12:29:12 Europe/Moscow] [FEEDING DEBUG pool=9] temp=12.20°C, weight_kg=0.874, weight_g=874.0, strategy=normal, range=800-1000 (6.0 мм), temp_range=[12.0-14.0]°C, coeff=[1.00-1.20], final=1.0200 (rounded=1.02), biomass=1309.52 kg
+
+[06-Jan-2026 12:29:19 Europe/Moscow] PHP Fatal error:  Uncaught Error: Call to private App\Support\Request::__construct() from global scope in /var/www/html/api/database_backups.php:14
+Stack trace:
+#0 {main}
+  thrown in /var/www/html/api/database_backups.php on line 14
+[06-Jan-2026 12:29:22 Europe/Moscow] PHP Fatal error:  Uncaught Error: Call to private App\Support\Request::__construct() from global scope in /var/www/html/api/database_backups.php:14
+Stack trace:
+#0 {main}
+  thrown in /var/www/html/api/database_backups.php on line 14
+[06-Jan-2026 12:29:30 Europe/Moscow] PHP Fatal error:  Uncaught Error: Call to private App\Support\Request::__construct() from global scope in /var/www/html/api/database_backups.php:14
+Stack trace:
+#0 {main}
+  thrown in /var/www/html/api/database_backups.php on line 14

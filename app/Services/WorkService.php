@@ -215,19 +215,20 @@ class WorkService
         $this->applyMeasurementInfo($session, $poolId);
         $this->applyMortalityInfo($session, $sessionRow['id']);
         $this->applyCurrentLoad($session, $sessionRow['id']);
-        $this->applyFeedingPlan($session, $sessionRow);
+        $this->applyFeedingPlan($session, $sessionRow, $poolId);
 
         return $session->toArray();
     }
 
     private function applyWeighingInfo(SessionSummary $session, int $poolId, string $startDate, int $sessionId): void
     {
-        // Используем session_id для поиска последней навески, если он доступен
-        // Иначе используем старый метод по pool_id и start_date для обратной совместимости
+        // ВАЖНО: Используем только навески с session_id текущей сессии
+        // Это гарантирует, что мы не используем навески от других сессий
         $lastWeighing = $this->weighings->findLatestForSession($sessionId);
-        if (!$lastWeighing) {
-            $lastWeighing = $this->weighings->findLatestSince($poolId, $startDate);
-        }
+        
+        // Если навесок с session_id нет, НЕ используем старый метод findLatestSince,
+        // так как он может найти навески от других сессий в том же бассейне
+        // Вместо этого используем начальные данные сессии
 
         $session->avg_fish_weight = null;
         $session->avg_weight_source = null;
@@ -235,9 +236,34 @@ class WorkService
         if ($lastWeighing && (int)$lastWeighing['fish_count'] > 0) {
             $session->avg_fish_weight = (float)$lastWeighing['weight'] / (int)$lastWeighing['fish_count'];
             $session->avg_weight_source = 'weighing';
+            
+            // Отладка для бассейна 9
+            if ($poolId == 9) {
+                $debugInfo = sprintf(
+                    "[WEIGHING DEBUG pool=9] Found weighing: weight=%.2f kg, count=%d, avg=%.3f kg (%.1f g), date=%s, source=weighing\n",
+                    $lastWeighing['weight'],
+                    $lastWeighing['fish_count'],
+                    $session->avg_fish_weight,
+                    $session->avg_fish_weight * 1000,
+                    $lastWeighing['recorded_at'] ?? 'unknown'
+                );
+                file_put_contents(__DIR__ . '/../../storage/feeding_debug.log', date('Y-m-d H:i:s') . ' ' . $debugInfo, FILE_APPEND);
+            }
         } elseif ($session->start_mass !== null && $session->start_fish_count && $session->start_fish_count > 0) {
             $session->avg_fish_weight = $session->start_mass / $session->start_fish_count;
             $session->avg_weight_source = 'session';
+            
+            // Отладка для бассейна 9
+            if ($poolId == 9) {
+                $debugInfo = sprintf(
+                    "[WEIGHING DEBUG pool=9] Using start data: mass=%.2f kg, count=%d, avg=%.3f kg (%.1f g), source=session\n",
+                    $session->start_mass,
+                    $session->start_fish_count,
+                    $session->avg_fish_weight,
+                    $session->avg_fish_weight * 1000
+                );
+                file_put_contents(__DIR__ . '/../../storage/feeding_debug.log', date('Y-m-d H:i:s') . ' ' . $debugInfo, FILE_APPEND);
+            }
         }
 
         $session->last_weighing_at = $lastWeighing['recorded_at'] ?? null;
@@ -360,7 +386,7 @@ class WorkService
      * 5. Все шаги защищены проверками и логированием, чтобы карточка сессии оставалась стабильной
      *    даже при некорректных данных или неполных таблицах.
      */
-    private function applyFeedingPlan(SessionSummary $session, array $sessionRow): void
+    private function applyFeedingPlan(SessionSummary $session, array $sessionRow, int $poolId): void
     {
         $session->feeding_plan = null;
         $session->feed_ratio = null;
@@ -404,6 +430,28 @@ class WorkService
         }
 
         $ratioPer100Kg = max(0, (float)$match['value']);
+        
+        // ВРЕМЕННАЯ ОТЛАДКА для бассейна 9 - записываем в файл для удобства
+        if ($poolId == 9) {
+            $debugInfo = sprintf(
+                "[FEEDING DEBUG pool=9] temp=%.2f°C, weight_kg=%.3f, weight_g=%.1f, strategy=%s, range=%s, temp_range=[%.1f-%.1f]°C, coeff=[%.2f-%.2f], final=%.4f (rounded=%.2f), biomass=%.2f kg\n",
+                $temperature,
+                $avgWeightKg,
+                $avgWeightGrams,
+                $strategy,
+                $match['weight_label'] ?? 'unknown',
+                $match['temp_lower'] ?? 0,
+                $match['temp_upper'] ?? 0,
+                $match['coeff_lower'] ?? 0,
+                $match['coeff_upper'] ?? 0,
+                $ratioPer100Kg,
+                round($ratioPer100Kg, 2),
+                $biomassKg
+            );
+            error_log($debugInfo);
+            // Также записываем в отдельный файл для удобства
+            file_put_contents(__DIR__ . '/../../storage/feeding_debug.log', date('Y-m-d H:i:s') . ' ' . $debugInfo, FILE_APPEND);
+        }
         $recommendedPerDay = max(0, ($ratioPer100Kg / 100) * (float)$biomassKg);
         $perFeeding = max(0, $recommendedPerDay / $dailyFeedings);
         $session->feed_ratio = $ratioPer100Kg;

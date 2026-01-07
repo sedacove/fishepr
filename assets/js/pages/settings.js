@@ -142,6 +142,15 @@ function buildSettingsCategories(settings) {
         });
     }
 
+    // Добавляем вкладку с дампами базы данных
+    categories.push({
+        id: 'backups',
+        title: 'Резервные копии БД',
+        render: function(panel) {
+            renderBackups(panel);
+        }
+    });
+
     return categories;
 }
 
@@ -796,6 +805,205 @@ function escapeHtml(text) {
     };
     return String(text).replace(/[&<>"']/g, m => map[m]);
 }
+
+// Функция для отображения дампов базы данных
+function renderBackups(panel) {
+    panel.html(`
+        <div class="backups-section">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5>Резервные копии базы данных</h5>
+                <button type="button" class="btn btn-primary" id="createBackupBtn">
+                    <i class="bi bi-plus-circle"></i> Создать дамп
+                </button>
+            </div>
+            <div id="backupsTableContainer">
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `);
+
+    loadBackups();
+}
+
+// Загрузка списка дампов
+function loadBackups() {
+    $.ajax({
+        url: BASE_URL + 'api/database_backups.php?action=list',
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                renderBackupsTable(response.data);
+            } else {
+                $('#backupsTableContainer').html(`<div class="alert alert-danger">${response.message}</div>`);
+            }
+        },
+        error: function() {
+            $('#backupsTableContainer').html('<div class="alert alert-danger">Ошибка при загрузке списка дампов</div>');
+        }
+    });
+}
+
+// Отображение таблицы дампов
+function renderBackupsTable(backups) {
+    const container = $('#backupsTableContainer');
+    
+    if (backups.length === 0) {
+        container.html('<div class="alert alert-info">Дампы не найдены</div>');
+        return;
+    }
+
+    let tableHtml = `
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Имя файла</th>
+                        <th>Размер</th>
+                        <th>Дата создания</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    backups.forEach(function(backup) {
+        tableHtml += `
+            <tr>
+                <td>${escapeHtml(backup.filename)}</td>
+                <td>${escapeHtml(backup.size_formatted)}</td>
+                <td>${escapeHtml(backup.created_at_formatted)}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a href="${BASE_URL}api/database_backups.php?action=download&filename=${encodeURIComponent(backup.filename)}" 
+                           class="btn btn-sm btn-outline-primary" title="Скачать">
+                            <i class="bi bi-download"></i>
+                        </a>
+                        <button type="button" class="btn btn-sm btn-outline-warning restore-backup-btn" 
+                                data-filename="${escapeHtml(backup.filename)}" title="Восстановить">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger delete-backup-btn" 
+                                data-filename="${escapeHtml(backup.filename)}" title="Удалить">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    tableHtml += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    container.html(tableHtml);
+}
+
+// Создание дампа
+$(document).on('click', '#createBackupBtn', function() {
+    const btn = $(this);
+    const originalText = btn.html();
+    
+    btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Создание...');
+    
+    $.ajax({
+        url: BASE_URL + 'api/database_backups.php?action=create',
+        method: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                showAlert('success', response.message || 'Дамп успешно создан');
+                loadBackups();
+            } else {
+                showAlert('danger', response.message || 'Ошибка при создании дампа');
+            }
+        },
+        error: function() {
+            showAlert('danger', 'Ошибка при создании дампа');
+        },
+        complete: function() {
+            btn.prop('disabled', false).html(originalText);
+        }
+    });
+});
+
+// Восстановление дампа
+$(document).on('click', '.restore-backup-btn', function() {
+    const filename = $(this).data('filename');
+    
+    if (!confirm(`ВНИМАНИЕ! Восстановление дампа "${filename}" приведет к полной замене текущей базы данных. Все текущие данные будут потеряны. Продолжить?`)) {
+        return;
+    }
+
+    if (!confirm('Вы уверены? Это действие необратимо!')) {
+        return;
+    }
+
+    const btn = $(this);
+    btn.prop('disabled', true);
+    
+    $.ajax({
+        url: BASE_URL + 'api/database_backups.php?action=restore',
+        method: 'POST',
+        data: { filename: filename },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                showAlert('success', response.message || 'Дамп успешно восстановлен');
+                // Перезагружаем страницу через 2 секунды
+                setTimeout(function() {
+                    location.reload();
+                }, 2000);
+            } else {
+                showAlert('danger', response.message || 'Ошибка при восстановлении дампа');
+                btn.prop('disabled', false);
+            }
+        },
+        error: function() {
+            showAlert('danger', 'Ошибка при восстановлении дампа');
+            btn.prop('disabled', false);
+        }
+    });
+});
+
+// Удаление дампа
+$(document).on('click', '.delete-backup-btn', function() {
+    const filename = $(this).data('filename');
+    
+    if (!confirm(`Вы уверены, что хотите удалить дамп "${filename}"?`)) {
+        return;
+    }
+
+    const btn = $(this);
+    btn.prop('disabled', true);
+    
+    $.ajax({
+        url: BASE_URL + 'api/database_backups.php?action=delete',
+        method: 'POST',
+        data: { filename: filename },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                showAlert('success', response.message || 'Дамп успешно удален');
+                loadBackups();
+            } else {
+                showAlert('danger', response.message || 'Ошибка при удалении дампа');
+                btn.prop('disabled', false);
+            }
+        },
+        error: function() {
+            showAlert('danger', 'Ошибка при удалении дампа');
+            btn.prop('disabled', false);
+        }
+    });
+});
 
 // Загрузка при открытии страницы
 $(document).ready(function() {
