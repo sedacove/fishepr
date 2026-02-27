@@ -51,5 +51,34 @@ class ReportsController extends Controller
             'extra_styles' => ['assets/css/pages/reports.css'],
         ]);
     }
+
+    /**
+     * Страница отчета по росту посадок
+     *
+     * Позволяет выбрать посадку и построить график средней навески по навескам
+     * всех сессий этой посадки (включая архивные).
+     *
+     * @return string
+     */
+    public function plantingGrowth(): string
+    {
+        requireAuth();
+
+        if (!isAdmin()) {
+            http_response_code(403);
+            return 'Доступ запрещен';
+        }
+
+        // Для отчета по росту показываем и активные, и архивные посадки
+        $active = $this->plantings->listByArchived(false);
+        $archived = $this->plantings->listByArchived(true);
+        $plantings = array_merge($active, $archived);
+
+        return $this->view('reports/planting_growth', [
+            'page_title' => 'Отчет по росту посадок',
+            'plantings' => $plantings,
+            'extra_styles' => ['assets/css/pages/reports.css'],
+        ]);
+    }
 }
 

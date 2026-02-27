@@ -23,6 +23,11 @@ class Request
     private array $query;
     
     /**
+     * @var array Параметры POST-запроса
+     */
+    private array $post;
+    
+    /**
      * @var array|null Распарсенное тело запроса в формате JSON
      */
     private ?array $jsonBody = null;
@@ -37,11 +42,13 @@ class Request
      * 
      * @param string $method HTTP метод
      * @param array $query Параметры запроса
+     * @param array $post Параметры POST-запроса
      */
-    private function __construct(string $method, array $query)
+    private function __construct(string $method, array $query, array $post = [])
     {
         $this->method = strtoupper($method);
         $this->query = $query;
+        $this->post = $post;
     }
 
     /**
@@ -53,7 +60,8 @@ class Request
     {
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $query = $_GET ?? [];
-        return new self($method, $query);
+        $post = $_POST ?? [];
+        return new self($method, $query, $post);
     }
 
     /**
@@ -97,6 +105,28 @@ class Request
     public function allQuery(): array
     {
         return $this->query;
+    }
+
+    /**
+     * Получает значение параметра POST по ключу
+     * 
+     * @param string $key Ключ параметра
+     * @param mixed $default Значение по умолчанию
+     * @return mixed
+     */
+    public function getPost(string $key, $default = null)
+    {
+        return $this->post[$key] ?? $default;
+    }
+
+    /**
+     * Возвращает все параметры POST-запроса
+     * 
+     * @return array
+     */
+    public function allPost(): array
+    {
+        return $this->post;
     }
 
     /**

@@ -183,3 +183,100 @@
     white-space: nowrap;
 }
 
+/* Отчет по росту посадок — блок основных данных над графиком */
+.planting-growth-summary {
+    font-family: 'Roboto', sans-serif;
+}
+
+.planting-growth-days {
+    font-family: 'Bitter', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--bs-body-color);
+    letter-spacing: 0.02em;
+}
+
+.planting-growth-days #plantingGrowthDaysValue {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--bs-primary, #0d6efd);
+}
+
+.planting-growth-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    background: var(--bs-light, #f8f9fa);
+    border-radius: 8px;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.planting-growth-stat-label {
+    font-size: 0.8rem;
+    color: var(--bs-secondary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.planting-growth-stat-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--bs-body-color);
+}
+
+.planting-growth-extra-card .card-body {
+    font-size: 0.95rem;
+}
+
+.planting-growth-extra-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--bs-secondary-color);
+    margin-bottom: 0.35rem;
+}
+
+.planting-growth-extra-value {
+    font-weight: 600;
+    color: var(--bs-body-color);
+}
+
+/* Тёмная тема — контрастные плашки и текст */
+[data-theme="dark"] .planting-growth-days {
+    color: #e4e6eb;
+}
+
+[data-theme="dark"] .planting-growth-days #plantingGrowthDaysValue {
+    color: #6ea8fe;
+}
+
+[data-theme="dark"] .planting-growth-stat {
+    background: #2d3238;
+    border: 1px solid #4a5058;
+}
+
+[data-theme="dark"] .planting-growth-stat-label {
+    color: #adb5bd;
+}
+
+[data-theme="dark"] .planting-growth-stat-value {
+    color: #e4e6eb;
+}
+
+[data-theme="dark"] .planting-growth-extra-card {
+    background: #2d3238;
+    border-color: #4a5058 !important;
+}
+
+[data-theme="dark"] .planting-growth-extra-card .card-body {
+    color: #e4e6eb;
+}
+
+[data-theme="dark"] .planting-growth-extra-label {
+    color: #adb5bd;
+}
+
+[data-theme="dark"] .planting-growth-extra-value {
+    color: #e4e6eb;
+}
+

@@ -350,6 +350,13 @@ if (!isset($page_title)) {
                             <span class="submenu-desc">Отчет по отгрузкам</span>
                         </span>
                     </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>reports/planting-growth">
+                        <span class="submenu-icon"><i class="bi bi-graph-up"></i></span>
+                        <span class="submenu-info">
+                            <span class="submenu-title">Рост посадок</span>
+                            <span class="submenu-desc">График средней навески</span>
+                        </span>
+                    </a>
                 </div>
             </div>
             <?php endif; ?>

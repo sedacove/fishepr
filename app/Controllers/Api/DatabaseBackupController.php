@@ -32,8 +32,14 @@ class DatabaseBackupController
      */
     public function __construct()
     {
-        \requireAuth();
-        \requireAdmin();
+        // Авторизация уже проверена в api/_bootstrap.php (isLoggedIn()).
+        // Здесь дополнительно убеждаемся, что пользователь — администратор,
+        // и возвращаем JSON-ошибку вместо редиректа.
+        if (!\function_exists('isAdmin') || !\isAdmin()) {
+            JsonResponse::error('Доступ запрещен: требуются права администратора', 403);
+            exit;
+        }
+
         $this->service = new DatabaseBackupService();
     }
 

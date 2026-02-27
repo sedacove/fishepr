@@ -16,3 +16,17 @@
 2026-01-06 12:09:30 [FEEDING DEBUG pool=9] temp=12.20°C, weight_kg=0.874, weight_g=874.0, strategy=normal, range=800-1000 (6.0 мм), temp_range=[12.0-14.0]°C, coeff=[1.00-1.20], final=1.0200 (rounded=1.02), biomass=1309.52 kg
 2026-01-06 12:29:12 [WEIGHING DEBUG pool=9] Using start data: mass=1741.00 kg, count=1992, avg=0.874 kg (874.0 g), source=session
 2026-01-06 12:29:12 [FEEDING DEBUG pool=9] temp=12.20°C, weight_kg=0.874, weight_g=874.0, strategy=normal, range=800-1000 (6.0 мм), temp_range=[12.0-14.0]°C, coeff=[1.00-1.20], final=1.0200 (rounded=1.02), biomass=1309.52 kg
+2026-02-27 12:13:40 [WEIGHING DEBUG pool=9] Using start data: mass=1741.00 kg, count=1992, avg=0.874 kg (874.0 g), source=session
+2026-02-27 12:13:40 [FEEDING DEBUG pool=9] temp=12.20°C, weight_kg=0.874, weight_g=874.0, strategy=normal, range=800-1000 (6.0 мм), temp_range=[12.0-14.0]°C, coeff=[1.00-1.20], final=1.0200 (rounded=1.02), biomass=1309.52 kg
+2026-02-27 12:16:14 [WEIGHING DEBUG pool=9] Found weighing: weight=34.85 kg, count=100, avg=0.349 kg (348.5 g), date=2026-02-16 12:06:00, source=weighing
+2026-02-27 12:16:14 [FEEDING DEBUG pool=9] temp=12.40°C, weight_kg=0.349, weight_g=348.5, strategy=normal, range=200-400 (4.5 мм), temp_range=[12.0-14.0]°C, coeff=[2.00-2.00], final=2.0000 (rounded=2.00), biomass=494.17 kg
+2026-02-27 12:16:42 [WEIGHING DEBUG pool=9] Found weighing: weight=34.85 kg, count=100, avg=0.349 kg (348.5 g), date=2026-02-16 12:06:00, source=weighing
+2026-02-27 12:16:42 [FEEDING DEBUG pool=9] temp=12.40°C, weight_kg=0.349, weight_g=348.5, strategy=normal, range=200-400 (4.5 мм), temp_range=[12.0-14.0]°C, coeff=[2.00-2.00], final=2.0000 (rounded=2.00), biomass=494.17 kg
+2026-02-27 15:03:27 [WEIGHING DEBUG pool=9] Found weighing: weight=34.85 kg, count=100, avg=0.349 kg (348.5 g), date=2026-02-16 12:06:00, source=weighing
+2026-02-27 15:03:27 [FEEDING DEBUG pool=9] temp=12.40°C, weight_kg=0.349, weight_g=348.5, strategy=normal, range=200-400 (4.5 мм), temp_range=[12.0-14.0]°C, coeff=[2.00-2.00], final=2.0000 (rounded=2.00), biomass=494.17 kg
+2026-02-27 15:04:44 [WEIGHING DEBUG pool=9] Found weighing: weight=34.85 kg, count=100, avg=0.349 kg (348.5 g), date=2026-02-16 12:06:00, source=weighing
+2026-02-27 15:04:44 [FEEDING DEBUG pool=9] temp=12.40°C, weight_kg=0.349, weight_g=348.5, strategy=normal, range=200-400 (4.5 мм), temp_range=[12.0-14.0]°C, coeff=[2.00-2.00], final=2.0000 (rounded=2.00), biomass=494.17 kg
+2026-02-27 15:17:14 [WEIGHING DEBUG pool=9] Found weighing: weight=34.85 kg, count=100, avg=0.349 kg (348.5 g), date=2026-02-16 12:06:00, source=weighing
+2026-02-27 15:17:14 [FEEDING DEBUG pool=9] temp=12.40°C, weight_kg=0.349, weight_g=348.5, strategy=normal, range=200-400 (4.5 мм), temp_range=[12.0-14.0]°C, coeff=[2.00-2.00], final=2.0000 (rounded=2.00), biomass=494.17 kg
+2026-02-27 15:27:06 [WEIGHING DEBUG pool=9] Found weighing: weight=34.85 kg, count=100, avg=0.349 kg (348.5 g), date=2026-02-16 12:06:00, source=weighing
+2026-02-27 15:27:06 [FEEDING DEBUG pool=9] temp=12.40°C, weight_kg=0.349, weight_g=348.5, strategy=normal, range=200-400 (4.5 мм), temp_range=[12.0-14.0]°C, coeff=[2.00-2.00], final=2.0000 (rounded=2.00), biomass=494.17 kg

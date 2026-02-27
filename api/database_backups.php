@@ -11,6 +11,6 @@ use App\Controllers\Api\DatabaseBackupController;
 use App\Support\Request;
 
 $controller = new DatabaseBackupController();
-$request = new Request();
+$request = Request::fromGlobals();
 $controller->handle($request);
 

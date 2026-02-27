@@ -43,6 +43,9 @@ class ReportsController
             case 'harvests':
                 $this->getHarvestsReport();
                 break;
+            case 'planting_growth':
+                $this->getPlantingGrowthReport();
+                break;
             default:
                 JsonResponse::error('Неизвестное действие', 400);
         }
@@ -87,6 +90,35 @@ class ReportsController
             JsonResponse::success($data);
         } catch (\Exception $e) {
             JsonResponse::error($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Получает данные для отчета по росту посадки
+     *
+     * @return void
+     */
+    private function getPlantingGrowthReport(): void
+    {
+        $plantingId = isset($_GET['planting_id']) && $_GET['planting_id'] !== ''
+            ? (int)$_GET['planting_id']
+            : 0;
+
+        if ($plantingId <= 0) {
+            JsonResponse::error('Не выбрана посадка', 400);
+            return;
+        }
+
+        $dateFrom = $_GET['date_from'] ?? null;
+        $dateTo = $_GET['date_to'] ?? null;
+
+        try {
+            $data = $this->reportService->getPlantingGrowthReport($plantingId, $dateFrom, $dateTo);
+            JsonResponse::success($data);
+        } catch (\InvalidArgumentException $e) {
+            JsonResponse::error($e->getMessage(), 400);
+        } catch (\Throwable $e) {
+            JsonResponse::error('Ошибка при построении отчета: ' . $e->getMessage(), 500);
         }
     }
 }

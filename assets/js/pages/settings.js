@@ -839,11 +839,16 @@ function loadBackups() {
             if (response.success) {
                 renderBackupsTable(response.data);
             } else {
-                $('#backupsTableContainer').html(`<div class="alert alert-danger">${response.message}</div>`);
+                const message = response.message || 'Ошибка при загрузке списка дампов';
+                $('#backupsTableContainer').html(`<div class="alert alert-danger">${escapeHtml(message)}</div>`);
             }
         },
-        error: function() {
-            $('#backupsTableContainer').html('<div class="alert alert-danger">Ошибка при загрузке списка дампов</div>');
+        error: function(xhr) {
+            let message = 'Ошибка при загрузке списка дампов';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                message = xhr.responseJSON.message;
+            }
+            $('#backupsTableContainer').html(`<div class="alert alert-danger">${escapeHtml(message)}</div>`);
         }
     });
 }
