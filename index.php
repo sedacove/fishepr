@@ -35,6 +35,8 @@ $router->get('/shift-tasks', 'ShiftTasksController@index');
 $router->get('/partial-transplants', 'PartialTransplantsController@index');
 $router->get('/reports/harvests', 'ReportsController@harvests');
 $router->get('/reports/planting-growth', 'ReportsController@plantingGrowth');
+$router->get('/reports/expenses', 'ReportsController@expenses');
+$router->get('/reports/extra-works', 'ReportsController@extraWorks');
 
 try {
     $response = $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');

@@ -80,5 +80,37 @@ class ReportsController extends Controller
             'extra_styles' => ['assets/css/pages/reports.css'],
         ]);
     }
+
+    /**
+     * Страница отчёта по затратам (расходы)
+     */
+    public function expenses(): string
+    {
+        requireAuth();
+        if (!isAdmin()) {
+            http_response_code(403);
+            return 'Доступ запрещен';
+        }
+        return $this->view('reports/expenses', [
+            'page_title' => 'Отчёт о затратах',
+            'extra_styles' => ['assets/css/pages/reports.css'],
+        ]);
+    }
+
+    /**
+     * Страница отчёта по дополнительным работам
+     */
+    public function extraWorks(): string
+    {
+        requireAuth();
+        if (!isAdmin()) {
+            http_response_code(403);
+            return 'Доступ запрещен';
+        }
+        return $this->view('reports/extra_works', [
+            'page_title' => 'Отчёт о дополнительных работах',
+            'extra_styles' => ['assets/css/pages/reports.css'],
+        ]);
+    }
 }
 

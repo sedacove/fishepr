@@ -46,6 +46,12 @@ class ReportsController
             case 'planting_growth':
                 $this->getPlantingGrowthReport();
                 break;
+            case 'expenses':
+                $this->getExpensesReport();
+                break;
+            case 'extra_works':
+                $this->getExtraWorksReport();
+                break;
             default:
                 JsonResponse::error('Неизвестное действие', 400);
         }
@@ -119,6 +125,30 @@ class ReportsController
             JsonResponse::error($e->getMessage(), 400);
         } catch (\Throwable $e) {
             JsonResponse::error('Ошибка при построении отчета: ' . $e->getMessage(), 500);
+        }
+    }
+
+    private function getExpensesReport(): void
+    {
+        $dateFrom = $_GET['date_from'] ?? null;
+        $dateTo = $_GET['date_to'] ?? null;
+        try {
+            $data = $this->reportService->getExpensesReport($dateFrom ?: null, $dateTo ?: null);
+            JsonResponse::success($data);
+        } catch (\Exception $e) {
+            JsonResponse::error($e->getMessage(), 400);
+        }
+    }
+
+    private function getExtraWorksReport(): void
+    {
+        $dateFrom = $_GET['date_from'] ?? null;
+        $dateTo = $_GET['date_to'] ?? null;
+        try {
+            $data = $this->reportService->getExtraWorksReport($dateFrom ?: null, $dateTo ?: null);
+            JsonResponse::success($data);
+        } catch (\Exception $e) {
+            JsonResponse::error($e->getMessage(), 400);
         }
     }
 }

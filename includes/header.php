@@ -176,6 +176,8 @@ if (!isset($page_title)) {
                         </a>
                         <div class="mobile-submenu d-lg-none">
                             <a class="dropdown-item" href="<?php echo BASE_URL; ?>reports/harvests">Отборы</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>reports/expenses">Затраты</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>reports/extra-works">Доп. работы</a>
                         </div>
                     </li>
                     <li class="nav-item">
@@ -355,6 +357,20 @@ if (!isset($page_title)) {
                         <span class="submenu-info">
                             <span class="submenu-title">Рост посадок</span>
                             <span class="submenu-desc">График средней навески</span>
+                        </span>
+                    </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>reports/expenses">
+                        <span class="submenu-icon"><i class="bi bi-currency-dollar"></i></span>
+                        <span class="submenu-info">
+                            <span class="submenu-title">Затраты</span>
+                            <span class="submenu-desc">Отчёт о расходах</span>
+                        </span>
+                    </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>reports/extra-works">
+                        <span class="submenu-icon"><i class="bi bi-briefcase"></i></span>
+                        <span class="submenu-info">
+                            <span class="submenu-title">Доп. работы</span>
+                            <span class="submenu-desc">Отчёт о дополнительных работах</span>
                         </span>
                     </a>
                 </div>

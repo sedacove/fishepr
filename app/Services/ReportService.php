@@ -328,6 +328,96 @@ class ReportService
     }
 
     /**
+     * Отчёт по затратам (расходы finance_expenses).
+     * Опционально фильтр по датам record_date.
+     *
+     * @param string|null $dateFrom YYYY-MM-DD или null
+     * @param string|null $dateTo   YYYY-MM-DD или null
+     * @return array { items: array, total: float }
+     */
+    public function getExpensesReport(?string $dateFrom, ?string $dateTo): array
+    {
+        if ($dateFrom && !$this->isValidDate($dateFrom)) {
+            throw new \InvalidArgumentException('Неверный формат даты «с»');
+        }
+        if ($dateTo && !$this->isValidDate($dateTo)) {
+            throw new \InvalidArgumentException('Неверный формат даты «по»');
+        }
+
+        $where = [];
+        $params = [];
+        if ($dateFrom) {
+            $where[] = 'record_date >= ?';
+            $params[] = $dateFrom;
+        }
+        if ($dateTo) {
+            $where[] = 'record_date <= ?';
+            $params[] = $dateTo;
+        }
+        $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $stmt = $this->pdo->prepare(
+            "SELECT id, record_date, title, amount, comment FROM finance_expenses {$whereSql} ORDER BY record_date ASC, id ASC"
+        );
+        $stmt->execute($params);
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        $total = 0.0;
+        foreach ($items as &$row) {
+            $row['amount'] = (float)$row['amount'];
+            $total += $row['amount'];
+        }
+        return ['items' => $items, 'total' => $total];
+    }
+
+    /**
+     * Отчёт по дополнительным работам (extra_works).
+     * Опционально фильтр по датам work_date.
+     *
+     * @param string|null $dateFrom YYYY-MM-DD или null
+     * @param string|null $dateTo   YYYY-MM-DD или null
+     * @return array { items: array, total: float }
+     */
+    public function getExtraWorksReport(?string $dateFrom, ?string $dateTo): array
+    {
+        if ($dateFrom && !$this->isValidDate($dateFrom)) {
+            throw new \InvalidArgumentException('Неверный формат даты «с»');
+        }
+        if ($dateTo && !$this->isValidDate($dateTo)) {
+            throw new \InvalidArgumentException('Неверный формат даты «по»');
+        }
+
+        $where = [];
+        $params = [];
+        if ($dateFrom) {
+            $where[] = 'work_date >= ?';
+            $params[] = $dateFrom;
+        }
+        if ($dateTo) {
+            $where[] = 'work_date <= ?';
+            $params[] = $dateTo;
+        }
+        $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $stmt = $this->pdo->prepare(
+            "SELECT ew.id, ew.work_date, ew.title, ew.description, ew.amount, ew.is_paid, ew.paid_at,
+                    u.full_name AS assigned_name
+             FROM extra_works ew
+             LEFT JOIN users u ON u.id = ew.assigned_to
+             {$whereSql}
+             ORDER BY ew.work_date ASC, ew.id ASC"
+        );
+        $stmt->execute($params);
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        $total = 0.0;
+        foreach ($items as &$row) {
+            $row['amount'] = (float)$row['amount'];
+            $row['is_paid'] = (bool)($row['is_paid'] ?? false);
+            $total += $row['amount'];
+        }
+        return ['items' => $items, 'total' => $total];
+    }
+
+    /**
      * Проверяет валидность даты в формате YYYY-MM-DD
      * 
      * @param string $date Дата для проверки
