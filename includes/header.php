@@ -178,6 +178,7 @@ if (!isset($page_title)) {
                             <a class="dropdown-item" href="<?php echo BASE_URL; ?>reports/harvests">Отборы</a>
                             <a class="dropdown-item" href="<?php echo BASE_URL; ?>reports/expenses">Затраты</a>
                             <a class="dropdown-item" href="<?php echo BASE_URL; ?>reports/extra-works">Доп. работы</a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>reports/mortality-by-duty">Падежи по дежурным</a>
                         </div>
                     </li>
                     <li class="nav-item">
@@ -371,6 +372,13 @@ if (!isset($page_title)) {
                         <span class="submenu-info">
                             <span class="submenu-title">Доп. работы</span>
                             <span class="submenu-desc">Отчёт о дополнительных работах</span>
+                        </span>
+                    </a>
+                    <a class="submenu-link" href="<?php echo BASE_URL; ?>reports/mortality-by-duty">
+                        <span class="submenu-icon"><i class="bi bi-bar-chart"></i></span>
+                        <span class="submenu-info">
+                            <span class="submenu-title">Падежи по дежурным</span>
+                            <span class="submenu-desc">Сумма падежа по сотрудникам</span>
                         </span>
                     </a>
                 </div>

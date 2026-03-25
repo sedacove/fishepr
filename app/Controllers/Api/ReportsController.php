@@ -52,6 +52,9 @@ class ReportsController
             case 'extra_works':
                 $this->getExtraWorksReport();
                 break;
+            case 'mortality_by_duty':
+                $this->getMortalityByDutyReport();
+                break;
             default:
                 JsonResponse::error('Неизвестное действие', 400);
         }
@@ -146,6 +149,18 @@ class ReportsController
         $dateTo = $_GET['date_to'] ?? null;
         try {
             $data = $this->reportService->getExtraWorksReport($dateFrom ?: null, $dateTo ?: null);
+            JsonResponse::success($data);
+        } catch (\Exception $e) {
+            JsonResponse::error($e->getMessage(), 400);
+        }
+    }
+
+    private function getMortalityByDutyReport(): void
+    {
+        $dateFrom = $_GET['date_from'] ?? null;
+        $dateTo = $_GET['date_to'] ?? null;
+        try {
+            $data = $this->reportService->getMortalityByDutyReport($dateFrom ?: null, $dateTo ?: null);
             JsonResponse::success($data);
         } catch (\Exception $e) {
             JsonResponse::error($e->getMessage(), 400);

@@ -112,5 +112,21 @@ class ReportsController extends Controller
             'extra_styles' => ['assets/css/pages/reports.css'],
         ]);
     }
+
+    /**
+     * Страница отчёта по падежам в разрезе дежурных
+     */
+    public function mortalityByDuty(): string
+    {
+        requireAuth();
+        if (!isAdmin()) {
+            http_response_code(403);
+            return 'Доступ запрещен';
+        }
+        return $this->view('reports/mortality_by_duty', [
+            'page_title' => 'Падежи в разрезе дежурных',
+            'extra_styles' => ['assets/css/pages/reports.css'],
+        ]);
+    }
 }
 

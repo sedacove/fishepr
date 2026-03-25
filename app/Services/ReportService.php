@@ -418,6 +418,129 @@ class ReportService
     }
 
     /**
+     * Отчёт по падежам в разрезе дежурных (mortality.created_by).
+     * Показывает суммарный падеж (кг/шт) по каждому дежурному за период.
+     * Включает пользователей с deleted_at (удалённых из системы).
+     *
+     * @param string|null $dateFrom YYYY-MM-DD или null
+     * @param string|null $dateTo   YYYY-MM-DD или null
+     * @return array { items: array, totals: array }
+     */
+    public function getMortalityByDutyReport(?string $dateFrom, ?string $dateTo): array
+    {
+        if ($dateFrom && !$this->isValidDate($dateFrom)) {
+            throw new \InvalidArgumentException('Неверный формат даты "с"');
+        }
+        if ($dateTo && !$this->isValidDate($dateTo)) {
+            throw new \InvalidArgumentException('Неверный формат даты "по"');
+        }
+
+        $mortWhere = [];
+        $mortParams = [];
+        if ($dateFrom) {
+            $mortWhere[] = 'DATE(m.recorded_at) >= ?';
+            $mortParams[] = $dateFrom;
+        }
+        if ($dateTo) {
+            $mortWhere[] = 'DATE(m.recorded_at) <= ?';
+            $mortParams[] = $dateTo;
+        }
+        $mortWhereSql = $mortWhere ? 'WHERE ' . implode(' AND ', $mortWhere) : '';
+
+        $dutyWhere = [];
+        $dutyParams = [];
+        if ($dateFrom) {
+            $dutyWhere[] = 'ds.date >= ?';
+            $dutyParams[] = $dateFrom;
+        }
+        if ($dateTo) {
+            $dutyWhere[] = 'ds.date <= ?';
+            $dutyParams[] = $dateTo;
+        }
+        $dutyWhereSql = $dutyWhere ? 'WHERE ' . implode(' AND ', $dutyWhere) : '';
+
+        // Считаем падежи по created_by и подмешиваем количество дежурств (duty_schedule) за тот же период.
+        // Пользователи могут быть удалены (deleted_at), поэтому users присоединяем без фильтров.
+        $sql = "
+            SELECT
+                ma.duty_id,
+                u.login AS duty_login,
+                u.full_name AS duty_name,
+                u.deleted_at AS duty_deleted_at,
+                ma.total_weight_kg,
+                ma.total_fish_count,
+                COALESCE(sa.shifts_count, 0) AS shifts_count
+            FROM (
+                SELECT
+                    m.created_by AS duty_id,
+                    SUM(m.weight) AS total_weight_kg,
+                    SUM(m.fish_count) AS total_fish_count
+                FROM mortality m
+                {$mortWhereSql}
+                GROUP BY m.created_by
+            ) ma
+            LEFT JOIN (
+                SELECT
+                    ds.user_id AS duty_id,
+                    COUNT(*) AS shifts_count
+                FROM duty_schedule ds
+                {$dutyWhereSql}
+                GROUP BY ds.user_id
+            ) sa ON sa.duty_id = ma.duty_id
+            LEFT JOIN users u ON u.id = ma.duty_id
+            ORDER BY ma.total_fish_count DESC, ma.total_weight_kg DESC
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(array_merge($mortParams, $dutyParams));
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+        $items = [];
+        $sumWeight = 0.0;
+        $sumCount = 0;
+        $sumShifts = 0;
+        foreach ($rows as $row) {
+            $weight = (float)($row['total_weight_kg'] ?? 0);
+            $count = (int)($row['total_fish_count'] ?? 0);
+            $shifts = (int)($row['shifts_count'] ?? 0);
+            $sumWeight += $weight;
+            $sumCount += $count;
+            $sumShifts += $shifts;
+
+            $displayName = trim((string)($row['duty_name'] ?? ''));
+            if ($displayName === '') {
+                $displayName = trim((string)($row['duty_login'] ?? ''));
+            }
+            if ($displayName === '') {
+                $displayName = 'Пользователь #' . (int)$row['duty_id'];
+            }
+
+            $items[] = [
+                'duty_id' => (int)$row['duty_id'],
+                'duty_name' => $displayName,
+                'duty_login' => $row['duty_login'],
+                'is_deleted' => !empty($row['duty_deleted_at']),
+                'total_weight_kg' => $weight,
+                'total_fish_count' => $count,
+                'shifts_count' => $shifts,
+                'avg_weight_kg_per_shift' => $shifts > 0 ? ($weight / $shifts) : null,
+                'avg_fish_count_per_shift' => $shifts > 0 ? ($count / $shifts) : null,
+            ];
+        }
+
+        return [
+            'items' => $items,
+            'totals' => [
+                'total_weight_kg' => $sumWeight,
+                'total_fish_count' => $sumCount,
+                'total_shifts_count' => $sumShifts,
+                'avg_weight_kg_per_shift' => $sumShifts > 0 ? ($sumWeight / $sumShifts) : null,
+                'avg_fish_count_per_shift' => $sumShifts > 0 ? ($sumCount / $sumShifts) : null,
+            ],
+        ];
+    }
+
+    /**
      * Проверяет валидность даты в формате YYYY-MM-DD
      * 
      * @param string $date Дата для проверки

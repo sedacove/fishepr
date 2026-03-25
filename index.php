@@ -37,6 +37,7 @@ $router->get('/reports/harvests', 'ReportsController@harvests');
 $router->get('/reports/planting-growth', 'ReportsController@plantingGrowth');
 $router->get('/reports/expenses', 'ReportsController@expenses');
 $router->get('/reports/extra-works', 'ReportsController@extraWorks');
+$router->get('/reports/mortality-by-duty', 'ReportsController@mortalityByDuty');
 
 try {
     $response = $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
