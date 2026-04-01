@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Repositories\CounterpartyRepository;
 use App\Repositories\PlantingRepository;
+use PDO;
 
 require_once __DIR__ . '/../../includes/auth.php';
 
@@ -15,15 +16,16 @@ require_once __DIR__ . '/../../includes/auth.php';
  */
 class ReportsController extends Controller
 {
+    private PDO $pdo;
     private CounterpartyRepository $counterparties;
     private PlantingRepository $plantings;
 
     public function __construct()
     {
         require_once __DIR__ . '/../../config/database.php';
-        $pdo = getDBConnection();
-        $this->counterparties = new CounterpartyRepository($pdo);
-        $this->plantings = new PlantingRepository($pdo);
+        $this->pdo = getDBConnection();
+        $this->counterparties = new CounterpartyRepository($this->pdo);
+        $this->plantings = new PlantingRepository($this->pdo);
     }
 
     /**
@@ -107,8 +109,18 @@ class ReportsController extends Controller
             http_response_code(403);
             return 'Доступ запрещен';
         }
+
+        $stmt = $this->pdo->query(
+            "SELECT id, full_name, login
+             FROM users
+             WHERE deleted_at IS NULL AND is_active = 1
+             ORDER BY full_name IS NULL, full_name ASC, login ASC"
+        );
+        $executors = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
         return $this->view('reports/extra_works', [
             'page_title' => 'Отчёт о дополнительных работах',
+            'executors' => $executors,
             'extra_styles' => ['assets/css/pages/reports.css'],
         ]);
     }

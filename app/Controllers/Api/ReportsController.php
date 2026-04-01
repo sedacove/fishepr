@@ -147,8 +147,11 @@ class ReportsController
     {
         $dateFrom = $_GET['date_from'] ?? null;
         $dateTo = $_GET['date_to'] ?? null;
+        $assignedTo = isset($_GET['assigned_to']) && $_GET['assigned_to'] !== ''
+            ? (int)$_GET['assigned_to']
+            : null;
         try {
-            $data = $this->reportService->getExtraWorksReport($dateFrom ?: null, $dateTo ?: null);
+            $data = $this->reportService->getExtraWorksReport($dateFrom ?: null, $dateTo ?: null, $assignedTo);
             JsonResponse::success($data);
         } catch (\Exception $e) {
             JsonResponse::error($e->getMessage(), 400);

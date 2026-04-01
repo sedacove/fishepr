@@ -377,7 +377,7 @@ class ReportService
      * @param string|null $dateTo   YYYY-MM-DD или null
      * @return array { items: array, total: float }
      */
-    public function getExtraWorksReport(?string $dateFrom, ?string $dateTo): array
+    public function getExtraWorksReport(?string $dateFrom, ?string $dateTo, ?int $assignedTo = null): array
     {
         if ($dateFrom && !$this->isValidDate($dateFrom)) {
             throw new \InvalidArgumentException('Неверный формат даты «с»');
@@ -396,10 +396,15 @@ class ReportService
             $where[] = 'work_date <= ?';
             $params[] = $dateTo;
         }
+        if ($assignedTo !== null && $assignedTo > 0) {
+            $where[] = 'ew.assigned_to = ?';
+            $params[] = $assignedTo;
+        }
         $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
         $stmt = $this->pdo->prepare(
             "SELECT ew.id, ew.work_date, ew.title, ew.description, ew.amount, ew.is_paid, ew.paid_at,
+                    ew.assigned_to,
                     u.full_name AS assigned_name
              FROM extra_works ew
              LEFT JOIN users u ON u.id = ew.assigned_to
