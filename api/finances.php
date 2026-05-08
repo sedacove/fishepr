@@ -91,6 +91,19 @@ function requirePost(): void
 function getFilterDates(string $filter): array
 {
     $filter = in_array($filter, ['week', 'month', 'all'], true) ? $filter : 'month';
+
+    $dateFromRaw = trim((string)($_GET['date_from'] ?? ''));
+    $dateToRaw = trim((string)($_GET['date_to'] ?? ''));
+    $dateFrom = $dateFromRaw !== '' ? normalizeDate($dateFromRaw, 'Дата "с"') : null;
+    $dateTo = $dateToRaw !== '' ? normalizeDate($dateToRaw, 'Дата "по"') : null;
+
+    if ($dateFrom !== null || $dateTo !== null) {
+        if ($dateFrom !== null && $dateTo !== null && $dateFrom > $dateTo) {
+            throw new Exception('Дата "с" не может быть позже даты "по"');
+        }
+        return [$dateFrom, $dateTo, 'custom'];
+    }
+
     $startDate = null;
     $endDate = (new DateTimeImmutable('today'))->format('Y-m-d');
 
@@ -101,6 +114,15 @@ function getFilterDates(string $filter): array
     }
 
     return [$startDate, $endDate, $filter];
+}
+
+function normalizeDate(string $value, string $label): string
+{
+    $dt = DateTime::createFromFormat('Y-m-d', $value);
+    if (!$dt || $dt->format('Y-m-d') !== $value) {
+        throw new Exception($label . ': неверный формат даты');
+    }
+    return $value;
 }
 
 function listFinanceRecords(PDO $pdo, string $type): array

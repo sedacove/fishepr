@@ -1,4 +1,6 @@
 let currentFilter = 'month';
+let currentDateFrom = null;
+let currentDateTo = null;
 let expensesPage = 1;
 let incomesPage = 1;
 
@@ -10,10 +12,14 @@ function loadFinances() {
 }
 
 function loadSummary() {
+    const requestData = { action: 'summary', filter: currentFilter };
+    if (currentDateFrom) requestData.date_from = currentDateFrom;
+    if (currentDateTo) requestData.date_to = currentDateTo;
+
     $.ajax({
         url: BASE_URL + 'api/finances.php',
         method: 'GET',
-        data: { action: 'summary', filter: currentFilter },
+        data: requestData,
         dataType: 'json',
         success: function(response) {
             if (response.success) {
@@ -49,10 +55,14 @@ function loadTotalSummary() {
 
 function loadExpenses(page = 1) {
     expensesPage = page;
+    const requestData = { action: 'list_expenses', filter: currentFilter, page: expensesPage };
+    if (currentDateFrom) requestData.date_from = currentDateFrom;
+    if (currentDateTo) requestData.date_to = currentDateTo;
+
     $.ajax({
         url: BASE_URL + 'api/finances.php',
         method: 'GET',
-        data: { action: 'list_expenses', filter: currentFilter, page: expensesPage },
+        data: requestData,
         dataType: 'json',
         success: function(response) {
             if (!response.success) {
@@ -70,10 +80,14 @@ function loadExpenses(page = 1) {
 
 function loadIncomes(page = 1) {
     incomesPage = page;
+    const requestData = { action: 'list_incomes', filter: currentFilter, page: incomesPage };
+    if (currentDateFrom) requestData.date_from = currentDateFrom;
+    if (currentDateTo) requestData.date_to = currentDateTo;
+
     $.ajax({
         url: BASE_URL + 'api/finances.php',
         method: 'GET',
-        data: { action: 'list_incomes', filter: currentFilter, page: incomesPage },
+        data: requestData,
         dataType: 'json',
         success: function(response) {
             if (!response.success) {
@@ -428,6 +442,18 @@ function showAlert(type, message) {
 
 $('#dateFilter').on('change', function() {
     currentFilter = $(this).val();
+    expensesPage = 1;
+    incomesPage = 1;
+    loadFinances();
+});
+
+$('#applyDateRangeBtn').on('click', function() {
+    currentDateFrom = ($('#dateFrom').val() || '').trim() || null;
+    currentDateTo = ($('#dateTo').val() || '').trim() || null;
+    if (currentDateFrom && currentDateTo && currentDateFrom > currentDateTo) {
+        showAlert('warning', 'Дата "с" не может быть позже даты "по"');
+        return;
+    }
     expensesPage = 1;
     incomesPage = 1;
     loadFinances();

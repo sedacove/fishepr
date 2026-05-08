@@ -16,6 +16,11 @@ require_once __DIR__ . '/../../../includes/section_descriptions.php';
                     <option value="month" selected>Текущий месяц</option>
                     <option value="all">Все записи</option>
                 </select>
+                <input type="date" id="dateFrom" class="form-control" placeholder="Дата с" title="Дата с">
+                <input type="date" id="dateTo" class="form-control" placeholder="Дата по" title="Дата по">
+                <button class="btn btn-outline-primary" id="applyDateRangeBtn" type="button">
+                    <i class="bi bi-funnel"></i> Применить
+                </button>
                 <button class="btn btn-success" onclick="openIncomeModal()">
                     <i class="bi bi-plus-circle"></i> Добавить приход
                 </button>
